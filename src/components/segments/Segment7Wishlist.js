@@ -22,6 +22,11 @@ export function Segment7Wishlist({ onComplete }) {
   // Status item yang telah diketuk untuk melihat catatan refleksi Tatwa
   const [revealedNotes, setRevealedNotes] = useState({ 0: true });
 
+  // Status persentase sobekan garis perforasi (0 - 100)
+  const [tearProgress, setTearProgress] = useState(0);
+  const [isTorn, setIsTorn] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
   const handleToggleItem = (idx) => {
     playSfx("pencil-scratch");
     setRevealedNotes((prev) => ({
@@ -30,9 +35,20 @@ export function Segment7Wishlist({ onComplete }) {
     }));
   };
 
-  const handleProceedToClosing = () => {
+  // Interaksi Robek Tiket Boarding Pass Selesai (Zero Buttons)
+  const handleTearComplete = () => {
+    if (isTorn || isTransitioning) return;
+    setIsTorn(true);
+    setIsTransitioning(true);
     playSfx("ticket-tear");
-    onComplete();
+
+    setTimeout(() => {
+      playSfx("paper-swoosh");
+    }, 180);
+
+    setTimeout(() => {
+      onComplete();
+    }, 550);
   };
 
   return (
@@ -40,12 +56,23 @@ export function Segment7Wishlist({ onComplete }) {
       {/* WRAPPER TENGAH TERFOKUS DENGAN KERAPATAN MOBILE OPTIMAL */}
       <div className="w-full max-w-[340px] flex flex-col items-center justify-center gap-2 sm:gap-2.5 my-auto">
 
-        {/* LEMBARAN KERTAS KUNING ROBEK BERGARIS (YELLOW LEGAL PAD - IDENTIK DENGAN KERTAS YANG DITARIK DI SEGMEN 6) */}
-        <div className="w-full max-w-[335px] sm:max-w-[340px] relative z-10 flex flex-col items-center">
+        {/* LEMBARAN KERTAS KUNING ROBEK BERGARIS (YELLOW LEGAL PAD - IDENTIK DENGAN KERTAS DARI SEGMEN 6) */}
+        <motion.div
+          animate={
+            isTransitioning
+              ? {
+                  y: -220,
+                  opacity: 0.15,
+                  transition: { duration: 0.5, ease: "easeInOut" },
+                }
+              : { y: 0, opacity: 1 }
+          }
+          className="w-full max-w-[335px] sm:max-w-[340px] relative z-10 flex flex-col items-center"
+        >
           {/* Selotip Washi Tape Kuning */}
           <div className="w-20 h-3.5 bg-amber-200/70 -rotate-1 shadow-xs border border-amber-300/40 rounded-xs z-30 mb-[-6px] pointer-events-none" />
 
-          <div className="w-full bg-[#FEFCE8] rounded-b-xl border border-[#EADBBD] shadow-[0_15px_40px_rgba(0,0,0,0.2)] relative flex flex-col overflow-hidden text-left paper-shadow pb-3">
+          <div className="w-full bg-[#FEFCE8] rounded-b-xl border border-[#EADBBD] shadow-[0_15px_40px_rgba(0,0,0,0.18)] relative flex flex-col overflow-hidden text-left paper-shadow pb-3">
             {/* Efek Sobekan Kertas Kasar di Tepi Atas (Torn Paper Edge SVG) */}
             <div className="w-full h-4 bg-[#EDE3C8] relative overflow-hidden flex items-end">
               <svg viewBox="0 0 400 20" preserveAspectRatio="none" className="w-full h-3 text-[#FEFCE8] fill-current">
@@ -123,25 +150,135 @@ export function Segment7Wishlist({ onComplete }) {
             </div>
 
             {/* Teks Petunjuk Sentuh di Bawah Kertas */}
-            <div className="px-4 text-center mt-1">
-              <span className="font-sans-ui text-[10px] text-[#8C755E] font-bold">
+            <div className="px-4 text-center mt-0.5">
+              <span className="font-sans-ui text-[9.5px] text-[#8C755E] font-bold">
                 💡 Ketuk tiap rencana untuk membaca catatan refleksi di baliknya
               </span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* 3. TIKET BOARDING PASS TERSELIP (TRANSISI KE SEGMEN 8) */}
-        <div className="w-full max-w-[335px] sm:max-w-[340px] flex flex-col items-center mt-1 z-20">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.96 }}
-            onClick={handleProceedToClosing}
-            className="w-full h-11 rounded-xl bg-gradient-to-r from-[#A83226] via-[#BD3D30] to-[#8F2318] text-white font-sans-ui text-xs font-black shadow-lg flex items-center justify-center gap-2 border border-[#E5A89E]/60 cursor-pointer"
+        {/* 2. GARIS PERFORASI DAN STUB TIKET BOARDING PASS TERPASANG DI BAWAH WISHLIST */}
+        <div className="w-full max-w-[335px] sm:max-w-[340px] relative z-20 flex flex-col items-center">
+          
+          {/* JALUR GARIS PERFORASI PUTUS-PUTUS & SLIDER SOBEK */}
+          <div className="w-full h-7 relative flex items-center justify-between px-2 overflow-hidden my-0.5">
+            {/* Garis Perforasi Bergerigi SVG */}
+            <div className="absolute inset-x-3 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-[#8C6D4F]/60 flex items-center justify-between pointer-events-none">
+              {[...Array(18)].map((_, dotIdx) => (
+                <span
+                  key={`perf-dot-${dotIdx}`}
+                  className={`w-1.5 h-1.5 rounded-full transition-colors duration-150 ${
+                    tearProgress > (dotIdx / 18) * 100
+                      ? "bg-transparent"
+                      : "bg-[#7A5524]/40"
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* TAB SLIDER ROBEK BERGERIGI (DRAGGABLE X) */}
+            <motion.div
+              drag={!isTorn ? "x" : false}
+              dragConstraints={{ left: 0, right: 230 }}
+              dragElastic={0.08}
+              dragSnapToOrigin={!isTorn}
+              onDrag={(e, info) => {
+                const progress = Math.min(100, Math.max(0, (info.offset.x / 230) * 100));
+                setTearProgress(progress);
+              }}
+              onDragEnd={(e, info) => {
+                const progress = (info.offset.x / 230) * 100;
+                if (progress >= 70 || info.velocity.x > 150) {
+                  handleTearComplete();
+                } else {
+                  setTearProgress(0);
+                }
+              }}
+              animate={isTorn ? { x: 230 } : undefined}
+              whileTap={{ scale: 0.96 }}
+              className="absolute left-1 top-1/2 -translate-y-1/2 z-30 cursor-grab active:cursor-grabbing touch-none select-none"
+            >
+              <div className="flex items-center gap-1 bg-[#8C3E2D] text-white px-2 py-0.5 rounded-full border border-amber-300/80 shadow-md shadow-amber-950/20">
+                <span className="text-xs">✂️</span>
+                <span className="font-mono text-[9px] font-black uppercase tracking-tight">
+                  Sobek
+                </span>
+                <span className="text-[9px] font-bold text-amber-200 animate-pulse">➔</span>
+              </div>
+            </motion.div>
+
+            {/* Label Panduan Garis Perforasi di Sisi Kanan */}
+            <span className="ml-auto font-mono text-[8px] font-bold text-[#8C6D4F] uppercase tracking-wider pointer-events-none">
+              Tear Along Line
+            </span>
+          </div>
+
+          {/* STUB TIKET BOARDING PASS MERAH-MARUN DI BAWAH PERFORASI */}
+          <motion.div
+            animate={
+              isTransitioning
+                ? {
+                    y: -160,
+                    scale: 1.04,
+                    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+                  }
+                : {
+                    rotate: tearProgress * 0.05,
+                    y: tearProgress * 0.04,
+                  }
+            }
+            className="w-full bg-[#FFFDF8] rounded-xl border-2 border-[#D8C7B0] shadow-md overflow-hidden relative"
           >
-            <Plane className="w-3.5 h-3.5 text-rose-200" />
-            <span>Buka Tiket Doa Masa Depan & Penutup 🕊️ ➔</span>
-          </motion.button>
+            {/* Header Boarding Pass Mini */}
+            <div className="bg-gradient-to-r from-[#8C3E2D] to-[#6E2E1F] text-white px-3 py-1.5 flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Plane className="w-3 h-3 text-amber-300 rotate-45" />
+                <span className="font-mono text-[8.5px] font-black tracking-widest uppercase text-amber-200">
+                  BOARDING PASS • FLIGHT TO FUTURE
+                </span>
+              </div>
+              <span className="font-mono text-[8px] text-white/80 font-bold">
+                PILKOM-25
+              </span>
+            </div>
+
+            {/* Isi Ringkas Tiket yang Akan Disobek */}
+            <div className="px-3 py-1.5 flex items-center justify-between bg-[#FAF6EE]">
+              <div className="flex flex-col text-left">
+                <span className="font-mono text-[7px] uppercase tracking-wider text-[#8C7A6B] font-bold">
+                  PASSENGER
+                </span>
+                <span className="font-sans-ui text-[11px] font-black text-[#140E0A] leading-tight">
+                  Askiyaa Adiba
+                </span>
+              </div>
+              <div className="flex flex-col text-right">
+                <span className="font-mono text-[7px] uppercase tracking-wider text-[#8C7A6B] font-bold">
+                  DESTINATION
+                </span>
+                <span className="font-sans-ui text-[11px] font-black text-[#1B4D3E] leading-tight">
+                  Masa Depan Bahagia ✨
+                </span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* TEKS PETUNJUK GESTUR SOBEK TIKET (BEBAS TOMBOL) */}
+          <div className="mt-1 text-center pointer-events-none">
+            {!isTorn ? (
+              <span className="font-sans-ui text-[10px] text-[#8C6D4F] font-extrabold flex items-center justify-center gap-1">
+                <span>✂️</span>
+                <span>Geser tab gunting dari kiri ke kanan untuk merobek tiket penerbangan</span>
+              </span>
+            ) : (
+              <span className="font-sans-ui text-[10px] text-emerald-800 font-extrabold flex items-center justify-center gap-1 animate-pulse">
+                <span>✈️</span>
+                <span>Tiket terobek! Menuju doa masa depan...</span>
+              </span>
+            )}
+          </div>
+
         </div>
 
       </div>
