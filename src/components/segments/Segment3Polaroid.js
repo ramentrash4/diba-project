@@ -197,22 +197,29 @@ export function Segment3Polaroid({ onComplete }) {
           /* KONDISI B: TUMPUKAN FOTO AKTIF (FLIP & THROW) */
           <div className="w-full h-full relative flex items-center justify-center">
             
-            {/* Foto-foto di Bawah (Shadow Stack Effect) */}
+            {/* Foto-foto di Bawah (Cascade Spring Entrance & Shadow Stack Effect) */}
             {polaroids.slice(currentIndex + 1, currentIndex + 3).map((subPhoto, subIdx) => {
               const depth = subIdx + 1;
               return (
-                <div
+                <motion.div
                   key={`sub-${subPhoto.id}`}
-                  style={{
-                    transform: `translateY(${depth * 7}px) scale(${1 - depth * 0.04}) rotate(${
-                      subPhoto.rotation * 0.8
-                    }deg)`,
-                    zIndex: 10 - depth,
+                  initial={{ y: 70, opacity: 0, scale: 0.92, rotate: 0 }}
+                  animate={{
+                    y: depth * 7,
+                    scale: 1 - depth * 0.04,
+                    rotate: subPhoto.rotation * 0.8,
+                    opacity: 0.9,
                   }}
-                  className="absolute w-[275px] sm:w-[290px] h-[350px] sm:h-[365px] bg-[#FFFDF8] rounded-sm p-3 border border-[#D5C7B5] shadow-lg pointer-events-none opacity-90 transition-transform"
+                  transition={{
+                    delay: depth * 0.14,
+                    duration: 0.5,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  style={{ zIndex: 10 - depth }}
+                  className="absolute w-[275px] sm:w-[290px] h-[350px] sm:h-[365px] bg-[#FFFDF8] rounded-sm p-3 border border-[#D5C7B5] shadow-lg pointer-events-none"
                 >
                   <div className="w-full h-[215px] sm:h-[230px] bg-[#EBE0D2] rounded-xs relative overflow-hidden opacity-50" />
-                </div>
+                </motion.div>
               );
             })}
 
@@ -405,8 +412,8 @@ export function Segment3Polaroid({ onComplete }) {
             </motion.button>
           </div>
 
-          {/* Teks Bantuan / Hint Ergonomis */}
-          <div className="flex items-center gap-1.5 text-[#5A4839] font-sans-ui text-[10.5px] font-bold mt-0.5">
+          {/* Teks Bantuan / Hint Ergonomis (Murni Petunjuk Non-Clickable) */}
+          <div className="flex items-center gap-1.5 text-[#5A4839] font-sans-ui text-[10.5px] font-bold mt-0.5 select-none pointer-events-none">
             <Sparkles className="w-3 h-3 text-[#8C3E2D]" />
             <span>Geser kartu ke samping atau ketuk tombol untuk membalik</span>
           </div>

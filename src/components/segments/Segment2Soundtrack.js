@@ -142,8 +142,8 @@ export function Segment2Soundtrack({ onComplete }) {
     <section className="w-full h-full flex-1 flex flex-col items-center justify-center p-3 sm:p-4 select-none relative overflow-y-auto scrollbar-none my-auto">
       <motion.div
         initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        animate={isPullingOut ? { opacity: 0.2, y: 70, scale: 0.95 } : { opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.45, ease: "easeInOut" }}
         className="w-full max-w-[345px] flex flex-col items-center my-auto py-1"
       >
         {/* Header Segmen 2 Standout & Jelas */}
@@ -644,8 +644,7 @@ export function Segment2Soundtrack({ onComplete }) {
             >
               {/* KOTAK KASET MIKA JEWEL CASE DENGAN FOTO POLAROID TERSELIP */}
               <div
-                onClick={handlePullPolaroid}
-                className="relative w-full h-[78px] bg-[#1E1712]/90 backdrop-blur-xs rounded-2xl border-2 border-[#524436] p-2.5 shadow-xl flex items-center justify-between cursor-pointer hover:border-amber-400/70 transition-all select-none group overflow-visible"
+                className="relative w-full h-[78px] bg-[#1E1712]/90 backdrop-blur-xs rounded-2xl border-2 border-[#524436] p-2.5 shadow-xl flex items-center justify-between transition-all select-none group overflow-visible"
               >
                 {/* Efek Kilau Mika Akrilik */}
                 <div
@@ -672,25 +671,26 @@ export function Segment2Soundtrack({ onComplete }) {
                   </span>
                 </div>
 
-                {/* Sisi Kanan: Foto Polaroid Mengintip dengan Klip Kertas Emas */}
+                {/* Sisi Kanan: Foto Polaroid Mengintip dengan Klip Kertas Emas (Wajib Ditarik / Diketuk) */}
                 <div className="relative shrink-0 pr-1 z-20">
                   <motion.div
                     layoutId="shared-polaroid-lead"
                     drag="y"
-                    dragConstraints={{ top: -80, bottom: 0 }}
+                    dragConstraints={{ top: -140, bottom: 0 }}
                     dragElastic={0.25}
                     dragSnapToOrigin={true}
                     onDragEnd={(e, info) => {
-                      if (info.offset.y < -35) {
+                      if (info.offset.y < -35 || info.velocity.y < -200) {
                         handlePullPolaroid();
                       }
                     }}
+                    onClick={handlePullPolaroid}
                     animate={
                       isPullingOut
                         ? {
-                            y: -180,
+                            y: -220,
                             scale: 1.5,
-                            rotate: -4,
+                            rotate: 0,
                             opacity: 1,
                             transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
                           }
@@ -701,7 +701,7 @@ export function Segment2Soundtrack({ onComplete }) {
                         ? { repeat: Infinity, duration: 2, ease: "easeInOut" }
                         : undefined
                     }
-                    whileHover={{ scale: 1.05, y: -4 }}
+                    whileHover={{ scale: 1.06, y: -4 }}
                     className="relative w-[76px] h-[64px] bg-[#FFFDF8] rounded-sm p-1 border border-[#D5C7B5] shadow-lg -rotate-3 cursor-grab active:cursor-grabbing flex flex-col justify-between"
                   >
                     {/* Klip Kertas Emas Antik di Sudut */}
@@ -731,11 +731,11 @@ export function Segment2Soundtrack({ onComplete }) {
                 </div>
               </div>
 
-              {/* Teks Bantuan / Hint Berdenyut */}
+              {/* Teks Bantuan / Hint Berdenyut (Murni Petunjuk Visual Non-Clickable) */}
               <motion.div
                 animate={{ y: [0, -2, 0] }}
                 transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-                className="mt-1.5 flex items-center gap-1.5 text-[#3D2E1F] text-[10.5px] font-sans-ui font-bold"
+                className="mt-1.5 flex items-center gap-1.5 text-[#3D2E1F] text-[10.5px] font-sans-ui font-bold select-none pointer-events-none"
               >
                 <Sparkles className="w-3 h-3 text-amber-700" />
                 <span>Tarik foto yang terselip ke atas untuk membuka album foto 📸</span>
