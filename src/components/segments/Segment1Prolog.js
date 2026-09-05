@@ -213,13 +213,12 @@ export function Segment1Prolog({ onComplete }) {
                 </motion.div>
               </div>
 
-              {/* Hint Buka Segel */}
+              {/* Hint Buka Segel (Murni Petunjuk Visual, Tidak Bisa Diklik) */}
               {!isUnsealed && (
                 <motion.div
-                  animate={{ y: [0, -4, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
-                  className="mt-5 px-4 py-2 rounded-full bg-[#1C1510] text-[#FDE39E] font-sans-ui text-xs font-bold shadow-md flex items-center gap-1.5 border border-amber-400/40 cursor-pointer hover:bg-black transition-colors"
-                  onClick={handleOpenEnvelope}
+                  animate={{ y: [0, -3, 0] }}
+                  transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                  className="mt-5 px-4 py-2 rounded-full bg-[#1C1510]/95 text-[#FDE39E] font-sans-ui text-xs font-bold shadow-md flex items-center gap-1.5 border border-amber-400/30 select-none pointer-events-none"
                 >
                   <ArrowUp className="w-3.5 h-3.5 text-amber-300 animate-bounce" />
                   <span>Sentuh atau geser segel lilin merah ke atas ✉️</span>
@@ -282,18 +281,18 @@ export function Segment1Prolog({ onComplete }) {
                 {/* PEMUTAR KASET MINI DILAKBAN WASHI TAPE (OPSI A: PEEL)     */}
                 {/* ========================================================= */}
                 <div className="mt-1 pt-2.5 border-t border-dashed border-[#DAC9B4] flex flex-col items-center relative w-full pointer-events-auto">
-                  
+
                   {/* BODI PEMUTAR KASET MINI (SHARED ELEMENT MORPH) */}
                   <motion.div
                     layoutId="shared-tape-deck"
                     animate={
                       isPeelingTape
                         ? {
-                            scale: 1.18,
-                            y: -42,
-                            boxShadow: "0 30px 60px rgba(0,0,0,0.55)",
-                            transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] },
-                          }
+                          scale: 1.18,
+                          y: -42,
+                          boxShadow: "0 30px 60px rgba(0,0,0,0.55)",
+                          transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] },
+                        }
                         : { scale: 1, y: 0 }
                     }
                     className="relative w-full bg-[#201914] rounded-2xl p-3 border-2 border-[#483B30] shadow-xl flex items-center justify-between overflow-visible group select-none pointer-events-auto text-left"
@@ -312,12 +311,12 @@ export function Segment1Prolog({ onComplete }) {
                       animate={
                         isPeelingTape
                           ? {
-                              x: 140,
-                              rotateZ: 28,
-                              opacity: 0,
-                              scale: 1.15,
-                              transition: { duration: 0.35, ease: "easeOut" },
-                            }
+                            x: 140,
+                            rotateZ: 28,
+                            opacity: 0,
+                            scale: 1.15,
+                            transition: { duration: 0.35, ease: "easeOut" },
+                          }
                           : { x: 0, rotateZ: -1.5 }
                       }
                       whileHover={!isPeelingTape ? { scale: 1.02, y: -1 } : {}}
@@ -399,7 +398,7 @@ export function Segment1Prolog({ onComplete }) {
                     className="mt-2.5 flex items-center gap-1.5 text-[#664C35] text-[10.5px] font-sans-ui font-bold pointer-events-none"
                   >
                     <Sparkles className="w-3 h-3 text-amber-600" />
-                    <span>Tarik / usap selotip lakban ke kanan untuk melepas pemutar 🪄</span>
+                    <span>Tarik / usap selotip lakban ke kanan untuk melepas pemutar </span>
                   </motion.div>
                 </div>
               </motion.div>
