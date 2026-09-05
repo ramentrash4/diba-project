@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { scrapbookData } from "@/data/scrapbookData";
 import { useAudio } from "@/components/audio/AudioProvider";
+import { WashiTape } from "@/components/common/WashiTape";
 
 export function Segment6VoiceNotes({ onComplete }) {
   const { playTrack, pauseTrack, playSfx } = useAudio();
@@ -88,17 +89,17 @@ export function Segment6VoiceNotes({ onComplete }) {
     }
   };
 
-  // Transisi Tarik Kertas Wishlist ke Segmen 7 (Zero Buttons)
+  // Transisi Tarik Kertas Wishlist ke Segmen 7 (Zero Buttons & Menyambung Mulus)
   const handlePullWishlist = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     playSfx("ticket-tear");
     setTimeout(() => {
       playSfx("paper-swoosh");
-    }, 200);
+    }, 150);
     setTimeout(() => {
       onComplete();
-    }, 600);
+    }, 500);
   };
 
   useEffect(() => {
@@ -279,51 +280,113 @@ export function Segment6VoiceNotes({ onComplete }) {
           })}
         </div>
 
-        {/* 3. INTERAKSI TRANSISI KE SEGMEN 7: TARIK KERTAS WISHLIST (ZERO BUTTONS) */}
+        {/* 3. INTERAKSI TRANSISI TANGIBLE KE SEGMEN 7: TARIK LEMBARAN KERTAS WISHLIST */}
         {allVnsRevealed && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="w-full flex flex-col items-center mt-1 z-20"
-          >
-            {/* TAB LEMBARAN KERTAS WISHLIST (KERTAS KUNING ROBEK DENGAN WASHI TAPE) */}
-            <div className="w-full relative flex flex-col items-center">
-              {/* Selotip Washi Tape Kuning */}
-              <div className="w-20 h-3.5 bg-amber-200/70 -rotate-1 shadow-xs border border-amber-300/40 rounded-xs z-20 mb-[-6px] pointer-events-none" />
+          <div className="relative w-full h-[75px] mt-1 z-30 flex justify-center">
+            {/* Latar Belakang Redup saat Kertas Ditarik Naik */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isTransitioning ? 0.8 : 0 }}
+              transition={{ duration: 0.3 }}
+              className="absolute -inset-x-6 -inset-y-[450px] bg-black/80 z-20 pointer-events-none"
+            />
 
-              {/* Kertas Kuning yang Dapat Ditarik ke Atas (Drag Up) */}
-              <motion.div
-                drag="y"
-                dragConstraints={{ top: -70, bottom: 0 }}
-                dragElastic={0.2}
-                onDragEnd={(e, info) => {
-                  if (info.offset.y <= -30 || info.velocity.y < -100) {
-                    handlePullWishlist();
-                  }
-                }}
-                whileHover={{ y: -2 }}
-                className="w-full bg-gradient-to-b from-[#FFF6D6] via-[#FEF0B8] to-[#FCE89C] text-[#2D2013] rounded-t-xl px-3 py-2 border-t-2 border-x-2 border-dashed border-[#DEB853] shadow-[0_-6px_18px_rgba(0,0,0,0.4)] cursor-grab active:cursor-grabbing select-none relative z-10 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-[#8C5D1E]" />
-                  <div className="flex flex-col text-left">
-                    <span className="font-handwriting text-base text-[#24170F] font-black leading-none">
-                      Rencana Tertunda Kita 📝
-                    </span>
-                    <span className="font-mono text-[9px] text-[#7A5524] font-bold">
-                      Sobekan Wishlist Bersama
+            {/* Kertas Kuning Legal Pad Utuh yang Terulur & Bergerak Naik ke Tengah Menjadi Segmen 7 */}
+            <motion.div
+              drag={!isTransitioning ? "y" : false}
+              dragConstraints={{ top: -330, bottom: 0 }}
+              dragElastic={0.1}
+              dragSnapToOrigin={!isTransitioning}
+              onDragEnd={(e, info) => {
+                if (info.offset.y < -45 || info.velocity.y < -120) {
+                  handlePullWishlist();
+                }
+              }}
+              animate={
+                isTransitioning
+                  ? {
+                      y: -330,
+                      scale: 1,
+                      transition: { duration: 0.48, ease: [0.22, 1, 0.36, 1] },
+                    }
+                  : { y: 0 }
+              }
+              className="absolute top-0 w-full max-w-[335px] sm:max-w-[340px] cursor-grab active:cursor-grabbing touch-none select-none z-30 flex flex-col items-center"
+            >
+              {/* Selotip Washi Tape Kuning */}
+              <div className="w-20 h-3.5 bg-amber-200/70 -rotate-1 shadow-xs border border-amber-300/40 rounded-xs z-30 mb-[-6px] pointer-events-none" />
+
+              {/* LEMBARAN KERTAS KUNING ROBEK BERGARIS (YELLOW LEGAL PAD) */}
+              <div className="w-full bg-[#FEFCE8] rounded-b-xl border border-[#EADBBD] shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative flex flex-col overflow-hidden text-left paper-shadow pb-3">
+                {/* Efek Sobekan Kertas Kasar di Tepi Atas (Torn Paper Edge SVG) */}
+                <div className="w-full h-4 bg-[#EDE3C8] relative overflow-hidden flex items-end">
+                  <svg viewBox="0 0 400 20" preserveAspectRatio="none" className="w-full h-3 text-[#FEFCE8] fill-current">
+                    <path d="M0,0 L15,15 L30,3 L45,18 L60,2 L75,16 L90,4 L105,17 L120,3 L135,18 L150,2 L165,16 L180,4 L195,17 L210,3 L225,18 L240,2 L255,16 L270,4 L285,17 L300,3 L315,18 L330,2 L345,16 L360,4 L375,17 L390,3 L400,15 L400,20 L0,20 Z" />
+                  </svg>
+                </div>
+
+                {/* Isolasi Kertas Sage Perekat di Bagian Atas */}
+                <WashiTape color="sage" angle={1} className="absolute top-1 right-8 z-30 pointer-events-none" />
+
+                {/* Garis Margin Merah Buku Kiri */}
+                <div className="absolute left-9 top-4 bottom-0 w-px bg-rose-300 pointer-events-none" />
+
+                {/* HEADER TERPASANG DI KERTAS */}
+                <div className="px-3.5 pt-1.5 pb-1 flex flex-col text-left pl-11">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-handwriting text-xl sm:text-2xl text-[#140E0A] font-black tracking-wide leading-tight">
+                      Rencana Tertunda 📝
+                    </h3>
+                    <span className="font-mono text-[8.5px] text-[#7A5524] font-bold bg-[#8C5D1E]/10 px-1.5 py-0.5 rounded">
+                      Sobekan Wishlist
                     </span>
                   </div>
+                  <p className="font-typewriter text-[10px] text-[#5A4839] font-bold">
+                    Hal-hal yang belum sempat kita lakukan bersama.
+                  </p>
                 </div>
 
-                {/* Indikator Tarik ke Atas */}
-                <div className="flex items-center gap-1 bg-[#8C5D1E]/15 px-2 py-0.5 rounded-full border border-[#8C5D1E]/30 text-[#4D310C] font-sans-ui text-[10px] font-black animate-pulse">
-                  <span>Tarik ke atas ⬆️</span>
+                {/* HANDLE / TAB INDIKATOR TARIK KE ATAS */}
+                <div className="mx-3.5 my-1 py-1 px-3 bg-[#8C5D1E]/10 border border-[#8C5D1E]/25 rounded-full flex items-center justify-center gap-1.5 text-[#5C3A12] font-sans-ui text-[10px] font-black animate-pulse">
+                  <span>⬆️ Tarik kertas ke atas untuk membuka rencana kita ⬆️</span>
                 </div>
-              </motion.div>
-            </div>
-          </motion.div>
+
+                {/* PREVIEW KONTEN DAFTAR WISHLIST */}
+                <div className="p-3.5 pt-1 pl-11 space-y-2.5 relative z-10">
+                  {scrapbookData.wishlist.map((item, idx) => (
+                    <div key={`preview-wish-${idx}`} className="border-b border-[#F0E6CE] pb-2 last:border-0">
+                      <div className="flex items-start gap-2">
+                        <div className="mt-0.5 w-4 h-4 rounded border-2 border-[#8C6D4F] flex items-center justify-center shrink-0 bg-white shadow-2xs">
+                          {idx === 0 ? (
+                            <span className="text-[#8C3E2D] font-black text-xs">✓</span>
+                          ) : (
+                            <div className="w-1.5 h-1.5 rounded-xs bg-[#D8C2A7] opacity-40" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <span className="font-sans-ui text-xs font-black text-[#261B12] leading-snug block">
+                            {item.text}
+                          </span>
+                          {idx === 0 && (
+                            <p className="font-handwriting text-[14px] text-[#1E3A8A] font-bold mt-0.5">
+                              "{item.note}"
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Teks Petunjuk Sentuh di Bawah Kertas */}
+                <div className="px-4 text-center mt-0.5">
+                  <span className="font-sans-ui text-[9.5px] text-[#8C755E] font-bold">
+                    💡 Ketuk tiap rencana untuk membaca catatan refleksi di baliknya
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         )}
 
         {/* 4. PANDUAN INTERAKSI TUNGGAL (RINGKAS & TIDAK REDUNDAN) */}

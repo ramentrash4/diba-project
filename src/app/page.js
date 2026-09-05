@@ -48,7 +48,11 @@ function ScrapbookApp() {
     setIsWhiteoutLocked(true);
   };
 
+  const isDirectPaperTransition =
+    (prevSegment === 6 && currentSegment === 7);
+
   const isMorphTransition =
+    isDirectPaperTransition ||
     (prevSegment === 1 && currentSegment === 2) ||
     (prevSegment === 2 && currentSegment === 1) ||
     (prevSegment === 2 && currentSegment === 3) ||
@@ -75,7 +79,9 @@ function ScrapbookApp() {
             <motion.div
               key={`segment-${currentSegment}`}
               initial={
-                isMorphTransition
+                isDirectPaperTransition
+                  ? { opacity: 1, scale: 1, rotateY: 0 }
+                  : isMorphTransition
                   ? { opacity: 0, scale: 0.98 }
                   : {
                       opacity: 0,
@@ -90,12 +96,17 @@ function ScrapbookApp() {
                 scale: 1,
                 filter: "brightness(1)",
                 transition: {
-                  duration: isMorphTransition ? 0.45 : 0.65,
+                  duration: isDirectPaperTransition ? 0.05 : isMorphTransition ? 0.45 : 0.65,
                   ease: [0.22, 1, 0.36, 1],
                 },
               }}
               exit={
-                isMorphTransition
+                isDirectPaperTransition
+                  ? {
+                      opacity: 0,
+                      transition: { duration: 0.05 },
+                    }
+                  : isMorphTransition
                   ? {
                       opacity: 0,
                       scale: 0.95,
@@ -130,7 +141,7 @@ function ScrapbookApp() {
               <Segment5KacaEmbun onComplete={() => goToNextSegment(6)} />
             )}
             {currentSegment === 6 && (
-              <Segment6VoiceNotes onComplete={() => goToNextSegment(7)} />
+              <Segment6VoiceNotes onComplete={() => goToNextSegment(7, true)} />
             )}
             {currentSegment === 7 && (
               <Segment7Wishlist onComplete={() => goToNextSegment(8)} />
