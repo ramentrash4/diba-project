@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { AudioProvider, useAudio } from "@/components/audio/AudioProvider";
 import { AtmosphereBackdrop } from "@/components/common/AtmosphereBackdrop";
 import { DevNavigator } from "@/components/common/DevNavigator";
@@ -17,24 +17,28 @@ import { Segment8Closing } from "@/components/segments/Segment8Closing";
 
 function ScrapbookApp() {
   const [currentSegment, setCurrentSegment] = useState(1);
+  const [prevSegment, setPrevSegment] = useState(1);
   const [unlockedSegment, setUnlockedSegment] = useState(1);
   const [isStrictLock, setIsStrictLock] = useState(false);
   const [isWhiteoutLocked, setIsWhiteoutLocked] = useState(false);
 
   const { startBgm, fadeOutAll, playSfx } = useAudio();
 
-  // Transisi maju ke segmen berikutnya dengan efek suara membalik lembaran kertas
-  const goToNextSegment = (nextNum) => {
-    playSfx("page-turn");
+  // Transisi maju ke segmen berikutnya
+  const goToNextSegment = (nextNum, isMorph = false) => {
+    if (!isMorph) {
+      playSfx("page-turn");
+    }
+    setPrevSegment(currentSegment);
     if (nextNum > unlockedSegment) {
       setUnlockedSegment(nextNum);
     }
     setCurrentSegment(nextNum);
   };
 
-  // Handler khusus Segmen 1 (Buka Kado/Amplop)
+  // Handler khusus Segmen 1 ke Segmen 2 (Morphing Alami tanpa rotasi buku)
   const handlePrologComplete = () => {
-    goToNextSegment(2);
+    goToNextSegment(2, true);
   };
 
   // Handler akhir: Tutup Lembaran (Segmen 8)
@@ -43,6 +47,9 @@ function ScrapbookApp() {
     fadeOutAll(2500);
     setIsWhiteoutLocked(true);
   };
+
+  const isMorphBetween1And2 =
+    (prevSegment === 1 && currentSegment === 2) || (prevSegment === 2 && currentSegment === 1);
 
   return (
     /* OUTER WRAPPER: Di Desktop bernuansa meja kafe kayu gelap hangat dengan sorotan lampu temaram */
@@ -57,40 +64,52 @@ function ScrapbookApp() {
         {/* Background Atmosfer Dinamis di dalam Frame Mobile (Bayangan Daun & Cahaya Sore) */}
         <AtmosphereBackdrop currentSegment={currentSegment} />
 
-        {/* KONTEN SEGMEN AKTIF DENGAN TRANSISI MEMBALIK LEMBARAN SCRAPBOOK 3D */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`segment-${currentSegment}`}
-            initial={{
-              opacity: 0,
-              rotateY: 25,
-              transformOrigin: "left center",
-              scale: 0.97,
-              filter: "brightness(0.96)",
-            }}
-            animate={{
-              opacity: 1,
-              rotateY: 0,
-              scale: 1,
-              filter: "brightness(1)",
-              transition: {
-                duration: 0.65,
-                ease: [0.22, 1, 0.36, 1], // kurva elastis membalik kertas alami
-              },
-            }}
-            exit={{
-              opacity: 0,
-              rotateY: -25,
-              transformOrigin: "right center",
-              scale: 0.97,
-              filter: "brightness(0.92)",
-              transition: {
-                duration: 0.45,
-                ease: "easeInOut",
-              },
-            }}
-            className="w-full flex-1 flex flex-col justify-center relative z-10"
-          >
+        {/* KONTEN SEGMEN AKTIF DENGAN DUKUNGAN SHARED ELEMENT MORPHING */}
+        <LayoutGroup id="scrapbook-morph-group">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`segment-${currentSegment}`}
+              initial={
+                isMorphBetween1And2
+                  ? { opacity: 0 }
+                  : {
+                      opacity: 0,
+                      rotateY: 25,
+                      transformOrigin: "left center",
+                      scale: 0.97,
+                      filter: "brightness(0.96)",
+                    }
+              }
+              animate={{
+                opacity: 1,
+                rotateY: 0,
+                scale: 1,
+                filter: "brightness(1)",
+                transition: {
+                  duration: isMorphBetween1And2 ? 0.45 : 0.65,
+                  ease: [0.22, 1, 0.36, 1],
+                },
+              }}
+              exit={
+                currentSegment === 1
+                  ? {
+                      opacity: 0,
+                      transition: { duration: 0.3 },
+                    }
+                  : {
+                      opacity: 0,
+                      rotateY: -25,
+                      transformOrigin: "right center",
+                      scale: 0.97,
+                      filter: "brightness(0.92)",
+                      transition: {
+                        duration: 0.45,
+                        ease: "easeInOut",
+                      },
+                    }
+              }
+              className="w-full flex-1 flex flex-col justify-center relative z-10"
+            >
             {currentSegment === 1 && (
               <Segment1Prolog onComplete={handlePrologComplete} />
             )}
@@ -117,6 +136,7 @@ function ScrapbookApp() {
             )}
           </motion.div>
         </AnimatePresence>
+        </LayoutGroup>
 
         {/* Overlay Putih Mutlak Penutup Lembaran (Whiteout Closure) */}
         <AnimatePresence>

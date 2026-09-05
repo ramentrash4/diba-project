@@ -148,7 +148,8 @@ export function Segment2Soundtrack({ onComplete }) {
         </div>
 
         {/* 1. TAPE DECK STEREO RETRO (CASSETTE PLAYER) */}
-        <div
+        <motion.div
+          layoutId="shared-tape-deck"
           ref={dropZoneRef}
           className={`relative w-full rounded-2xl p-3 shadow-2xl border-2 transition-colors duration-300 paper-shadow-lifted flex flex-col justify-between overflow-hidden ${
             isDropTargetActive
@@ -425,7 +426,7 @@ export function Segment2Soundtrack({ onComplete }) {
               <span className="text-xs font-black">⏏</span>
             </motion.button>
           </div>
-        </div>
+        </motion.div>
 
         {/* 4. KARTU CATATAN MEMORI MESIN TIK (MUNCUL SAAT KASET DIMASUKKAN) */}
         <AnimatePresence>
@@ -457,7 +458,12 @@ export function Segment2Soundtrack({ onComplete }) {
         </AnimatePresence>
 
         {/* 5. RAK KASET FISIK (3 SLOT TETAP DENGAN COVER ALBUM & DRAG SNAP TO ORIGIN) */}
-        <div className="w-full mt-3">
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+          className="w-full mt-3"
+        >
           <div className="text-left mb-1.5 px-1 flex items-center justify-between">
             <span className="font-typewriter text-[9.5px] uppercase tracking-wider text-[#4E3F32] font-black">
               Rak Kaset Fisik:
@@ -607,7 +613,7 @@ export function Segment2Soundtrack({ onComplete }) {
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
         {/* 6. TOMBOL LANJUT KE SEGMEN 3 DENGAN TRANSISI MEMBALIK LEMBARAN */}
         <AnimatePresence>

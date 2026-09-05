@@ -61,19 +61,17 @@ export function Segment1Prolog({ onComplete }) {
     }, 500);
   };
 
-  // 2. Alur Transisi Zoom Membesar Menuju Segmen 2 (Page 3)
+  // 2. Alur Transisi Morphing Alami Menuju Segmen 2 (Page 3)
   const handleTriggerZoomTransition = () => {
     if (isZoomingTape) return;
     setIsZoomingTape(true);
 
     playSfx("tape-click");
-    playSfx("paper-swoosh");
 
-    // Efek zoom sinematik 550ms sebelum membalik halaman ke Segmen 2
+    // Washi tape terkelupas 180ms, lalu beralih segmen memicu shared-element morph
     setTimeout(() => {
-      playSfx("page-turn");
       onComplete();
-    }, 550);
+    }, 180);
   };
 
   return (
@@ -244,7 +242,11 @@ export function Segment1Prolog({ onComplete }) {
               }}
               className="w-full flex flex-col items-center pointer-events-auto"
             >
-              <div className="w-full bg-[#FFFDF8] rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#E5DACB] text-[#120C08] relative text-left paper-shadow-lifted z-30 flex flex-col pointer-events-auto">
+              <motion.div
+                animate={isZoomingTape ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1 }}
+                transition={{ duration: 0.2 }}
+                className="w-full bg-[#FFFDF8] rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#E5DACB] text-[#120C08] relative text-left paper-shadow-lifted z-30 flex flex-col pointer-events-auto"
+              >
                 {/* Washi Tape di Sudut Atas Kertas Surat */}
                 <WashiTape color="rose" angle={-2} className="absolute -top-2.5 left-6" />
                 <WashiTape color="sage" angle={2} className="absolute -top-2.5 right-6" />
@@ -281,24 +283,14 @@ export function Segment1Prolog({ onComplete }) {
                 {/* PEMUTAR KASET MINI DILAKBAN WASHI TAPE (KLIK KE PAGE 3)   */}
                 {/* ========================================================= */}
                 <div className="mt-1 pt-2.5 border-t border-dashed border-[#DAC9B4] flex flex-col items-center relative w-full pointer-events-auto">
-                  {/* BUTTON PEMUTAR KASET MINI DENGAN HANDLER KLIK 100% RESPONSIF */}
+                  {/* BUTTON PEMUTAR KASET MINI DENGAN SHARED ELEMENT LAYOUT ID */}
                   <motion.button
+                    layoutId="shared-tape-deck"
                     type="button"
                     onClick={handleTriggerZoomTransition}
-                    whileHover={!isZoomingTape ? { scale: 1.03, y: -2 } : {}}
-                    whileTap={!isZoomingTape ? { scale: 0.96 } : {}}
-                    animate={
-                      isZoomingTape
-                        ? {
-                            scale: [1, 1.25, 2.6],
-                            y: [0, -25, -60],
-                            opacity: [1, 1, 0],
-                            filter: ["brightness(1)", "brightness(1.15)", "brightness(1.3)"],
-                            transition: { duration: 0.55, ease: "easeIn" },
-                          }
-                        : { scale: 1, y: 0, opacity: 1 }
-                    }
-                    className="relative w-full bg-[#201914] rounded-xl p-2.5 border-2 border-[#4A3B2F] shadow-lg cursor-pointer flex items-center justify-between overflow-hidden group select-none pointer-events-auto text-left"
+                    whileHover={!isZoomingTape ? { scale: 1.02, y: -2 } : {}}
+                    whileTap={!isZoomingTape ? { scale: 0.97 } : {}}
+                    className="relative w-full bg-[#201914] rounded-2xl p-3 border-2 border-[#483B30] shadow-xl cursor-pointer flex items-center justify-between overflow-hidden group select-none pointer-events-auto text-left"
                   >
                     {/* LAKBAN WASHI TAPE 1: SUDUT KIRI ATAS */}
                     <motion.div
@@ -383,7 +375,7 @@ export function Segment1Prolog({ onComplete }) {
                     <span>Ketuk pemutar kaset yang dilakban ini untuk mulai memutar</span>
                   </motion.div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
