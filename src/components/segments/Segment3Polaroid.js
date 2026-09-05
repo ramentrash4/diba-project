@@ -1,15 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   RotateCcw,
-  ChevronRight,
-  ChevronLeft,
   Sparkles,
   Camera,
   BookOpen,
-  Heart,
   Paperclip,
 } from "lucide-react";
 import Image from "next/image";
@@ -33,15 +30,18 @@ export function Segment3Polaroid({ onComplete }) {
   // Status apakah pengguna sudah melihat seluruh foto
   const [hasFinishedAll, setHasFinishedAll] = useState(false);
 
+  // Ref untuk mendeteksi apakah pengguna sedang men-drag foto (mencegah flip tidak sengaja)
+  const isDraggingRef = useRef(false);
+
   // Fallback map untuk gambar lokal jika file JPG belum dimasukkan Tatwa
   const getPhotoSrc = (photo, idx) => {
-    // Jika ada file JPG asli, gunakan. Jika tidak, gunakan SVG mockup estetik
     return `/images/polaroids/photo${idx + 1}.svg`;
   };
 
-  // Toggle 3D flip card
+  // Toggle 3D flip card (eksklusif ketukan foto, bukan saat drag)
   const handleToggleFlip = (e) => {
     if (e) e.stopPropagation();
+    if (isDraggingRef.current) return;
     playSfx("card-flip");
     setIsFlipped((prev) => !prev);
   };
@@ -62,16 +62,6 @@ export function Segment3Polaroid({ onComplete }) {
     }, 220);
   };
 
-  // Kembali ke foto sebelumnya
-  const handlePrevPhoto = () => {
-    if (currentIndex > 0) {
-      playSfx("paper-swoosh");
-      setIsFlipped(false);
-      setHasFinishedAll(false);
-      setCurrentIndex((prev) => prev - 1);
-    }
-  };
-
   // Reset putar ulang tumpukan foto dari awal
   const handleResetStack = () => {
     playSfx("paper-swoosh");
@@ -83,7 +73,7 @@ export function Segment3Polaroid({ onComplete }) {
   const currentPhoto = polaroids[currentIndex];
 
   return (
-    <section className="min-h-screen w-full flex flex-col justify-between items-center px-3.5 py-4 select-none relative overflow-hidden">
+    <section className="w-full h-full flex-1 flex flex-col justify-between items-center p-3 sm:p-4 select-none relative overflow-hidden my-auto">
       
       {/* 1. HEADER SEGMEN: JUDUL TULISAN TANGAN & INDIKATOR COUNTER */}
       <div className="w-full max-w-[340px] flex flex-col items-center text-center mt-1 z-20">
@@ -107,15 +97,22 @@ export function Segment3Polaroid({ onComplete }) {
             </span>
             <div className="flex items-center gap-1 ml-1">
               {polaroids.map((_, i) => (
-                <span
+                <button
                   key={`dot-${i}`}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    playSfx("paper-swoosh");
+                    setIsFlipped(false);
+                    setCurrentIndex(i);
+                  }}
+                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
                     i === currentIndex
                       ? "bg-[#8C3E2D] w-3"
                       : i < currentIndex
-                      ? "bg-[#A8947E]"
-                      : "bg-[#D5C7B5]"
+                      ? "bg-[#A8947E] hover:bg-[#8C3E2D] w-1.5"
+                      : "bg-[#D5C7B5] hover:bg-[#A8947E] w-1.5"
                   }`}
+                  title={`Foto ${i + 1}`}
                 />
               ))}
             </div>
@@ -223,7 +220,7 @@ export function Segment3Polaroid({ onComplete }) {
               );
             })}
 
-            {/* FOTO TERATAS AKTIF (DAPAT DI-DRAG, DI-SWIPE, & DI-FLIP) */}
+            {/* FOTO TERATAS AKTIF (DAPAT DI-DRAG, DI-SWIPE, & DI-FLIP LANGSUNG) */}
             <AnimatePresence custom={exitX}>
               <motion.div
                 key={currentPhoto.id}
@@ -231,10 +228,16 @@ export function Segment3Polaroid({ onComplete }) {
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.8}
+                onDragStart={() => {
+                  isDraggingRef.current = true;
+                }}
                 onDragEnd={(e, info) => {
-                  if (info.offset.x > 80 || info.velocity.x > 300) {
+                  setTimeout(() => {
+                    isDraggingRef.current = false;
+                  }, 80);
+                  if (info.offset.x > 70 || info.velocity.x > 250) {
                     handleNextPhoto(1);
-                  } else if (info.offset.x < -80 || info.velocity.x < -300) {
+                  } else if (info.offset.x < -70 || info.velocity.x < -250) {
                     handleNextPhoto(-1);
                   }
                 }}
@@ -308,10 +311,10 @@ export function Segment3Polaroid({ onComplete }) {
                         "{currentPhoto.frontCaption}"
                       </p>
                       
-                      {/* Hint Balik Foto */}
-                      <div className="mt-1 flex items-center gap-1 text-[10px] font-sans-ui text-[#7A6757] font-bold">
-                        <RotateCcw className="w-2.5 h-2.5" />
-                        <span>Ketuk foto untuk baca catatan belakang ✍️</span>
+                      {/* Hint Balik Foto (Non-clickable visual cue) */}
+                      <div className="mt-1 flex items-center justify-center gap-1 text-[10.5px] font-sans-ui text-[#7A6757] font-bold select-none pointer-events-none">
+                        <RotateCcw className="w-2.5 h-2.5 text-[#8C3E2D]" />
+                        <span>Ketuk foto untuk baca catatan ✍️</span>
                       </div>
                     </div>
                   </div>
@@ -347,18 +350,15 @@ export function Segment3Polaroid({ onComplete }) {
                       </p>
                     </div>
 
-                    {/* Tanda Tangan & Tombol Balik Kembali */}
+                    {/* Tanda Tangan & Petunjuk Balik (Murni Visual Non-Clickable) */}
                     <div className="border-t border-[#E0D2C0] pt-2 flex items-center justify-between">
                       <span className="font-handwriting text-sm text-[#1E3A8A] font-bold">
                         — Tatwa ✨
                       </span>
-                      <button
-                        onClick={handleToggleFlip}
-                        className="h-7 px-2 rounded bg-[#EFE4D6] hover:bg-[#E5D7C5] text-[#3D2E1F] font-sans-ui text-[10px] font-black flex items-center gap-1 border border-[#D5C7B5] cursor-pointer"
-                      >
-                        <RotateCcw className="w-2.5 h-2.5" />
-                        <span>Balik ke foto</span>
-                      </button>
+                      <div className="flex items-center gap-1 text-[10.5px] font-sans-ui text-[#7A6757] font-bold select-none pointer-events-none">
+                        <RotateCcw className="w-2.5 h-2.5 text-[#8C3E2D]" />
+                        <span>Ketuk untuk balik ke foto</span>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -368,56 +368,26 @@ export function Segment3Polaroid({ onComplete }) {
         )}
       </div>
 
-      {/* 3. PANEL TOMBOL NAVIGASI & KONTROL ERGONOMIS (TOUCH TARGET >= 40PX) */}
+      {/* 3. PANDUAN INTERAKSI FISIK SKEUOMORFIK (MURNI PANDUAN NON-CLICKABLE) */}
       {!hasFinishedAll && (
-        <div className="w-full max-w-[340px] flex flex-col items-center gap-2 mb-1 z-20">
-          {/* Tombol Aksi Sentuh (Balik Kartu & Foto Berikutnya) */}
-          <div className="w-full flex items-center justify-between gap-2 px-1">
-            {/* Tombol Sebelumnya (Opsional jika bukan foto pertama) */}
-            {currentIndex > 0 ? (
-              <motion.button
-                whileTap={{ scale: 0.94 }}
-                onClick={handlePrevPhoto}
-                className="h-10 px-3 rounded-xl bg-[#FFFDF8] hover:bg-[#F5ECE0] text-[#3D2E1F] border border-[#C5B49E] font-sans-ui text-xs font-black shadow-2xs flex items-center gap-1 cursor-pointer"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span>Sebelumnya</span>
-              </motion.button>
-            ) : (
-              <div className="w-20" />
-            )}
-
-            {/* Tombol Balik Kartu Tengah */}
-            <motion.button
-              whileTap={{ scale: 0.94 }}
-              onClick={handleToggleFlip}
-              className={`h-10 px-4 rounded-xl font-sans-ui text-xs font-black shadow-md flex items-center gap-1.5 border cursor-pointer transition-colors ${
-                isFlipped
-                  ? "bg-[#3D2E1C] text-amber-200 border-amber-500/60 hover:bg-[#4E3B24]"
-                  : "bg-[#FFFDF8] hover:bg-[#F5ECE0] text-[#140E0A] border-[#C5B49E]"
-              }`}
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>{isFlipped ? "Lihat Foto Depan" : "Balik Kartu ✍️"}</span>
-            </motion.button>
-
-            {/* Tombol Foto Berikutnya / Geser */}
-            <motion.button
-              whileTap={{ scale: 0.94 }}
-              onClick={() => handleNextPhoto(1)}
-              className="h-10 px-3.5 rounded-xl bg-[#8C3E2D] hover:bg-[#773324] text-white border border-[#6B281A] font-sans-ui text-xs font-black shadow-md flex items-center gap-1 cursor-pointer"
-            >
-              <span>{currentIndex + 1 === polaroids.length ? "Selesai" : "Foto Berikutnya"}</span>
-              <ChevronRight className="w-4 h-4" />
-            </motion.button>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="w-full max-w-[325px] flex flex-col items-center mt-2 mb-1 z-20 select-none pointer-events-none"
+        >
+          <div className="w-full bg-[#EFE4D6]/95 border border-[#D5C7B5] rounded-xl px-3 py-2 shadow-xs flex items-center justify-around text-[#3A281A] font-sans-ui text-[11px] sm:text-[11.5px] font-bold">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">👆</span>
+              <span>Ketuk foto untuk membalik</span>
+            </div>
+            <span className="text-[#B5A38E]">•</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">👉</span>
+              <span>Geser untuk foto berikutnya</span>
+            </div>
           </div>
-
-          {/* Teks Bantuan / Hint Ergonomis (Murni Petunjuk Non-Clickable) */}
-          <div className="flex items-center gap-1.5 text-[#5A4839] font-sans-ui text-[10.5px] font-bold mt-0.5 select-none pointer-events-none">
-            <Sparkles className="w-3 h-3 text-[#8C3E2D]" />
-            <span>Geser kartu ke samping atau ketuk tombol untuk membalik</span>
-          </div>
-        </div>
+        </motion.div>
       )}
     </section>
   );
