@@ -51,8 +51,14 @@ function ScrapbookApp() {
   const isDirectPaperTransition =
     (prevSegment === 6 && currentSegment === 7);
 
+  const isDirectBoardingPassTransition =
+    (prevSegment === 7 && currentSegment === 8);
+
+  const isDirectSeamlessTransition =
+    isDirectPaperTransition || isDirectBoardingPassTransition;
+
   const isMorphTransition =
-    isDirectPaperTransition ||
+    isDirectSeamlessTransition ||
     (prevSegment === 1 && currentSegment === 2) ||
     (prevSegment === 2 && currentSegment === 1) ||
     (prevSegment === 2 && currentSegment === 3) ||
@@ -79,7 +85,7 @@ function ScrapbookApp() {
             <motion.div
               key={`segment-${currentSegment}`}
               initial={
-                isDirectPaperTransition
+                isDirectSeamlessTransition
                   ? { opacity: 1, scale: 1, rotateY: 0 }
                   : isMorphTransition
                   ? { opacity: 0, scale: 0.98 }
@@ -96,12 +102,12 @@ function ScrapbookApp() {
                 scale: 1,
                 filter: "brightness(1)",
                 transition: {
-                  duration: isDirectPaperTransition ? 0.05 : isMorphTransition ? 0.45 : 0.65,
+                  duration: isDirectSeamlessTransition ? 0.05 : isMorphTransition ? 0.45 : 0.65,
                   ease: [0.22, 1, 0.36, 1],
                 },
               }}
               exit={
-                isDirectPaperTransition
+                isDirectSeamlessTransition
                   ? {
                       opacity: 0,
                       transition: { duration: 0.05 },
@@ -144,7 +150,7 @@ function ScrapbookApp() {
               <Segment6VoiceNotes onComplete={() => goToNextSegment(7, true)} />
             )}
             {currentSegment === 7 && (
-              <Segment7Wishlist onComplete={() => goToNextSegment(8)} />
+              <Segment7Wishlist onComplete={() => goToNextSegment(8, true)} />
             )}
             {currentSegment === 8 && (
               <Segment8Closing onFinalLock={handleFinalClosure} />
