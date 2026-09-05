@@ -4,8 +4,9 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CloudRain,
-  Sparkles,
   Droplets,
+  Wind,
+  Sparkles,
 } from "lucide-react";
 import { scrapbookData } from "@/data/scrapbookData";
 import { useAudio } from "@/components/audio/AudioProvider";
@@ -17,14 +18,17 @@ export function Segment5KacaEmbun({ onComplete }) {
   // Jendela memori yang aktif saat ini (0, 1, 2)
   const [activeTab, setActiveTab] = useState(0);
 
-  // Arah perpindahan jendela ('next' | 'prev') untuk animasi geser
-  const [slideDirection, setSlideDirection] = useState("next");
-
   // Status bersihnya embun untuk tiap jendela
   const [clearedTabs, setClearedTabs] = useState({ 0: false, 1: false, 2: false });
 
   // Persentase embun yang terhapus pada jendela saat ini
   const [clearedPercent, setClearedPercent] = useState(0);
+
+  // Status transisi uap dingin mengembun kembali (Re-Frosting)
+  const [isReFrosting, setIsReFrosting] = useState(false);
+
+  // Status transisi penyelesaian ke Segmen 6
+  const [isFinishing, setIsFinishing] = useState(false);
 
   const canvasRef = useRef(null);
   const isDrawing = useRef(false);
@@ -41,7 +45,6 @@ export function Segment5KacaEmbun({ onComplete }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Reset transformasi dan ukuran
     const width = canvas.width;
     const height = canvas.height;
 
@@ -58,14 +61,14 @@ export function Segment5KacaEmbun({ onComplete }) {
     ctx.fillRect(0, 0, width, height);
 
     // Butiran-butiran air embun dingin realistis
-    for (let i = 0; i < 75; i++) {
+    for (let i = 0; i < 85; i++) {
       const rx = (Math.sin(i * 99 + activeTab * 17) * 0.5 + 0.5) * width;
       const ry = (Math.cos(i * 33 + activeTab * 11) * 0.5 + 0.5) * height;
       const radius = 1.5 + (i % 3);
 
       ctx.beginPath();
       ctx.arc(rx, ry, radius, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.45)";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.48)";
       ctx.fill();
     }
 
@@ -131,19 +134,21 @@ export function Segment5KacaEmbun({ onComplete }) {
   };
 
   const startWiping = (e) => {
+    if (isCurrentCleared || isReFrosting || isFinishing) return;
     isDrawing.current = true;
     lastPoint.current = getCanvasCoordinates(e);
     wipe(e);
   };
 
   const stopWiping = () => {
+    if (!isDrawing.current) return;
     isDrawing.current = false;
     lastPoint.current = null;
     checkClearedPercentage();
   };
 
   const wipe = (e) => {
-    if (!isDrawing.current) return;
+    if (!isDrawing.current || isCurrentCleared || isReFrosting || isFinishing) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -175,53 +180,32 @@ export function Segment5KacaEmbun({ onComplete }) {
     lastPoint.current = currentPoint;
   };
 
-  // Navigasi geser kaca ke hal kecil berikutnya (Zero Buttons)
-  const handleNextWindow = () => {
+  // Transisi Re-Frosting: Ketuk kaca bersih untuk mengembunkan kembali uap dingin baru
+  const handleTapGlass = () => {
+    if (!isCurrentCleared || isReFrosting || isFinishing) return;
+
     if (activeTab + 1 < memories.length) {
+      // Masih ada kaca berikutnya -> Uap dingin mengembun kembali
+      setIsReFrosting(true);
       playSfx("mist-wipe");
-      setSlideDirection("next");
-      setActiveTab((prev) => prev + 1);
+
+      // Setengah jalan saat uap menutup kaca: ganti memori
+      setTimeout(() => {
+        setActiveTab((prev) => prev + 1);
+      }, 350);
+
+      // Selesaikan animasi uap mengembun
+      setTimeout(() => {
+        setIsReFrosting(false);
+      }, 700);
     } else {
-      // Pada kaca terakhir, geser mengalirkan transisi ke Segmen 6 (Voice Notes)
+      // Kaca terakhir (Hal Kecil #3) -> Transisi membuka jendela kafe ke Segmen 6
+      setIsFinishing(true);
       playSfx("paper-swoosh");
-      onComplete();
+      setTimeout(() => {
+        onComplete();
+      }, 1200);
     }
-  };
-
-  // Navigasi geser kaca ke hal kecil sebelumnya
-  const handlePrevWindow = () => {
-    if (activeTab > 0) {
-      playSfx("mist-wipe");
-      setSlideDirection("prev");
-      setActiveTab((prev) => prev - 1);
-    }
-  };
-
-  // Varian animasi pergantian jendela kaca
-  const windowVariants = {
-    enter: (dir) => ({
-      x: dir === "next" ? 60 : -60,
-      opacity: 0,
-      scale: 0.96,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.38,
-        ease: [0.22, 1, 0.36, 1],
-      },
-    },
-    exit: (dir) => ({
-      x: dir === "next" ? -60 : 60,
-      opacity: 0,
-      scale: 0.96,
-      transition: {
-        duration: 0.28,
-        ease: [0.4, 0, 0.2, 1],
-      },
-    }),
   };
 
   return (
@@ -240,7 +224,7 @@ export function Segment5KacaEmbun({ onComplete }) {
             Hal-hal Kecil Tentangmu ✨
           </h2>
 
-          {/* Indikator Posisi Jendela Kaca (Murni Visual Dots, Bukan Tombol) */}
+          {/* Indikator Posisi Kaca Memori (Murni Visual Dots, Bukan Tombol) */}
           <div className="mt-1 flex items-center gap-1.5 bg-black/40 px-3 py-1 rounded-full border border-white/10 shadow-xs">
             <span className="font-mono text-[10px] font-black text-blue-200/80">
               Kaca 0{activeTab + 1} / 0{memories.length}
@@ -249,7 +233,7 @@ export function Segment5KacaEmbun({ onComplete }) {
               {memories.map((_, i) => (
                 <div
                   key={`dot-${i}`}
-                  className={`h-1.5 rounded-full transition-all ${
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
                     i === activeTab
                       ? "bg-amber-400 w-3"
                       : clearedTabs[i]
@@ -262,96 +246,97 @@ export function Segment5KacaEmbun({ onComplete }) {
           </div>
         </div>
 
-        {/* 2. BINGKAI JENDELA KACA BEREMBUN INTERAKTIF DENGAN DUKUNGAN SWIPE (ZERO BUTTONS) */}
-        <div className="w-full max-w-[320px] sm:max-w-[335px] h-[375px] sm:h-[390px] relative z-10 flex flex-col items-center justify-center">
-          <AnimatePresence mode="wait" custom={slideDirection}>
-            <motion.div
-              key={`window-${activeTab}`}
-              custom={slideDirection}
-              variants={windowVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              drag={isCurrentCleared ? "x" : false}
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.35}
-              onDragEnd={(e, info) => {
-                if (info.offset.x < -35 || info.velocity.x < -120) {
-                  handleNextWindow();
-                } else if (info.offset.x > 35 || info.velocity.x > 120) {
-                  handlePrevWindow();
-                }
-              }}
-              className="w-full h-full bg-[#1F1711] rounded-2xl p-2.5 sm:p-3 border-4 border-[#3D2E24] shadow-[0_22px_55px_rgba(0,0,0,0.85)] relative flex flex-col justify-between overflow-hidden cursor-default select-none"
-            >
-              {/* Siluet Tetesan Air Hujan di Luar Kaca */}
-              <div className="absolute inset-0 bg-radial from-blue-900/25 via-transparent to-black/60 pointer-events-none z-0" />
+        {/* 2. BINGKAI JENDELA KACA BEREMBUN (KOKOH DI TENGAH, BEBAS GESER KARTU, RE-FROSTING TACTILE) */}
+        <div
+          onClick={handleTapGlass}
+          className={`w-full max-w-[320px] sm:max-w-[335px] h-[375px] sm:h-[390px] relative z-10 flex flex-col items-center justify-center bg-[#1F1711] rounded-2xl p-2.5 sm:p-3 border-4 border-[#3D2E24] shadow-[0_22px_55px_rgba(0,0,0,0.85)] select-none transition-all duration-300 ${
+            isCurrentCleared ? "cursor-pointer ring-2 ring-amber-400/40" : "cursor-default"
+          }`}
+        >
+          {/* Siluet Tetesan Air Hujan di Luar Kaca */}
+          <div className="absolute inset-0 bg-radial from-blue-900/25 via-transparent to-black/60 pointer-events-none z-0" />
 
-              {/* KONTEN TERSEMBUNYI DI BALIK KACA (TEKS MEMORI TULISAN TANGAN) */}
-              <div className="w-full h-full bg-gradient-to-b from-[#1C2536] to-[#0F1622] rounded-xl p-4 sm:p-5 border border-white/15 flex flex-col justify-between text-center relative overflow-hidden z-10">
-                {/* Header Mini di Balik Kaca */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                  <span className="font-mono text-[9px] text-amber-300 font-bold uppercase tracking-wider">
-                    {currentItem.title}
-                  </span>
-                  <Droplets className="w-3.5 h-3.5 text-blue-300/80" />
-                </div>
+          {/* KONTEN TERSEMBUNYI DI BALIK KACA (TEKS MEMORI TULISAN TANGAN) */}
+          <div className="w-full h-full bg-gradient-to-b from-[#1C2536] to-[#0F1622] rounded-xl p-4 sm:p-5 border border-white/15 flex flex-col justify-between text-center relative overflow-hidden z-10">
+            {/* Header Mini di Balik Kaca */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+              <span className="font-mono text-[9px] text-amber-300 font-bold uppercase tracking-wider">
+                {currentItem.title}
+              </span>
+              <Droplets className="w-3.5 h-3.5 text-blue-300/80" />
+            </div>
 
-                {/* Pesan Manis yang Tersingkap */}
-                <div className="my-auto px-1 py-3 flex flex-col items-center justify-center">
-                  <p className="font-handwriting text-xl sm:text-2xl text-amber-100 font-bold leading-relaxed drop-shadow-sm">
-                    "{currentItem.hiddenText}"
-                  </p>
-                  <span className="font-sans-ui text-[10.5px] text-amber-300/80 font-bold mt-2">
-                    — Hal sederhana yang paling berkesan.
-                  </span>
-                </div>
+            {/* Pesan Manis yang Tersingkap */}
+            <div className="my-auto px-1 py-3 flex flex-col items-center justify-center">
+              <p className="font-handwriting text-xl sm:text-2xl text-amber-100 font-bold leading-relaxed drop-shadow-sm">
+                "{currentItem.hiddenText}"
+              </p>
+              <span className="font-sans-ui text-[10.5px] text-amber-300/80 font-bold mt-2">
+                — Hal sederhana yang paling berkesan.
+              </span>
+            </div>
 
-                {/* Footer Mini di Balik Kaca */}
-                <div className="flex items-center justify-between border-t border-white/10 pt-2 text-[9.5px] font-mono text-white/50">
-                  <span>PILKOM 25 MEMORY</span>
-                  <span>TATWA ARCHIVE</span>
-                </div>
-              </div>
+            {/* Footer Mini di Balik Kaca */}
+            <div className="flex items-center justify-between border-t border-white/10 pt-2 text-[9.5px] font-mono text-white/50">
+              <span>PILKOM 25 MEMORY</span>
+              <span>TATWA ARCHIVE</span>
+            </div>
+          </div>
 
-              {/* LAPISAN CANVAS KACA BEREMBUN (DAPAT DIUSAP DENGAN JARI) */}
-              <canvas
-                ref={canvasRef}
-                onMouseDown={startWiping}
-                onMouseMove={wipe}
-                onMouseUp={stopWiping}
-                onMouseLeave={stopWiping}
-                onTouchStart={startWiping}
-                onTouchMove={wipe}
-                onTouchEnd={stopWiping}
-                className={`absolute inset-2.5 sm:inset-3 w-[calc(100%-20px)] sm:w-[calc(100%-24px)] h-[calc(100%-20px)] sm:h-[calc(100%-24px)] rounded-xl cursor-pointer z-20 transition-opacity duration-500 ${
-                  isCurrentCleared ? "pointer-events-none opacity-0" : "opacity-100"
-                }`}
-              />
+          {/* LAPISAN KANVAS KACA BEREMBUN (DAPAT DIUSAP DENGAN JARI) */}
+          <canvas
+            ref={canvasRef}
+            onMouseDown={startWiping}
+            onMouseMove={wipe}
+            onMouseUp={stopWiping}
+            onMouseLeave={stopWiping}
+            onTouchStart={startWiping}
+            onTouchMove={wipe}
+            onTouchEnd={stopWiping}
+            className={`absolute inset-2.5 sm:inset-3 w-[calc(100%-20px)] sm:w-[calc(100%-24px)] h-[calc(100%-20px)] sm:h-[calc(100%-24px)] rounded-xl z-20 transition-opacity duration-500 ${
+              isCurrentCleared ? "pointer-events-none opacity-0" : "opacity-100 cursor-pointer"
+            }`}
+          />
 
-              {/* Teks Bantuan Usap Berkedip di Atas Embun */}
-              {!isCurrentCleared && (
-                <motion.div
-                  animate={{ opacity: [0.65, 1, 0.65] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                  className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-30 text-slate-800"
-                >
-                  <div className="bg-white/85 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-white/50 shadow-md flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-700" />
-                    <span className="font-sans-ui text-xs font-black">
-                      Usap dengan jari untuk menghapus embun 🌧️
-                    </span>
-                  </div>
-                </motion.div>
-              )}
+          {/* OVERLAY UAP DINGIN MENGEMBUN KEMBALI (RE-FROSTING MIST ANIMATION) */}
+          <AnimatePresence>
+            {isReFrosting && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                className="absolute inset-2.5 sm:inset-3 rounded-xl bg-gradient-to-b from-[#BED3EB]/95 via-[#ACC8E8]/90 to-[#99BEDF]/95 backdrop-blur-md flex flex-col items-center justify-center z-30 pointer-events-none text-blue-950 shadow-inner px-4 text-center"
+              >
+                <Wind className="w-8 h-8 text-blue-700 animate-pulse mb-1.5" />
+                <span className="font-sans-ui text-xs font-black tracking-wide text-blue-950">
+                  Uap dingin mengembun kembali... ❄️
+                </span>
+                <span className="font-mono text-[9.5px] text-blue-900/80 font-bold mt-1">
+                  Menyiapkan kaca hal kecil berikutnya
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-              {/* Petunjuk Geser di Sudut Kanan Bawah saat Kaca Sudah Bersih */}
-              {isCurrentCleared && (
-                <div className="absolute bottom-4 right-4 pointer-events-none z-30 flex items-center gap-1 text-[9.5px] font-mono text-amber-300/80 bg-black/50 px-2 py-0.5 rounded-md border border-amber-400/20">
-                  <span>👈 Geser kaca</span>
-                </div>
-              )}
-            </motion.div>
+          {/* OVERLAY SELESAI MENUJU SEGMEN 6 (VOICE NOTES) */}
+          <AnimatePresence>
+            {isFinishing && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="absolute inset-0 rounded-2xl bg-black/85 backdrop-blur-sm flex flex-col items-center justify-center z-40 text-center p-5 text-white pointer-events-none"
+              >
+                <Sparkles className="w-8 h-8 text-amber-300 animate-pulse mb-2" />
+                <h4 className="font-handwriting text-2xl text-amber-200 font-black mb-1">
+                  Membuka Jendela Kafe...
+                </h4>
+                <p className="font-sans-ui text-xs text-blue-200">
+                  Mendengarkan rekaman suara voice notes kita 🎙️
+                </p>
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
 
@@ -364,14 +349,14 @@ export function Segment5KacaEmbun({ onComplete }) {
             </div>
           ) : activeTab === memories.length - 1 ? (
             <div className="bg-[#182333]/95 border border-amber-400/40 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-amber-200 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs">
-              <span>✨</span>
-              <span className="font-black">👈 Geser kaca terakhir untuk dengarkan rekaman suara 🎙️</span>
+              <span>🎙️</span>
+              <span className="font-black">Ketuk kaca untuk membuka rekaman suara kita ✨</span>
             </div>
           ) : (
             <div className="bg-[#182333]/90 border border-blue-300/30 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-blue-100 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs">
               <span>✨ Kaca bersih!</span>
               <span className="text-blue-300/40">•</span>
-              <span>👈 Geser kaca ke kiri untuk hal berikutnya</span>
+              <span>Ketuk kaca untuk mengembunkan hal berikutnya ❄️</span>
             </div>
           )}
         </div>
@@ -380,3 +365,4 @@ export function Segment5KacaEmbun({ onComplete }) {
     </section>
   );
 }
+
