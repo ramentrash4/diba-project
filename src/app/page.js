@@ -47,8 +47,8 @@ function ScrapbookApp() {
     /* OUTER WRAPPER: Di Desktop bernuansa meja kafe kayu gelap hangat dengan sorotan lampu temaram */
     <div className="min-h-screen w-full flex justify-center items-center bg-gradient-to-b from-[#1C1612] via-[#140F0C] to-[#0D0A08] sm:p-4 sm:py-6 overflow-hidden selection:bg-rose-200">
       
-      {/* STRICT MOBILE CANVAS: Di desktop terkunci dalam frame ponsel proporsional */}
-      <div className="w-full max-w-[412px] min-h-screen sm:min-h-[830px] sm:max-h-[92vh] sm:rounded-[38px] sm:shadow-[0_25px_90px_rgba(0,0,0,0.85),0_0_0_8px_#2B221A] relative flex flex-col justify-center overflow-hidden bg-transparent">
+      {/* STRICT MOBILE CANVAS: Di desktop terkunci dalam frame ponsel proporsional dengan latar kertas solid */}
+      <div className="w-full max-w-[412px] min-h-screen sm:min-h-[830px] sm:max-h-[92vh] sm:rounded-[38px] sm:shadow-[0_25px_90px_rgba(0,0,0,0.85),0_0_0_8px_#2B221A] relative flex flex-col justify-center overflow-hidden bg-[#FAF6EE] isolate">
         
         {/* Background Atmosfer Dinamis di dalam Frame Mobile (Bayangan Daun & Cahaya Sore) */}
         <AtmosphereBackdrop currentSegment={currentSegment} />
@@ -103,7 +103,7 @@ function ScrapbookApp() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1.8, duration: 1.5, ease: "easeOut" }}
-                className="font-handwriting text-3xl sm:text-4xl text-[#2C2621] tracking-wide"
+                className="font-handwriting text-3xl sm:text-4xl text-[#140E0A] tracking-wide font-bold"
               >
                 Berbahagialah. — Tatwa
               </motion.p>

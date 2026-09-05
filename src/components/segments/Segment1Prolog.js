@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
-import { scrapbookData } from "@/data/scrapbookData";
 import { ArrowUp, ChevronRight } from "lucide-react";
 import { useAudio } from "@/components/audio/AudioProvider";
 import { WashiTape } from "@/components/common/WashiTape";
@@ -68,22 +67,22 @@ export function Segment1Prolog({ onComplete }) {
             exit={{ opacity: 0, scale: 0.9, y: -20, transition: { duration: 0.5, ease: "easeInOut" } }}
             className="w-full max-w-[340px] flex flex-col items-center"
           >
-            {/* Header Sapaan untuk Adiba */}
+            {/* Header Sapaan untuk Adiba - SANGAT TEGAS, STANDOUT & KONTRAS TINGGI */}
             <div className="text-center mb-4">
-              <span className="font-typewriter text-[11px] tracking-widest text-[#7D6B5A] uppercase font-bold block mb-1">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF9EE] border border-[#CDB9A0] text-[#423223] font-bold text-[11px] font-sans-ui tracking-wide shadow-xs mb-1.5">
                 The Scrapbook of Us
               </span>
-              <h1 className="font-handwriting text-4xl sm:text-5xl text-[#1E1915] font-bold tracking-wide">
+              <h1 className="font-handwriting text-4xl sm:text-5xl text-[#120C08] font-bold tracking-wide leading-tight drop-shadow-xs">
                 Untuk Askiyaa, Pilkom '25
               </h1>
-              <p className="font-sans-ui text-xs text-[#6B5E52] mt-1">
+              <p className="font-sans-ui text-xs text-[#3D3024] font-medium mt-1">
                 Ada sepucuk surat kenangan yang disegel khusus untukmu.
               </p>
             </div>
 
             {/* WADAH AMPLOP SURAT DENGAN PERSPEKTIF 3D */}
             <div
-              className="relative w-full h-[250px] bg-[#E8DCB8] rounded-2xl shadow-2xl border-2 border-[#D1BFAB] paper-shadow-lifted overflow-visible flex flex-col justify-between p-4"
+              className="relative w-full h-[250px] bg-[#EADECE] rounded-2xl shadow-2xl border-2 border-[#CDB8A0] paper-shadow-lifted overflow-visible flex flex-col justify-between p-4"
               style={{ perspective: "1000px" }}
             >
               {/* Garis Tepian Pos Klasik (Airmail Striping) */}
@@ -100,15 +99,15 @@ export function Segment1Prolog({ onComplete }) {
               {/* Area Atas: Prangko Asli & Stempel Cap Pos */}
               <div className="flex items-start justify-between relative z-10">
                 {/* Cap Stempel Bundar Pos Bandung */}
-                <div className="w-14 h-14 rounded-full border-2 border-dashed border-[#5C4C3E]/70 p-1 flex flex-col items-center justify-center -rotate-12 opacity-80 select-none">
-                  <span className="font-typewriter text-[7px] text-[#5C4C3E] uppercase font-bold tracking-tighter">
+                <div className="w-14 h-14 rounded-full border-2 border-dashed border-[#423223]/70 p-1 flex flex-col items-center justify-center -rotate-12 opacity-85 select-none">
+                  <span className="font-typewriter text-[7px] text-[#423223] uppercase font-bold tracking-tighter">
                     PILKOM '25
                   </span>
-                  <div className="w-8 h-0.5 bg-[#5C4C3E]/50 my-0.5" />
-                  <span className="font-typewriter text-[7px] text-[#5C4C3E] font-bold">
+                  <div className="w-8 h-0.5 bg-[#423223]/50 my-0.5" />
+                  <span className="font-typewriter text-[7px] text-[#423223] font-bold">
                     ARCHIVE
                   </span>
-                  <span className="font-typewriter text-[5px] text-[#5C4C3E]/80">BANDUNG</span>
+                  <span className="font-typewriter text-[5px] text-[#423223]/80">BANDUNG</span>
                 </div>
 
                 {/* GAMBAR PRANGKO ASLI DARI USER (public/images/prangko.webp) */}
@@ -116,25 +115,25 @@ export function Segment1Prolog({ onComplete }) {
                   <img
                     src="/images/prangko.webp"
                     alt="Prangko Indonesia Vintage"
-                    className="w-18 sm:w-20 object-contain rounded-xs shadow-md border-2 border-white/80 -rotate-2"
+                    className="w-18 sm:w-20 object-contain rounded-xs shadow-md border-2 border-white/90 -rotate-2"
                   />
                   {/* Cap Pos Tinta di atas Prangko */}
-                  <div className="absolute -bottom-2 -left-3 w-10 h-10 rounded-full border border-black/30 border-dashed pointer-events-none rotate-45" />
+                  <div className="absolute -bottom-2 -left-3 w-10 h-10 rounded-full border border-black/35 border-dashed pointer-events-none rotate-45" />
                 </div>
               </div>
 
-              {/* Area Bawah: Tulisan Tangan Alamat (100% Bersih & Bebas Halangan Komponen) */}
+              {/* Area Bawah: Tulisan Tangan Alamat (100% Bersih & Tinta Gelap Tajam) */}
               <div className="relative z-10 text-left font-handwriting pl-2 pb-1">
-                <span className="font-typewriter text-[9px] uppercase tracking-wider text-[#736354] block">
+                <span className="font-typewriter text-[9px] uppercase tracking-wider text-[#524132] font-bold block">
                   Penerima:
                 </span>
-                <span className="text-2xl sm:text-3xl text-[#1E1915] font-bold block leading-tight">
+                <span className="text-2xl sm:text-3xl text-[#120C08] font-bold block leading-tight">
                   Adiba (Askiyaa)
                 </span>
-                <span className="text-xs text-[#594B3D] block font-sans-ui mt-0.5">
+                <span className="text-xs text-[#382C20] font-sans-ui font-semibold block mt-0.5">
                   Ilmu Komputer — Angkatan 2025
                 </span>
-                <span className="text-sm text-[#8C3E2D] font-bold block mt-1">
+                <span className="text-sm text-[#8C2318] font-bold block mt-1">
                   Dari: Tatwa
                 </span>
               </div>
@@ -184,8 +183,8 @@ export function Segment1Prolog({ onComplete }) {
                       exit={{ scale: 0, opacity: 0, transition: { duration: 0.3 } }}
                     >
                       {/* Cap Lilin Merah Hati Monogram 'A' */}
-                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#A83226] via-[#8C2318] to-[#63140C] shadow-xl border-2 border-[#C94A3C]/50 flex items-center justify-center select-none active:scale-95 transition-transform">
-                        <div className="w-11 h-11 rounded-full border border-amber-200/40 flex items-center justify-center shadow-inner">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#A83226] via-[#8C2318] to-[#63140C] shadow-xl border-2 border-[#C94A3C]/60 flex items-center justify-center select-none active:scale-95 transition-transform">
+                        <div className="w-11 h-11 rounded-full border border-amber-200/50 flex items-center justify-center shadow-inner">
                           <span className="font-handwriting text-2xl font-bold text-amber-100 drop-shadow">
                             A
                           </span>
@@ -201,7 +200,7 @@ export function Segment1Prolog({ onComplete }) {
             <motion.div
               animate={{ y: [0, -4, 0] }}
               transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
-              className="mt-5 px-4 py-2 rounded-full bg-[#1E1915] text-amber-200 font-sans-ui text-xs font-semibold shadow-md flex items-center gap-1.5 border border-amber-300/30 cursor-pointer hover:bg-black transition-colors"
+              className="mt-5 px-4 py-2 rounded-full bg-[#1C1510] text-[#FDE39E] font-sans-ui text-xs font-bold shadow-md flex items-center gap-1.5 border border-amber-400/40 cursor-pointer hover:bg-black transition-colors"
               onClick={handleOpenEnvelope}
             >
               <ArrowUp className="w-3.5 h-3.5 text-amber-300 animate-bounce" />
@@ -215,7 +214,7 @@ export function Segment1Prolog({ onComplete }) {
             initial={{ opacity: 0, scale: 0.92, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="w-full max-w-[340px] bg-[#FFFDF8] rounded-3xl p-6 sm:p-7 shadow-2xl border border-[#E5DACB] text-[#1E1915] relative text-left paper-shadow-lifted my-auto"
+            className="w-full max-w-[340px] bg-[#FFFDF8] rounded-3xl p-6 sm:p-7 shadow-2xl border border-[#E5DACB] text-[#120C08] relative text-left paper-shadow-lifted my-auto"
           >
             {/* Washi Tape Nyata di Atas Surat */}
             <WashiTape color="rose" angle={-2} className="absolute -top-2.5 left-7" />
@@ -223,21 +222,21 @@ export function Segment1Prolog({ onComplete }) {
 
             {/* Header Surat */}
             <div className="flex items-center justify-between border-b border-[#E8DCCF] pb-2.5 mb-4 pt-1">
-              <span className="font-typewriter text-[11px] text-[#8C7A68] tracking-widest uppercase font-bold">
+              <span className="font-typewriter text-[11px] text-[#6B5A4B] tracking-widest uppercase font-bold">
                 SURAT PEMBUKA
               </span>
-              <span className="font-typewriter text-[11px] text-[#A83226] font-bold">
+              <span className="font-typewriter text-[11px] text-[#8C2318] font-bold">
                 Lembar 01 / 08
               </span>
             </div>
 
             {/* Judul Sapaan Standout & Besar */}
-            <h2 className="font-handwriting text-3xl sm:text-4xl font-bold text-[#1E1915] mb-2 leading-tight">
+            <h2 className="font-handwriting text-3xl sm:text-4xl font-bold text-[#120C08] mb-2 leading-tight">
               Untuk Adiba (Askiyaa),
             </h2>
 
             {/* Isi Surat Terbaca Sangat Jelas & Menyentuh */}
-            <div className="space-y-3 font-sans-ui text-sm text-[#382F26] leading-relaxed mb-6 font-normal">
+            <div className="space-y-3 font-sans-ui text-sm text-[#2D2319] leading-relaxed mb-6 font-medium">
               <p>
                 Selamat datang di buku kenangan kecil kita.
               </p>
@@ -247,7 +246,7 @@ export function Segment1Prolog({ onComplete }) {
             </div>
 
             {/* Tanda Tangan Tatwa */}
-            <div className="font-handwriting text-2xl font-bold text-[#A83226] text-right mb-6">
+            <div className="font-handwriting text-2xl font-bold text-[#8C2318] text-right mb-6">
               — Tatwa
             </div>
 
@@ -256,7 +255,7 @@ export function Segment1Prolog({ onComplete }) {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={onComplete}
-              className="w-full py-3.5 px-4 rounded-xl bg-[#1E1915] hover:bg-black text-[#F4EDE2] font-sans-ui text-xs sm:text-sm font-semibold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full py-3.5 px-4 rounded-xl bg-[#1C1510] hover:bg-black text-[#FAF2E6] font-sans-ui text-xs sm:text-sm font-semibold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               <span>Mulai Buka Lembaran Pertama (Mixtape)</span>
               <ChevronRight className="w-4 h-4 text-amber-300" />
