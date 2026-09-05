@@ -26,6 +26,9 @@ export function Segment2Soundtrack({ onComplete }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasPlayedAny, setHasPlayedAny] = useState(false);
 
+  // Apakah rak kaset dibuka penuh saat kaset sedang di dalam player (toggle dinamis agar tidak sesak)
+  const [isRackExpanded, setIsRackExpanded] = useState(false);
+
   // Status saat foto polaroid yang terselip ditarik keluar dari kotak kaset mika
   const [isPullingOut, setIsPullingOut] = useState(false);
 
@@ -59,6 +62,7 @@ export function Segment2Soundtrack({ onComplete }) {
     setIsPlaying(true);
     setHasPlayedAny(true);
     setIsDropTargetActive(false);
+    setIsRackExpanded(false); // otomatis minimalkan rak agar layar lega dan padat
     playTrack(tape.id, tape.src);
   };
 
@@ -69,6 +73,7 @@ export function Segment2Soundtrack({ onComplete }) {
     setIsPlaying(false);
     setInsertedTape(null);
     setIsDropTargetActive(false);
+    setIsRackExpanded(false);
   };
 
   // Toggle Play / Pause mekanik
@@ -471,161 +476,202 @@ export function Segment2Soundtrack({ onComplete }) {
           )}
         </AnimatePresence>
 
-        {/* 5. RAK KASET FISIK (3 SLOT TETAP DENGAN COVER ALBUM & DRAG SNAP TO ORIGIN) */}
+        {/* 5. RAK KASET FISIK (DINAMIS: KOMPAK SAAT LAGU DIPUTAR, LENGKAP SAAT KOSONG/DIBUKA) */}
         <motion.div
-          initial={{ y: 50, opacity: 0 }}
+          initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
-          className="w-full mt-2.5"
+          transition={{ delay: 0.15, duration: 0.4, ease: "easeOut" }}
+          className="w-full mt-2"
         >
-          <div className="text-left mb-1.5 px-1 flex items-center justify-between">
-            <span className="font-typewriter text-[10.5px] uppercase tracking-wider text-[#3D2E1F] font-black">
-              Rak Kaset Fisik:
-            </span>
-            <span className="font-sans-ui text-[10px] text-[#5A4839] font-bold italic">
-              (Tarik kaset ke pemutar atau ketuk)
-            </span>
-          </div>
-
-          {/* 3 SLOT RAK KASET */}
-          <div className="space-y-2 relative">
-            {scrapbookData.soundtrack.map((tape, idx) => {
-              const isLoadedInPlayer = insertedTape && insertedTape.id === tape.id;
-
-              // Skema warna retro kaset
-              const tapeStyles = [
-                {
-                  bg: "bg-[#D88A78]",
-                  border: "border-[#A85848]",
-                  labelBg: "bg-[#FFF9EE]",
-                  accent: "#8C3420",
-                },
-                {
-                  bg: "bg-[#C47D8A]",
-                  border: "border-[#9E5361]",
-                  labelBg: "bg-[#FDF5F6]",
-                  accent: "#7A3440",
-                },
-                {
-                  bg: "bg-[#7AA089]",
-                  border: "border-[#537A62]",
-                  labelBg: "bg-[#F5F9F6]",
-                  accent: "#385944",
-                },
-              ];
-
-              const style = tapeStyles[idx % tapeStyles.length];
-
-              return (
-                <div
-                  key={tape.id}
-                  className="relative w-full h-[64px] rounded-xl"
+          {insertedTape && !isRackExpanded ? (
+            /* MODE RAK KOMPAK (DRAWER) - Menghemat ~150px ruang layar di mobile saat lagu berputar */
+            <div className="w-full bg-[#EFE6D8]/60 border border-[#D5C2AA] rounded-xl p-2 shadow-xs">
+              <div className="flex items-center justify-between mb-1.5 px-0.5">
+                <span className="font-typewriter text-[10px] uppercase tracking-wider text-[#3D2E1F] font-black">
+                  Kaset Lainnya di Rak:
+                </span>
+                <button
+                  onClick={() => setIsRackExpanded(true)}
+                  className="font-sans-ui text-[10px] text-[#8C3E2D] font-extrabold hover:underline cursor-pointer flex items-center gap-0.5"
                 >
-                  {/* TAMPILAN KETIKA KASET SEDANG DI DALAM PEMUTAR: CERUK RAK KOSONG */}
-                  {isLoadedInPlayer ? (
-                    <div className="w-full h-full rounded-xl border-2 border-dashed border-[#C5B49E] bg-[#EFE6D8]/70 flex items-center justify-between px-3 shadow-inner">
-                      <div className="flex items-center gap-2 overflow-hidden mr-2">
-                        <div className="w-8 h-8 rounded border border-dashed border-[#A8947E] flex items-center justify-center text-amber-900 font-mono text-[10px] font-black shrink-0">
-                          0{idx + 1}
-                        </div>
-                        <div className="flex flex-col text-left overflow-hidden">
-                          <span className="font-typewriter text-[9.5px] font-black uppercase text-[#735F4C]">
-                            SLOT 0{idx + 1} KOSONG
-                          </span>
-                          <span className="font-sans-ui text-[11px] font-bold text-[#261C14] truncate">
-                            "{tape.title}" sedang di player 🎵
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={handleEjectTape}
-                        className="h-8 px-2.5 rounded-md bg-[#E4D8C6] hover:bg-[#D8C7B0] text-[#33251A] font-sans-ui text-[10.5px] font-black border border-[#C5B49E] shadow-xs cursor-pointer shrink-0"
-                      >
-                        Kembalikan ⏏
-                      </button>
-                    </div>
-                  ) : (
-                    /* TAMPILAN KASET FISIK DI RAK: BISA DI-DRAG ATAU DI-TAP */
-                    <motion.div
-                      drag
-                      dragSnapToOrigin={true}
-                      dragElastic={0.15}
-                      onDrag={(e, info) => {
-                        // Cek jika ditarik mendekati arah pemutar
-                        if (info.offset.y < -50) {
-                          setIsDropTargetActive(true);
-                        } else {
-                          setIsDropTargetActive(false);
-                        }
-                      }}
-                      onDragEnd={(e, info) => {
-                        setIsDropTargetActive(false);
-                        if (info.offset.y < -70) {
-                          handleInsertTape(tape);
-                        }
-                      }}
+                  <span>Buka Semua Rak</span>
+                  <span>▾</span>
+                </button>
+              </div>
+
+              {/* 2 Kaset Tersisa Berjejer Rapi (Side-by-side) */}
+              <div className="grid grid-cols-2 gap-2">
+                {scrapbookData.soundtrack
+                  .filter((tape) => tape.id !== insertedTape.id)
+                  .map((tape) => (
+                    <motion.button
+                      key={tape.id}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => handleInsertTape(tape)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      whileDrag={{
-                        scale: 1.05,
-                        zIndex: 9999,
-                        rotate: -1.5,
-                        boxShadow: "0 18px 28px rgba(0,0,0,0.3)",
-                      }}
-                      className={`relative w-full h-full rounded-xl p-2 border-2 shadow-md cursor-grab active:cursor-grabbing transition-shadow flex items-center justify-between overflow-hidden ${
-                        style.bg
-                      } ${style.border}`}
+                      className="h-[44px] rounded-lg p-1.5 border-2 shadow-xs flex items-center gap-1.5 bg-[#FFFDF8] border-[#CBB69E] hover:border-amber-500 cursor-pointer overflow-hidden text-left group"
                     >
-                      {/* Cover Album Realistis & Jelas */}
-                      <div className="w-11 h-11 rounded-md overflow-hidden shrink-0 border border-black/25 shadow-sm relative bg-white">
+                      <div className="w-8 h-8 rounded shrink-0 overflow-hidden relative border border-black/20 bg-white">
                         <Image
                           src={tape.coverImage}
                           alt={tape.title}
                           fill
                           className="object-cover"
-                          sizes="44px"
+                          sizes="32px"
                         />
                       </div>
-
-                      {/* Label Kertas Tengah dengan Judul Extra Bold & Jelas */}
-                      <div
-                        className={`flex-1 mx-2 h-[46px] rounded px-2.5 py-0.5 border border-[#CBB69E] shadow-xs flex flex-col justify-center text-left ${style.labelBg}`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span
-                            className="font-typewriter text-[9.5px] font-black uppercase tracking-wider"
-                            style={{ color: style.accent }}
-                          >
-                            TRACK 0{idx + 1} • {tape.duration}
-                          </span>
-                          <span className="font-mono text-[8.5px] bg-[#E5D7C7] text-[#3D2E1F] font-black px-1.5 py-0.2 rounded">
-                            {tape.tag}
-                          </span>
-                        </div>
-                        <span className="font-sans-ui text-xs sm:text-[13px] font-black text-[#140E0A] truncate leading-tight">
+                      <div className="flex-1 min-w-0">
+                        <span className="font-sans-ui text-[11px] font-black text-[#140E0A] truncate block leading-tight group-hover:text-[#8C3E2D]">
                           {tape.title}
                         </span>
-                        <span className="font-typewriter text-[10px] text-[#453629] font-bold truncate">
-                          {tape.artist}
+                        <span className="font-mono text-[8px] text-[#6B5441] font-bold truncate block">
+                          {tape.tag} • Putar ➔
                         </span>
                       </div>
+                    </motion.button>
+                  ))}
+              </div>
+            </div>
+          ) : (
+            /* MODE RAK PENUH (Semua 3 slot terbuka penuh) */
+            <div>
+              <div className="text-left mb-1.5 px-1 flex items-center justify-between">
+                <span className="font-typewriter text-[10.5px] uppercase tracking-wider text-[#3D2E1F] font-black">
+                  Rak Kaset Fisik:
+                </span>
+                {insertedTape ? (
+                  <button
+                    onClick={() => setIsRackExpanded(false)}
+                    className="font-sans-ui text-[10px] text-[#8C3E2D] font-bold hover:underline cursor-pointer"
+                  >
+                    ▴ Ciutkan Rak
+                  </button>
+                ) : (
+                  <span className="font-sans-ui text-[10px] text-[#5A4839] font-bold italic">
+                    (Tarik kaset ke pemutar atau ketuk)
+                  </span>
+                )}
+              </div>
 
-                      {/* Dua Lubang Roda Kaset Mini & Panah Dorong */}
-                      <div className="flex items-center gap-1.5 shrink-0 pr-0.5">
-                        <div className="w-4 h-4 rounded-full bg-white border border-[#3D2E1C] flex items-center justify-center">
-                          <div className="w-1.5 h-1.5 rounded-full bg-[#3D2E1C]" />
+              {/* 3 SLOT RAK KASET */}
+              <div className="space-y-2 relative">
+                {scrapbookData.soundtrack.map((tape, idx) => {
+                  const isLoadedInPlayer = insertedTape && insertedTape.id === tape.id;
+                  const tapeStyles = [
+                    {
+                      bg: "bg-[#D88A78]",
+                      border: "border-[#A85848]",
+                      labelBg: "bg-[#FFF9EE]",
+                      accent: "#8C3420",
+                    },
+                    {
+                      bg: "bg-[#C47D8A]",
+                      border: "border-[#9E5361]",
+                      labelBg: "bg-[#FDF5F6]",
+                      accent: "#7A3440",
+                    },
+                    {
+                      bg: "bg-[#7AA089]",
+                      border: "border-[#537A62]",
+                      labelBg: "bg-[#F5F9F6]",
+                      accent: "#385944",
+                    },
+                  ];
+                  const style = tapeStyles[idx % tapeStyles.length];
+
+                  return (
+                    <div key={tape.id} className="relative w-full h-[60px] rounded-xl">
+                      {isLoadedInPlayer ? (
+                        <div className="w-full h-full rounded-xl border-2 border-dashed border-[#C5B49E] bg-[#EFE6D8]/70 flex items-center justify-between px-3 shadow-inner">
+                          <div className="flex items-center gap-2 overflow-hidden mr-2">
+                            <div className="w-7 h-7 rounded border border-dashed border-[#A8947E] flex items-center justify-center text-amber-900 font-mono text-[9.5px] font-black shrink-0">
+                              0{idx + 1}
+                            </div>
+                            <div className="flex flex-col text-left overflow-hidden">
+                              <span className="font-typewriter text-[9px] font-black uppercase text-[#735F4C]">
+                                SLOT 0{idx + 1} KOSONG
+                              </span>
+                              <span className="font-sans-ui text-[11px] font-bold text-[#261C14] truncate">
+                                "{tape.title}" sedang di player 🎵
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={handleEjectTape}
+                            className="h-7 px-2 rounded-md bg-[#E4D8C6] hover:bg-[#D8C7B0] text-[#33251A] font-sans-ui text-[10px] font-black border border-[#C5B49E] shadow-xs cursor-pointer shrink-0"
+                          >
+                            Kembalikan ⏏
+                          </button>
                         </div>
-                        <div className="w-6 h-6 rounded-full bg-black/30 text-white flex items-center justify-center text-xs font-black shadow-xs">
-                          ↑
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                      ) : (
+                        <motion.div
+                          drag
+                          dragSnapToOrigin={true}
+                          dragElastic={0.15}
+                          onDrag={(e, info) => {
+                            if (info.offset.y < -50) setIsDropTargetActive(true);
+                            else setIsDropTargetActive(false);
+                          }}
+                          onDragEnd={(e, info) => {
+                            setIsDropTargetActive(false);
+                            if (info.offset.y < -70) handleInsertTape(tape);
+                          }}
+                          onClick={() => handleInsertTape(tape)}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          whileDrag={{
+                            scale: 1.05,
+                            zIndex: 9999,
+                            rotate: -1.5,
+                            boxShadow: "0 18px 28px rgba(0,0,0,0.3)",
+                          }}
+                          className={`relative w-full h-full rounded-xl p-2 border-2 shadow-md cursor-grab active:cursor-grabbing transition-shadow flex items-center justify-between overflow-hidden ${style.bg} ${style.border}`}
+                        >
+                          <div className="w-10 h-10 rounded-md overflow-hidden shrink-0 border border-black/25 shadow-sm relative bg-white">
+                            <Image
+                              src={tape.coverImage}
+                              alt={tape.title}
+                              fill
+                              className="object-cover"
+                              sizes="40px"
+                            />
+                          </div>
+                          <div
+                            className={`flex-1 mx-2 h-[44px] rounded px-2 py-0.5 border border-[#CBB69E] shadow-xs flex flex-col justify-center text-left ${style.labelBg}`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span
+                                className="font-typewriter text-[9px] font-black uppercase tracking-wider"
+                                style={{ color: style.accent }}
+                              >
+                                TRACK 0{idx + 1} • {tape.duration}
+                              </span>
+                              <span className="font-mono text-[8px] bg-[#E5D7C7] text-[#3D2E1F] font-black px-1.5 py-0.2 rounded">
+                                {tape.tag}
+                              </span>
+                            </div>
+                            <span className="font-sans-ui text-[12px] font-black text-[#140E0A] truncate leading-tight">
+                              {tape.title}
+                            </span>
+                            <span className="font-typewriter text-[9.5px] text-[#453629] font-bold truncate">
+                              {tape.artist}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0 pr-0.5">
+                            <div className="w-3.5 h-3.5 rounded-full bg-white border border-[#3D2E1C] flex items-center justify-center">
+                              <div className="w-1 h-1 rounded-full bg-[#3D2E1C]" />
+                            </div>
+                            <div className="w-5 h-5 rounded-full bg-black/30 text-white flex items-center justify-center text-[10px] font-black shadow-xs">
+                              ↑
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* 6. ELEMEN POLAROID TERSILIP DI SCRAPBOOK (NATURAL SKEUOMORPHIC TRANSITION KE SEGMEN 3) */}
@@ -639,36 +685,32 @@ export function Segment2Soundtrack({ onComplete }) {
                   : { opacity: 1, y: 0, scale: 1 }
               }
               transition={{ duration: 0.45, ease: "easeOut" }}
-              className="w-full mt-3.5 pb-2 flex flex-col items-center"
+              className="w-full mt-2.5 pb-1 flex flex-col items-center"
             >
-              {/* LEMBARAN SCRAPBOOK ORGANIK: FOTO POLAROID ASLI TERTEMPEL WASHI TAPE & CATATAN PENSIL TATWA */}
-              <div className="relative w-full flex items-center justify-between px-1.5 py-1 select-none overflow-visible">
-                {/* Sisi Kiri: Catatan Tulisan Tangan Pensil Tatwa Langsung di Halaman */}
-                <div className="flex-1 flex flex-col text-left pr-2 relative">
-                  <div className="flex items-center gap-1 text-[#3A2A1E]">
-                    <span className="font-handwriting text-[17px] sm:text-[19px] font-bold leading-tight -rotate-1">
-                      ada foto-foto kita di sini...
-                    </span>
-                    <span className="font-handwriting text-xl text-[#8C3E2D] font-black -rotate-6">
-                      ⤷
-                    </span>
+              {/* LEMBARAN SCRAPBOOK ORGANIK: MEMO KONTRAST TINGGI & POLAROID ASLI */}
+              <div className="relative w-full flex items-center justify-between gap-2 px-0.5 select-none overflow-visible">
+                {/* Sisi Kiri: Memo Kertas Kliping Hangat dengan Teks Sangat Kontras & Terbaca */}
+                <div className="flex-1 bg-[#FFF8EB] border border-[#D5C2AA] rounded-xl p-2.5 shadow-xs text-left relative">
+                  <div className="flex items-center gap-1 text-[#8C3E2D] font-sans-ui font-black text-[10.5px] uppercase tracking-wide">
+                    <Sparkles className="w-3.5 h-3.5 text-[#A83226]" />
+                    <span>Album Foto Kita</span>
                   </div>
-                  <span className="font-handwriting text-xs sm:text-[13px] text-[#7A6856] italic mt-0.5">
-                    "terselip banyak momen lucu kita 📸"
-                  </span>
-                  <div className="flex items-center gap-1.5 mt-1 text-[11px] font-handwriting text-[#9C7F68]">
-                    <span className="text-amber-700">✦</span>
-                    <span>album foto kenangan</span>
+                  <p className="font-handwriting text-[15px] sm:text-[16px] font-black text-[#140E0A] leading-snug mt-0.5">
+                    "Ada foto kita yang terselip di sini... 📸"
+                  </p>
+                  <div className="flex items-center gap-1 text-[10px] font-sans-ui font-extrabold text-[#7A5B43] mt-1">
+                    <span>Tarik foto ke atas</span>
+                    <span className="text-xs">➔</span>
                   </div>
                 </div>
 
-                {/* Sisi Kanan: Foto Polaroid Fisik Asli dengan Washi Tape & Paperclip (Wajib Ditarik) */}
-                <div className="relative shrink-0 pr-2 z-20">
+                {/* Sisi Kanan: Foto Polaroid Fisik Asli (Tanpa Loop Jittery, Drag & Tap Mulus) */}
+                <div className="relative shrink-0 z-20">
                   <motion.div
                     layoutId="shared-polaroid-lead"
                     drag="y"
                     dragConstraints={{ top: -140, bottom: 0 }}
-                    dragElastic={0.25}
+                    dragElastic={0.2}
                     dragSnapToOrigin={true}
                     onDragEnd={(e, info) => {
                       if (info.offset.y < -35 || info.velocity.y < -200) {
@@ -680,20 +722,17 @@ export function Segment2Soundtrack({ onComplete }) {
                       isPullingOut
                         ? {
                             y: -220,
-                            scale: 1.5,
+                            scale: 1.45,
                             rotate: 0,
                             opacity: 1,
                             transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
                           }
-                        : { y: [0, -3, 0] }
+                        : { y: 0, scale: 1 }
                     }
-                    transition={
-                      !isPullingOut
-                        ? { repeat: Infinity, duration: 2, ease: "easeInOut" }
-                        : undefined
-                    }
-                    whileHover={{ scale: 1.06, y: -4, rotate: -1 }}
-                    className="relative w-[90px] h-[82px] bg-[#FFFDF8] rounded-xs p-1.5 border border-[#D5C7B5] shadow-[0_6px_18px_rgba(40,25,15,0.2)] -rotate-3 cursor-grab active:cursor-grabbing flex flex-col justify-between"
+                    whileHover={{ scale: 1.05, y: -3, rotate: -1 }}
+                    whileTap={{ scale: 0.96 }}
+                    whileDrag={{ scale: 1.08, rotate: 0, zIndex: 100 }}
+                    className="relative w-[88px] h-[82px] bg-[#FFFDF8] rounded-xs p-1.5 border border-[#D5C7B5] shadow-[0_6px_18px_rgba(40,25,15,0.2)] -rotate-3 cursor-grab active:cursor-grabbing flex flex-col justify-between"
                   >
                     {/* Selotip Washi Tape Nyata di Sudut Kiri Atas */}
                     <div className="absolute -top-2.5 -left-3 z-30 pointer-events-none">
@@ -706,7 +745,7 @@ export function Segment2Soundtrack({ onComplete }) {
                     </div>
 
                     {/* Area Gambar Polaroid dengan Foto Kenangan */}
-                    <div className="w-full h-[50px] bg-[#2E241E] rounded-xs relative overflow-hidden flex items-center justify-center border border-black/15 shadow-inner">
+                    <div className="w-full h-[50px] shrink-0 bg-[#2E241E] rounded-xs relative overflow-hidden flex items-center justify-center border border-black/15 shadow-inner">
                       <Image
                         src="/images/polaroids/photo1.svg"
                         alt="Polaroid Preview"
