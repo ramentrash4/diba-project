@@ -484,11 +484,11 @@ export function Segment2Soundtrack({ onComplete }) {
           className="w-full mt-2"
         >
           {insertedTape && !isRackExpanded ? (
-            /* MODE RAK KOMPAK (DRAWER) - Menghemat ~150px ruang layar di mobile saat lagu berputar */
-            <div className="w-full bg-[#EFE6D8]/60 border border-[#D5C2AA] rounded-xl p-2 shadow-xs">
+            /* MODE RAK KOMPAK (DRAWER) - Tetap Berbentuk Kaset Fisik & Bisa Drag-and-Drop ke Player */
+            <div className="w-full bg-[#EFE6D8]/70 border border-[#D5C2AA] rounded-xl p-2 shadow-xs">
               <div className="flex items-center justify-between mb-1.5 px-0.5">
                 <span className="font-typewriter text-[10px] uppercase tracking-wider text-[#3D2E1F] font-black">
-                  Kaset Lainnya di Rak:
+                  Kaset Lainnya di Rak (Tarik ↑):
                 </span>
                 <button
                   onClick={() => setIsRackExpanded(true)}
@@ -499,36 +499,103 @@ export function Segment2Soundtrack({ onComplete }) {
                 </button>
               </div>
 
-              {/* 2 Kaset Tersisa Berjejer Rapi (Side-by-side) */}
+              {/* 2 Kaset Fisik Tersisa Berjejer Rapi (Side-by-side) - Tetap Berbentuk Kaset & Drag-and-Drop */}
               <div className="grid grid-cols-2 gap-2">
                 {scrapbookData.soundtrack
                   .filter((tape) => tape.id !== insertedTape.id)
-                  .map((tape) => (
-                    <motion.button
-                      key={tape.id}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleInsertTape(tape)}
-                      className="h-[44px] rounded-lg p-1.5 border-2 shadow-xs flex items-center gap-1.5 bg-[#FFFDF8] border-[#CBB69E] hover:border-amber-500 cursor-pointer overflow-hidden text-left group"
-                    >
-                      <div className="w-8 h-8 rounded shrink-0 overflow-hidden relative border border-black/20 bg-white">
-                        <Image
-                          src={tape.coverImage}
-                          alt={tape.title}
-                          fill
-                          className="object-cover"
-                          sizes="32px"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="font-sans-ui text-[11px] font-black text-[#140E0A] truncate block leading-tight group-hover:text-[#8C3E2D]">
-                          {tape.title}
-                        </span>
-                        <span className="font-mono text-[8px] text-[#6B5441] font-bold truncate block">
-                          {tape.tag} • Putar ➔
-                        </span>
-                      </div>
-                    </motion.button>
-                  ))}
+                  .map((tape, subIdx) => {
+                    const origIdx = scrapbookData.soundtrack.findIndex((t) => t.id === tape.id);
+                    const tapeStyles = [
+                      {
+                        bg: "bg-[#D88A78]",
+                        border: "border-[#A85848]",
+                        labelBg: "bg-[#FFF9EE]",
+                        accent: "#8C3420",
+                      },
+                      {
+                        bg: "bg-[#C47D8A]",
+                        border: "border-[#9E5361]",
+                        labelBg: "bg-[#FDF5F6]",
+                        accent: "#7A3440",
+                      },
+                      {
+                        bg: "bg-[#7AA089]",
+                        border: "border-[#537A62]",
+                        labelBg: "bg-[#F5F9F6]",
+                        accent: "#385944",
+                      },
+                    ];
+                    const style = tapeStyles[origIdx >= 0 ? origIdx % tapeStyles.length : subIdx % tapeStyles.length];
+
+                    return (
+                      <motion.div
+                        key={tape.id}
+                        drag
+                        dragSnapToOrigin={true}
+                        dragElastic={0.15}
+                        onDrag={(e, info) => {
+                          if (info.offset.y < -50) setIsDropTargetActive(true);
+                          else setIsDropTargetActive(false);
+                        }}
+                        onDragEnd={(e, info) => {
+                          setIsDropTargetActive(false);
+                          if (info.offset.y < -70) handleInsertTape(tape);
+                        }}
+                        onClick={() => handleInsertTape(tape)}
+                        whileHover={{ scale: 1.03, y: -2 }}
+                        whileTap={{ scale: 0.97 }}
+                        whileDrag={{
+                          scale: 1.06,
+                          zIndex: 9999,
+                          rotate: -2,
+                          boxShadow: "0 16px 26px rgba(0,0,0,0.35)",
+                        }}
+                        className={`relative w-full h-[66px] rounded-xl p-1.5 border-2 shadow-md cursor-grab active:cursor-grabbing flex flex-col justify-between overflow-hidden select-none ${style.bg} ${style.border}`}
+                      >
+                        {/* Baris Atas: Cover Album Mini + Judul & Track */}
+                        <div className="flex items-center gap-1.5 overflow-hidden">
+                          <div className="w-8 h-8 rounded shrink-0 overflow-hidden relative border border-black/25 shadow-xs bg-white">
+                            <Image
+                              src={tape.coverImage}
+                              alt={tape.title}
+                              fill
+                              className="object-cover"
+                              sizes="32px"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0 text-left">
+                            <span
+                              className="font-typewriter text-[8px] font-black uppercase tracking-wider block truncate"
+                              style={{ color: style.accent }}
+                            >
+                              0{origIdx + 1} • {tape.duration}
+                            </span>
+                            <span className="font-sans-ui text-[11px] font-black text-[#140E0A] truncate block leading-tight">
+                              {tape.title}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Baris Bawah: Pita Magnetik Mini, Roda Kaset & Panah Drag */}
+                        <div
+                          className={`w-full h-[22px] rounded px-1.5 border border-[#CBB69E] shadow-xs flex items-center justify-between ${style.labelBg}`}
+                        >
+                          <span className="font-typewriter text-[8.5px] text-[#453629] font-bold truncate max-w-[80px]">
+                            {tape.artist}
+                          </span>
+                          <div className="flex items-center gap-1 shrink-0">
+                            {/* Roda Kaset Mini */}
+                            <div className="w-3.5 h-3.5 rounded-full bg-white border border-[#3D2E1C] flex items-center justify-center">
+                              <div className="w-1 h-1 rounded-full bg-[#3D2E1C]" />
+                            </div>
+                            <div className="w-4 h-4 rounded-full bg-black/30 text-white flex items-center justify-center text-[9px] font-black shadow-xs">
+                              ↑
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
               </div>
             </div>
           ) : (
@@ -764,12 +831,6 @@ export function Segment2Soundtrack({ onComplete }) {
                     </span>
                   </motion.div>
                 </div>
-              </div>
-
-              {/* Teks Bantuan / Hint Ergonomis (Murni Petunjuk Visual Non-Clickable) */}
-              <div className="mt-1 flex items-center gap-1.5 text-[#5A4839] font-handwriting text-[13px] font-bold select-none pointer-events-none">
-                <Sparkles className="w-3 h-3 text-[#8C3E2D]" />
-                <span>~ tarik fotonya ke atas untuk membuka album 📸 ~</span>
               </div>
             </motion.div>
           )}
