@@ -1,0 +1,153 @@
+/**
+ * Web Audio API Synthesizer & Procedural Sound Engine
+ * Digunakan sebagai penghasil efek suara (SFX) dan fallback musik lo-fi merdu
+ * sebelum file MP3 asli dimasukkan oleh Tatwa.
+ */
+
+let audioCtx = null;
+
+function getAudioContext() {
+  if (typeof window === "undefined") return null;
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
+    }
+  }
+  if (audioCtx && audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+/**
+ * Memainkan nada instrumen lembut (piano/kalimba chimes)
+ */
+export function playSyntheticNote(freq = 440, duration = 0.8, type = "sine", gainLevel = 0.15) {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+    // Warm envelope (attack & gentle decay)
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(gainLevel, ctx.currentTime + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch (err) {
+    console.warn("Web Audio Note error:", err);
+  }
+}
+
+/**
+ * Efek Suara Haptik (SFX)
+ */
+export function playSfx(name) {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  switch (name) {
+    case "tape-click":
+      // Suara klik tombol kaset mekanik
+      playSyntheticNote(240, 0.08, "triangle", 0.2);
+      setTimeout(() => playSyntheticNote(180, 0.05, "sine", 0.1), 40);
+      break;
+
+    case "paper-swoosh":
+      // Suara lembar foto / kertas bergeser
+      playSyntheticNote(320, 0.12, "sine", 0.08);
+      break;
+
+    case "unboxing-chime":
+      // Melodi pembuka kado: nada C5 -> E5 -> G5 -> B5 -> C6
+      [523.25, 659.25, 783.99, 987.77, 1046.5].forEach((freq, idx) => {
+        setTimeout(() => {
+          playSyntheticNote(freq, 1.2, "sine", 0.12);
+        }, idx * 110);
+      });
+      break;
+
+    case "sparkle":
+      // Suara kilauan saat embun kaca terhapus
+      [880, 1100, 1320, 1760].forEach((freq, idx) => {
+        setTimeout(() => {
+          playSyntheticNote(freq, 0.3, "triangle", 0.06);
+        }, idx * 60);
+      });
+      break;
+
+    case "bubble-pop":
+      // Suara chat bubble Tatwa muncul
+      playSyntheticNote(600, 0.09, "sine", 0.18);
+      setTimeout(() => playSyntheticNote(850, 0.12, "sine", 0.15), 50);
+      break;
+
+    default:
+      playSyntheticNote(440, 0.15, "sine", 0.1);
+  }
+}
+
+/**
+ * Generator Melodi Lo-Fi Ambient sederhana untuk BGM
+ */
+class LofiAmbientEngine {
+  constructor() {
+    this.isPlaying = false;
+    this.intervalId = null;
+    this.chords = [
+      [261.63, 329.63, 392.0, 493.88], // Cmaj7
+      [220.0, 261.63, 329.63, 392.0],  // Am7
+      [174.61, 220.0, 261.63, 329.63], // Fmaj7
+      [196.0, 246.94, 293.66, 392.0],  // G7
+    ];
+    this.chordIndex = 0;
+    this.masterGain = null;
+  }
+
+  start() {
+    const ctx = getAudioContext();
+    if (!ctx || this.isPlaying) return;
+
+    this.isPlaying = true;
+    let step = 0;
+
+    const playChordStep = () => {
+      if (!this.isPlaying) return;
+      const currentChord = this.chords[this.chordIndex % this.chords.length];
+
+      // Arpeggiate chord gently
+      currentChord.forEach((freq, i) => {
+        setTimeout(() => {
+          if (this.isPlaying) {
+            playSyntheticNote(freq, 2.2, "sine", 0.04);
+          }
+        }, i * 380);
+      });
+
+      this.chordIndex = (this.chordIndex + 1) % this.chords.length;
+    };
+
+    playChordStep();
+    this.intervalId = setInterval(playChordStep, 3200);
+  }
+
+  stop() {
+    this.isPlaying = false;
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+  }
+}
+
+export const lofiEngine = new LofiAmbientEngine();

@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+:root {
+  /* Paper & Scrapbook Tokens */
+  --paper-cream: #FAF7F2;
+  --paper-kraft: #EFE7DA;
+  --paper-aged: #E4DAC9;
+  --paper-dark: #2B2520;
+
+  /* Ink Colors */
+  --ink-primary: #2C2621;
+  --ink-muted: #6B6259;
+  --ink-faded: #9E9489;
+  --ink-blue-pen: #1D3557;
+
+  /* Washi Tape & Pastels */
+  --washi-rose: #E8B4B8;
+  --washi-sage: #B8C4B8;
+  --washi-mustard: #E2C275;
+  --washi-sky: #A8C0D6;
+
+  /* Night Atmosphere */
+  --night-bg: #141B2B;
+  --night-card: rgba(26, 35, 54, 0.88);
+  --night-glow: #FFAA5A;
+}
+
+/* Typography utility classes */
+.font-handwriting {
+  font-family: var(--font-handwriting), "Caveat", cursive;
+}
+
+.font-typewriter {
+  font-family: var(--font-typewriter), "Courier Prime", monospace;
+}
+
+.font-sans-ui {
+  font-family: var(--font-sans), "Plus Jakarta Sans", sans-serif;
+}
+
+/* Custom Paper Shadows */
+.paper-shadow {
+  box-shadow: 0 4px 15px -3px rgba(44, 38, 33, 0.08), 0 2px 6px -2px rgba(44, 38, 33, 0.04);
+}
+
+.paper-shadow-lifted {
+  box-shadow: 0 10px 25px -5px rgba(44, 38, 33, 0.12), 0 8px 10px -6px rgba(44, 38, 33, 0.08);
+}
+
+.night-card-glow {
+  box-shadow: 0 0 35px rgba(255, 170, 90, 0.12), 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* Prevent accidental iOS rubberband interference during drag gestures */
+html, body {
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
