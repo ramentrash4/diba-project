@@ -34,9 +34,53 @@ export function Segment5KacaEmbun({ onComplete }) {
   const isDrawing = useRef(false);
   const lastPoint = useRef(null);
   const wipeAudioCooldown = useRef(0);
+  const totalWipeDistance = useRef(0);
+  const autoTransitionTimer = useRef(null);
 
   const currentItem = memories[activeTab];
   const isCurrentCleared = !!clearedTabs[activeTab];
+
+  // Bersihkan timer transisi otomatis jika komponen unmount atau tab berganti
+  useEffect(() => {
+    return () => {
+      if (autoTransitionTimer.current) {
+        clearTimeout(autoTransitionTimer.current);
+      }
+    };
+  }, [activeTab]);
+
+  // Transisi Re-Frosting: Mengalirkan uap dingin ke jendela berikutnya
+  const handleProceedNext = useCallback(() => {
+    if (isReFrosting || isFinishing) return;
+    if (autoTransitionTimer.current) {
+      clearTimeout(autoTransitionTimer.current);
+      autoTransitionTimer.current = null;
+    }
+
+    if (activeTab + 1 < memories.length) {
+      // Masih ada kaca berikutnya -> Uap dingin mengembun kembali
+      setIsReFrosting(true);
+      playSfx("mist-wipe");
+
+      // Setengah jalan saat uap menutup kaca: ganti memori
+      setTimeout(() => {
+        totalWipeDistance.current = 0;
+        setActiveTab((prev) => prev + 1);
+      }, 350);
+
+      // Selesaikan animasi uap mengembun
+      setTimeout(() => {
+        setIsReFrosting(false);
+      }, 700);
+    } else {
+      // Kaca terakhir (Hal Kecil #3) -> Transisi membuka jendela kafe ke Segmen 6
+      setIsFinishing(true);
+      playSfx("paper-swoosh");
+      setTimeout(() => {
+        onComplete();
+      }, 1200);
+    }
+  }, [activeTab, isReFrosting, isFinishing, memories.length, onComplete, playSfx]);
 
   // Inisialisasi kanvas kaca berembun setiap kali berpindah tab
   const drawFog = useCallback(() => {
@@ -73,6 +117,7 @@ export function Segment5KacaEmbun({ onComplete }) {
     }
 
     setClearedPercent(0);
+    totalWipeDistance.current = 0;
   }, [activeTab]);
 
   useEffect(() => {
@@ -88,7 +133,7 @@ export function Segment5KacaEmbun({ onComplete }) {
   }, [activeTab, drawFog]);
 
   // Hitung persentase embun yang terhapus
-  const checkClearedPercentage = () => {
+  const checkClearedPercentage = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -103,7 +148,8 @@ export function Segment5KacaEmbun({ onComplete }) {
 
       for (let i = 3; i < data.length; i += 4 * sampleStep) {
         totalSampled++;
-        if (data[i] === 0) {
+        // Hitung pixel yang sudah terhapus transparan atau semi-transparan
+        if (data[i] < 120) {
           emptyPixels++;
         }
       }
@@ -111,14 +157,33 @@ export function Segment5KacaEmbun({ onComplete }) {
       const percent = Math.round((emptyPixels / totalSampled) * 100);
       setClearedPercent(percent);
 
-      if (percent >= 35 && !clearedTabs[activeTab]) {
+      // Cukup 10% atau jarak usap > 180px untuk membuka pesan secara responsif
+      const isWipedEnough = percent >= 10 || totalWipeDistance.current > 180;
+
+      if (isWipedEnough && !clearedTabs[activeTab]) {
         playSfx("sparkle");
         setClearedTabs((prev) => ({ ...prev, [activeTab]: true }));
+
+        // Transisi otomatis ke jendela berikutnya setelah jeda waktu membaca yang pas (~2.5s)
+        if (!autoTransitionTimer.current) {
+          autoTransitionTimer.current = setTimeout(() => {
+            handleProceedNext();
+          }, 2400);
+        }
       }
     } catch {
-      // Abaikan jika ada issue read pixel di browser tertentu
+      // Fallback jika getImageData gagal: gunakan total distance
+      if (totalWipeDistance.current > 180 && !clearedTabs[activeTab]) {
+        playSfx("sparkle");
+        setClearedTabs((prev) => ({ ...prev, [activeTab]: true }));
+        if (!autoTransitionTimer.current) {
+          autoTransitionTimer.current = setTimeout(() => {
+            handleProceedNext();
+          }, 2400);
+        }
+      }
     }
-  };
+  }, [activeTab, clearedTabs, handleProceedNext, playSfx]);
 
   // Logika mengusap kaca (Scratch / Wiper)
   const getCanvasCoordinates = (e) => {
@@ -156,6 +221,13 @@ export function Segment5KacaEmbun({ onComplete }) {
 
     const currentPoint = getCanvasCoordinates(e);
 
+    // Akumulasi jarak usapan jari
+    if (lastPoint.current) {
+      const dx = currentPoint.x - lastPoint.current.x;
+      const dy = currentPoint.y - lastPoint.current.y;
+      totalWipeDistance.current += Math.sqrt(dx * dx + dy * dy);
+    }
+
     // Mainkan suara usapan kaca dengan cooldown
     const now = Date.now();
     if (now - wipeAudioCooldown.current > 180) {
@@ -164,7 +236,7 @@ export function Segment5KacaEmbun({ onComplete }) {
     }
 
     ctx.globalCompositeOperation = "destination-out";
-    ctx.lineWidth = 46;
+    ctx.lineWidth = 48;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
@@ -173,39 +245,22 @@ export function Segment5KacaEmbun({ onComplete }) {
       ctx.moveTo(lastPoint.current.x, lastPoint.current.y);
       ctx.lineTo(currentPoint.x, currentPoint.y);
     } else {
-      ctx.arc(currentPoint.x, currentPoint.y, 23, 0, Math.PI * 2);
+      ctx.arc(currentPoint.x, currentPoint.y, 24, 0, Math.PI * 2);
     }
     ctx.stroke();
 
     lastPoint.current = currentPoint;
+
+    // Cek berkala saat mengusap jika usapan sudah cukup panjang
+    if (totalWipeDistance.current > 220 && !clearedTabs[activeTab]) {
+      checkClearedPercentage();
+    }
   };
 
-  // Transisi Re-Frosting: Ketuk kaca bersih untuk mengembunkan kembali uap dingin baru
+  // Ketukan pada kaca yang sudah bersih untuk langsung melompat tanpa menunggu timer
   const handleTapGlass = () => {
     if (!isCurrentCleared || isReFrosting || isFinishing) return;
-
-    if (activeTab + 1 < memories.length) {
-      // Masih ada kaca berikutnya -> Uap dingin mengembun kembali
-      setIsReFrosting(true);
-      playSfx("mist-wipe");
-
-      // Setengah jalan saat uap menutup kaca: ganti memori
-      setTimeout(() => {
-        setActiveTab((prev) => prev + 1);
-      }, 350);
-
-      // Selesaikan animasi uap mengembun
-      setTimeout(() => {
-        setIsReFrosting(false);
-      }, 700);
-    } else {
-      // Kaca terakhir (Hal Kecil #3) -> Transisi membuka jendela kafe ke Segmen 6
-      setIsFinishing(true);
-      playSfx("paper-swoosh");
-      setTimeout(() => {
-        onComplete();
-      }, 1200);
-    }
+    handleProceedNext();
   };
 
   return (
@@ -350,13 +405,13 @@ export function Segment5KacaEmbun({ onComplete }) {
           ) : activeTab === memories.length - 1 ? (
             <div className="bg-[#182333]/95 border border-amber-400/40 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-amber-200 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs">
               <span>🎙️</span>
-              <span className="font-black">Ketuk kaca untuk membuka rekaman suara kita ✨</span>
+              <span className="font-black">Kaca bersih! Membuka rekaman suara sebentar lagi... ✨</span>
             </div>
           ) : (
             <div className="bg-[#182333]/90 border border-blue-300/30 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-blue-100 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs">
               <span>✨ Kaca bersih!</span>
               <span className="text-blue-300/40">•</span>
-              <span>Ketuk kaca untuk mengembunkan hal berikutnya ❄️</span>
+              <span>Lanjut sebentar lagi (atau ketuk kaca) ❄️</span>
             </div>
           )}
         </div>
