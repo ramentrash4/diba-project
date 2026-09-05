@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
   Camera,
-  BookOpen,
   Paperclip,
 } from "lucide-react";
 import Image from "next/image";
@@ -28,9 +27,6 @@ export function Segment3Polaroid({ onComplete }) {
 
   // Arah perpindahan foto ('next' | 'prev') untuk animasi transisi masuk
   const [slideDirection, setSlideDirection] = useState("next");
-
-  // Status apakah pengguna sudah melihat seluruh foto
-  const [hasFinishedAll, setHasFinishedAll] = useState(false);
 
   // Ref untuk mendeteksi apakah pengguna sedang men-drag foto (mencegah flip tidak sengaja)
   const isDraggingRef = useRef(false);
@@ -63,9 +59,10 @@ export function Segment3Polaroid({ onComplete }) {
       if (currentIndex + 1 < polaroids.length) {
         setCurrentIndex((prev) => prev + 1);
       } else {
-        setHasFinishedAll(true);
+        // Selesai melihat seluruh foto polaroid, transisi mulus ke Segmen 4 (Kamus Bahasa Kita)
+        onComplete();
       }
-    }, 200);
+    }, 220);
   };
 
   // Tarik kembali foto sebelumnya (interaktif tanpa tombol)
@@ -76,23 +73,6 @@ export function Segment3Polaroid({ onComplete }) {
     setIsFlipped(false);
     setExitX(0);
     setCurrentIndex((prev) => prev - 1);
-  };
-
-  // Status animasi membuka cover buku saku kamus (3D open animation)
-  const [isBookOpening, setIsBookOpening] = useState(false);
-
-  // Handler membuka cover buku saku dengan gestur kancing / swipe cover
-  const handleUnlockAndOpenBook = () => {
-    if (isBookOpening) return;
-    setIsBookOpening(true);
-    playSfx("clasp-open");
-    setTimeout(() => {
-      playSfx("page-turn");
-    }, 120);
-
-    setTimeout(() => {
-      onComplete();
-    }, 550);
   };
 
   const currentPhoto = polaroids[currentIndex];
@@ -106,178 +86,42 @@ export function Segment3Polaroid({ onComplete }) {
         <div className="w-full flex flex-col items-center text-center z-20">
           <div className="relative inline-block mb-1">
             <WashiTape
-              color={hasFinishedAll ? "mustard" : "sage"}
+              color="sage"
               angle={-1.5}
               className="absolute -top-3 left-1/2 -translate-x-1/2"
             />
             <h2 className="font-handwriting text-2xl sm:text-3xl text-[#140E0A] font-black tracking-wide pt-1">
-              {hasFinishedAll ? "Kamus Bahasa Kita 📖" : "Tumpukan Memori 📸"}
+              Tumpukan Memori 📸
             </h2>
           </div>
 
-          {/* Counter Badge Pill & Dots saat foto aktif / Badge Khusus saat cover buku */}
-          {hasFinishedAll ? (
-            <span className="font-mono text-[9.5px] text-[#8C3E2D] font-black uppercase tracking-wider bg-[#FAF0E6] px-2.5 py-0.5 rounded-full border border-[#E8DACB]">
-              Buku Saku Rahasia • Pilkom 25
+          {/* Counter Badge Pill & Dots saat foto aktif */}
+          <div className="mt-1 flex items-center gap-2 bg-[#EFE4D6]/90 px-3 py-1 rounded-full border border-[#D5C7B5] shadow-2xs">
+            <Camera className="w-3.5 h-3.5 text-[#8C3E2D]" />
+            <span className="font-mono text-[10.5px] font-black text-[#2E2016]">
+              Foto 0{currentIndex + 1} / 0{polaroids.length}
             </span>
-          ) : (
-            <div className="mt-1 flex items-center gap-2 bg-[#EFE4D6]/90 px-3 py-1 rounded-full border border-[#D5C7B5] shadow-2xs">
-              <Camera className="w-3.5 h-3.5 text-[#8C3E2D]" />
-              <span className="font-mono text-[10.5px] font-black text-[#2E2016]">
-                Foto 0{currentIndex + 1} / 0{polaroids.length}
-              </span>
-              <div className="flex items-center gap-1 ml-1">
-                {polaroids.map((_, i) => (
-                  <button
-                    key={`dot-${i}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      playSfx("paper-swoosh");
-                      setSlideDirection(i < currentIndex ? "prev" : "next");
-                      setIsFlipped(false);
-                      setCurrentIndex(i);
-                    }}
-                    className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                      i === currentIndex
-                        ? "bg-[#8C3E2D] w-3"
-                        : i < currentIndex
-                        ? "bg-[#A8947E] hover:bg-[#8C3E2D] w-1.5"
-                        : "bg-[#D5C7B5] hover:bg-[#A8947E] w-1.5"
-                    }`}
-                    title={`Foto ${i + 1}`}
-                  />
-                ))}
-              </div>
+            <div className="flex items-center gap-1 ml-1">
+              {polaroids.map((_, i) => (
+                <div
+                  key={`dot-${i}`}
+                  className={`h-1.5 rounded-full transition-all ${
+                    i === currentIndex
+                      ? "bg-[#8C3E2D] w-3"
+                      : i < currentIndex
+                      ? "bg-[#A8947E] w-1.5"
+                      : "bg-[#D5C7B5] w-1.5"
+                  }`}
+                  title={`Foto ${i + 1}`}
+                />
+              ))}
             </div>
-          )}
+          </div>
         </div>
 
         {/* 2. TUMPUKAN KARTU POLAROID FISIK REALISTIS */}
         <div className="w-full max-w-[325px] sm:max-w-[340px] h-[360px] sm:h-[375px] relative flex items-center justify-center z-10">
-          
-          {/* KONDISI A: PENGGUNA SUDAH MENYELESAIKAN SEMUA FOTO -> BUKU SAKU KAMUS KITA (INTERAKTIF BUKA COVER) */}
-          {hasFinishedAll ? (
-            <div
-              className="w-full max-w-[295px] sm:max-w-[310px] h-[350px] sm:h-[365px] relative"
-              style={{ perspective: "1200px" }}
-            >
-              {/* 1. BAGIAN DALAM BUKU SAKU: KERTAS BERGARIS MEWAH (TERLIHAT SAAT COVER TERBUKA KE KIRI) */}
-              <div className="absolute inset-0 bg-[#FFFDF8] rounded-2xl p-4 border border-[#D5C7B5] shadow-inner flex flex-col justify-between overflow-hidden">
-                <div className="w-full h-full flex flex-col justify-between py-2 border-l-2 border-[#E8DACB] pl-3 select-none">
-                  <div className="flex items-center justify-between border-b border-[#E8DACB] pb-1.5">
-                    <span className="font-mono text-[9px] text-[#8C3E2D] font-black tracking-wider">
-                      EDISI SPESIAL KITA • 2025
-                    </span>
-                    <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-spin" />
-                  </div>
-                  <div className="space-y-2.5 py-4">
-                    <div className="h-3 bg-amber-200/60 rounded-sm w-3/4 -rotate-0.5" />
-                    <div className="h-2 bg-[#EFE4D6] rounded w-full" />
-                    <div className="h-2 bg-[#EFE4D6] rounded w-5/6" />
-                    <div className="h-2 bg-[#EFE4D6] rounded w-4/5" />
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-[#E8DACB]">
-                    <span className="font-handwriting text-sm text-[#1E3A8A] font-bold">— Tatwa ✨</span>
-                    <span className="font-mono text-[9px] text-[#8C7A6B]">HAL. 01</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 2. COVER DEPAN BUKU SAKU KULIT FISIK (LURUS, TEGAK, HANYA KANCING YANG DAPAT DIGESER) */}
-              <motion.div
-                layoutId="shared-pocket-book"
-                style={{
-                  transformOrigin: "left center",
-                  transformStyle: "preserve-3d",
-                }}
-                initial={{ rotate: 0, rotateY: 0, scale: 1, x: 0, y: 0 }}
-                animate={
-                  isBookOpening
-                    ? {
-                        rotate: 0,
-                        rotateY: -115,
-                        opacity: [1, 1, 0.15],
-                        scale: 1.02,
-                        x: -25,
-                        transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
-                      }
-                    : {
-                        rotate: 0,
-                        rotateY: 0,
-                        scale: 1,
-                        x: 0,
-                        y: 0,
-                        opacity: 1,
-                      }
-                }
-                className="w-full h-full bg-gradient-to-b from-[#4A3222] via-[#3B2516] to-[#2B190D] rounded-2xl p-4 sm:p-5 border-4 border-[#6E4B33] shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col justify-between relative paper-shadow select-none z-10"
-              >
-                {/* Tekstur Jahitan Buku Kulit (Stitching) */}
-                <div className="absolute inset-2 rounded-xl border border-dashed border-[#8C6549]/50 pointer-events-none z-10" />
-
-                {/* Tulang Buku Kiri (Spine) */}
-                <div className="absolute left-3.5 top-0 bottom-0 w-3 bg-black/25 border-r border-[#6E4B33] z-10" />
-
-                {/* Pita Pembatas Buku Merah Terjulur Lurus di Bawah */}
-                <div className="absolute -bottom-5 right-8 w-4 h-8 bg-[#A83226] shadow-md rounded-b-xs pointer-events-none z-30 flex items-end justify-center pb-1">
-                  <div className="w-2 h-2 border-b-2 border-r-2 border-[#FFE8E8]/70 transform rotate-45 mb-0.5" />
-                </div>
-
-                {/* Bagian Atas Sampul: Stempel Emas Pos */}
-                <div className="flex items-center justify-between pl-4 z-10">
-                  <span className="font-mono text-[9px] text-[#F3D39B] font-black uppercase tracking-wider bg-black/40 px-2 py-0.5 rounded border border-[#C59F60]/40">
-                    LIMITED EDITION • 01/01
-                  </span>
-                  <BookOpen className="w-4 h-4 text-[#F3D39B]" />
-                </div>
-
-                {/* Bagian Tengah Sampul: Judul Emboss Emas Mewah */}
-                <div className="text-center pl-4 my-auto z-10 space-y-1">
-                  <span className="font-typewriter text-[10.5px] uppercase tracking-widest text-[#D4AF7A] font-black block">
-                    Buku Saku
-                  </span>
-                  <h3 className="font-handwriting text-3xl sm:text-4xl text-[#FFF6E5] font-black tracking-wide leading-tight drop-shadow-md">
-                    Kamus Bahasa Kita 📖
-                  </h3>
-                  <p className="font-sans-ui text-[11px] text-[#D8C2A7] font-bold leading-relaxed pt-1 max-w-[220px] mx-auto">
-                    Hanya kita berdua yang tahu arti setiap kata di dalamnya.
-                  </p>
-                </div>
-
-                {/* Tali Pengunci dengan Kancing Kuningan Geser Fisik (Satu-satunya elemen yang dapat di-drag) */}
-                <div className="w-full flex flex-col items-center pl-4 z-20">
-                  <div className="w-full max-w-[240px] h-11 bg-black/45 rounded-full p-1 border border-[#8C6D1F]/60 shadow-inner relative flex items-center justify-between">
-                    {/* Label Jalur Geser Kancing */}
-                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-mono text-[#D4AF7A]/85 font-black tracking-wider pointer-events-none pl-6">
-                      Geser Kancing ➔
-                    </span>
-
-                    {/* Kancing Kuningan Fisik yang Dapat Di-drag ke Kanan */}
-                    <motion.div
-                      drag={isBookOpening ? false : "x"}
-                      dragConstraints={{ left: 0, right: 140 }}
-                      dragElastic={0.15}
-                      dragSnapToOrigin={!isBookOpening}
-                      onDragEnd={(e, info) => {
-                        if (info.offset.x > 50 || info.velocity.x > 140) {
-                          handleUnlockAndOpenBook();
-                        }
-                      }}
-                      whileHover={{ scale: 1.08 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="w-9 h-9 rounded-full bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#AA771C] border-2 border-white/70 shadow-lg cursor-grab active:cursor-grabbing flex items-center justify-center z-30"
-                    >
-                      <div className="w-3.5 h-3.5 rounded-full bg-[#3D2513] border border-white/70 shadow-inner flex items-center justify-center">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
-                      </div>
-                    </motion.div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          ) : (
-            /* KONDISI B: TUMPUKAN FOTO AKTIF (FLIP & THROW) */
-            <div className="w-full h-full relative flex items-center justify-center">
+          <div className="w-full h-full relative flex items-center justify-center">
               
               {/* LAYER TUMPUKAN FOTO LAMA DI KIRI (JIKA ADA LEBIH DARI 1 FOTO TERLEWAT) */}
               {currentIndex > 1 && (
@@ -565,60 +409,45 @@ export function Segment3Polaroid({ onComplete }) {
                 </motion.div>
               </AnimatePresence>
             </div>
-          )}
         </div>
 
         {/* 3. PANDUAN INTERAKSI FISIK SKEUOMORFIK TUNGGAL (JELAS, TEGAS, KONTEKSTUAL) */}
-        {hasFinishedAll ? (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="z-20 select-none pointer-events-none w-full max-w-[325px]"
-          >
-            <div className="bg-[#EFE4D6]/95 border border-[#D5C7B5] rounded-full px-4 py-2 shadow-2xs flex items-center justify-center gap-2 text-[#3A281A] font-sans-ui text-[11px] sm:text-[11.5px] font-bold text-center">
-              <span>🔓</span>
-              <span>Geser kancing ke kanan untuk membuka kamus</span>
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="z-20 select-none pointer-events-none w-full max-w-[325px]"
+        >
+          <div className="bg-[#EFE4D6]/95 border border-[#D5C7B5] rounded-2xl px-3.5 py-1.5 shadow-2xs flex flex-col items-center gap-0.5 text-[#3A281A] font-sans-ui text-[11px] font-bold text-center">
+            {/* Baris 1: Petunjuk Membalik Kartu */}
+            <div className="flex items-center gap-1.5 text-[#2E2016]">
+              <span>👆</span>
+              <span>Ketuk foto untuk membalik catatan</span>
             </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="z-20 select-none pointer-events-none w-full max-w-[325px]"
-          >
-            <div className="bg-[#EFE4D6]/95 border border-[#D5C7B5] rounded-2xl px-3.5 py-1.5 shadow-2xs flex flex-col items-center gap-0.5 text-[#3A281A] font-sans-ui text-[11px] font-bold text-center">
-              {/* Baris 1: Petunjuk Membalik Kartu */}
-              <div className="flex items-center gap-1.5 text-[#2E2016]">
-                <span>👆</span>
-                <span>Ketuk foto untuk membalik catatan</span>
-              </div>
 
-              {/* Baris 2: Petunjuk Arah Geser yang Gamblang & Kontekstual */}
-              <div className="flex items-center justify-center gap-2 text-[10.5px] border-t border-[#D5C7B5]/60 pt-0.5 w-full">
-                {currentIndex > 0 ? (
-                  <>
-                    <span className="text-[#8C3E2D] font-black flex items-center gap-1">
-                      <span>👉</span>
-                      <span>Geser kanan: Sebelumnya</span>
-                    </span>
-                    <span className="text-[#B5A38E]">•</span>
-                    <span className="text-[#1E3A8A] font-black flex items-center gap-1">
-                      <span>👈</span>
-                      <span>Geser kiri: Lanjut</span>
-                    </span>
-                  </>
-                ) : (
+            {/* Baris 2: Petunjuk Arah Geser yang Gamblang & Kontekstual */}
+            <div className="flex items-center justify-center gap-2 text-[10.5px] border-t border-[#D5C7B5]/60 pt-0.5 w-full">
+              {currentIndex > 0 ? (
+                <>
+                  <span className="text-[#8C3E2D] font-black flex items-center gap-1">
+                    <span>👉</span>
+                    <span>Geser kanan: Sebelumnya</span>
+                  </span>
+                  <span className="text-[#B5A38E]">•</span>
                   <span className="text-[#1E3A8A] font-black flex items-center gap-1">
                     <span>👈</span>
-                    <span>Geser kartu ke kiri untuk foto berikutnya</span>
+                    <span>Geser kiri: Lanjut</span>
                   </span>
-                )}
-              </div>
+                </>
+              ) : (
+                <span className="text-[#1E3A8A] font-black flex items-center gap-1">
+                  <span>👈</span>
+                  <span>Geser kartu ke kiri untuk foto berikutnya</span>
+                </span>
+              )}
             </div>
-          </motion.div>
-        )}
+          </div>
+        </motion.div>
 
       </div>
     </section>
