@@ -30,44 +30,51 @@ export function Segment8Closing({ onFinalLock }) {
   };
 
   return (
-    <section className="min-h-screen w-full flex flex-col justify-between items-center px-3.5 py-4 select-none relative overflow-hidden text-[#1E1712]">
-      
-      {/* 1. HEADER SEGMEN: TIKET DOA & PENUTUP */}
-      <div className="w-full max-w-[340px] flex flex-col items-center text-center mt-1 z-20">
-        <div className="relative inline-block mb-1">
-          <WashiTape color="mustard" angle={1.5} className="absolute -top-3 left-1/2 -translate-x-1/2" />
-          <h2 className="font-handwriting text-2xl sm:text-3xl text-[#140E0A] font-black tracking-wide pt-1">
-            Tiket Doa & Penutup 🕊️
-          </h2>
+    <section className="w-full flex-1 flex flex-col items-center justify-center px-3.5 py-2 sm:py-3 select-none relative overflow-hidden my-auto text-[#1E1712]">
+      {/* WRAPPER TENGAH DENGAN KERAPATAN MOBILE OPTIMAL */}
+      <div className="w-full max-w-[340px] flex flex-col items-center justify-center gap-2 sm:gap-2.5 my-auto">
+        
+        {/* 1. HEADER SEGMEN: TIKET DOA & PENUTUP */}
+        <div className="w-full flex flex-col items-center text-center relative z-20">
+          <div className="relative inline-block mb-1">
+            <WashiTape color="mustard" angle={1.5} className="absolute -top-3 left-1/2 -translate-x-1/2" />
+            <h2 className="font-handwriting text-2xl sm:text-3xl text-[#140E0A] font-black tracking-wide pt-1">
+              Tiket Doa & Penutup 🕊️
+            </h2>
+          </div>
+
+          <p className="font-typewriter text-[11px] sm:text-xs text-[#5A4839] font-bold">
+            Untuk lembaran barumu di masa depan.
+          </p>
         </div>
 
-        <p className="font-typewriter text-[11px] sm:text-xs text-[#5A4839] font-bold">
-          Untuk lembaran barumu di masa depan.
-        </p>
-      </div>
+        {/* 2. BOARDING PASS VINTAGE REALISTIS & SURAT PENUTUP */}
+        <div className="w-full max-w-[335px] sm:max-w-[340px] space-y-2.5 z-10 py-0.5">
+          
+          {/* KARTU BOARDING PASS VINTAGE (AIRLINE TICKET STUB DENGAN TEPIAN SOBEKAN PERFORASI SEGMEN 7) */}
+          <motion.div
+            initial={{ scale: 0.98, opacity: 1 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="w-full bg-[#FFFDF8] rounded-2xl border-2 border-[#D8C7B0] shadow-xl relative overflow-hidden paper-shadow"
+          >
+            {/* Tepian Atas Bergerigi Tanda Bekas Sobekan Perforasi dari Segmen 7 */}
+            <div className="w-full h-2 bg-[#702B1E] flex items-center justify-between px-2 overflow-hidden">
+              <div className="w-full border-t border-dashed border-amber-200/40" />
+            </div>
 
-      {/* 2. BOARDING PASS VINTAGE REALISTIS & SURAT PENUTUP */}
-      <div className="w-full max-w-[335px] sm:max-w-[350px] my-auto space-y-3 z-10 py-1">
-        
-        {/* KARTU BOARDING PASS VINTAGE (AIRLINE TICKET STUB) */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: "easeOut" }}
-          className="w-full bg-[#FFFDF8] rounded-2xl border-2 border-[#D8C7B0] shadow-xl relative overflow-hidden paper-shadow"
-        >
-          {/* Header Tiket: Garis Aksen Emas & Maskapai Kehidupan */}
-          <div className="bg-gradient-to-r from-[#8C3E2D] to-[#6E2E1F] text-white px-3.5 py-2 flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <Plane className="w-3.5 h-3.5 text-amber-300 rotate-45" />
-              <span className="font-mono text-[9.5px] font-black tracking-widest uppercase text-amber-200">
-                BOARDING PASS • FIRST CLASS
+            {/* Header Tiket: Garis Aksen Emas & Maskapai Kehidupan */}
+            <div className="bg-gradient-to-r from-[#8C3E2D] to-[#6E2E1F] text-white px-3.5 py-2 flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Plane className="w-3.5 h-3.5 text-amber-300 rotate-45" />
+                <span className="font-mono text-[9.5px] font-black tracking-widest uppercase text-amber-200">
+                  BOARDING PASS • FIRST CLASS
+                </span>
+              </div>
+              <span className="font-mono text-[9px] text-white/80 font-bold">
+                {ticket.flightNo}
               </span>
             </div>
-            <span className="font-mono text-[9px] text-white/80 font-bold">
-              {ticket.flightNo}
-            </span>
-          </div>
 
           {/* Badan Tiket Utama */}
           <div className="p-3.5 sm:p-4 text-left space-y-2.5 relative">
@@ -188,6 +195,8 @@ export function Segment8Closing({ onFinalLock }) {
         <span className="text-[10px] font-sans-ui text-[#8C7A6B] font-bold text-center">
           Menutup lembaran akan mengunci web ini dengan doa abadi.
         </span>
+      </div>
+
       </div>
     </section>
   );
