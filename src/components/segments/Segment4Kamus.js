@@ -10,6 +10,7 @@ import {
   Smile,
   Heart,
   Highlighter,
+  CloudRain,
 } from "lucide-react";
 import { scrapbookData } from "@/data/scrapbookData";
 import { useAudio } from "@/components/audio/AudioProvider";
@@ -23,6 +24,8 @@ export function Segment4Kamus({ onComplete }) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   // Status animasi membuka cover dalam 3D
   const [isOpeningCover, setIsOpeningCover] = useState(false);
+  // Status animasi menutup buku saku dalam 3D menuju Segmen 5
+  const [isClosingBook, setIsClosingBook] = useState(false);
 
   // Halaman kata yang sedang dibuka (0, 1, 2)
   const [activeWordIndex, setActiveWordIndex] = useState(0);
@@ -45,7 +48,7 @@ export function Segment4Kamus({ onComplete }) {
 
   // Efek coretan stabilo saat kartu diketuk (hanya jika tidak sedang dragging)
   const handleToggleHighlight = (idx) => {
-    if (isDraggingRef.current) return;
+    if (isDraggingRef.current || isClosingBook) return;
     playSfx("pencil-scratch");
     setHighlightedWords((prev) => ({
       ...prev,
@@ -69,6 +72,25 @@ export function Segment4Kamus({ onComplete }) {
     }, 600);
   };
 
+  // Handler menutup buku saku secara 3D dan bertransisi ke Segmen 5 (Kaca Berembun)
+  const handleCloseBookAndTransition = () => {
+    if (isClosingBook) return;
+    setIsClosingBook(true);
+    playSfx("page-turn");
+
+    setTimeout(() => {
+      playSfx("paper-swoosh");
+    }, 200);
+
+    setTimeout(() => {
+      playSfx("clasp-open");
+    }, 450);
+
+    setTimeout(() => {
+      onComplete();
+    }, 1500);
+  };
+
   // Navigasi fisik membalik lembaran kata ke depan (3D Page Turn)
   const handleFlipNext = () => {
     if (activeWordIndex + 1 < dictionary.length) {
@@ -76,13 +98,8 @@ export function Segment4Kamus({ onComplete }) {
       setTurnDirection("next");
       setActiveWordIndex((prev) => prev + 1);
     } else {
-      // Halaman terakhir (Kata 3) dibalik -> bertransisi ke Segmen 5 (Kaca Berembun)
-      playSfx("page-turn");
-      setTurnDirection("next");
-      setTimeout(() => {
-        playSfx("paper-swoosh");
-        onComplete();
-      }, 350);
+      // Di halaman terakhir (Kata 3), membalik lembaran menutup buku saku dan bertransisi ke Segmen 5
+      handleCloseBookAndTransition();
     }
   };
 
@@ -186,6 +203,30 @@ export function Segment4Kamus({ onComplete }) {
           className="w-full max-w-[320px] sm:max-w-[335px] h-[375px] sm:h-[390px] relative z-10"
           style={{ perspective: "1200px" }}
         >
+          {/* Tepi Cover Kiri Terbuka / Tarik ke Kanan untuk Menutup Buku (Khusus Halaman Terakhir) */}
+          {isCoverOpen && activeWordIndex === dictionary.length - 1 && !isClosingBook && (
+            <motion.div
+              initial={{ opacity: 0, x: -14 }}
+              animate={{ opacity: 1, x: 0 }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 140 }}
+              dragElastic={0.25}
+              onDragEnd={(e, info) => {
+                if (info.offset.x > 30 || info.velocity.x > 80) {
+                  handleCloseBookAndTransition();
+                }
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="absolute -left-3 sm:-left-3.5 top-10 bottom-10 w-6 bg-gradient-to-r from-[#382112] to-[#4D3220] rounded-l-xl border-l-2 border-[#734E33] shadow-md cursor-grab active:cursor-grabbing z-30 flex flex-col items-center justify-center gap-1 group select-none"
+              title="Geser ke kanan untuk menutup buku"
+            >
+              <span className="text-[8.5px] transform -rotate-90 text-[#E0C7A6] font-mono font-bold tracking-wider whitespace-nowrap">
+                TUTUP ➔
+              </span>
+            </motion.div>
+          )}
+
           {/* Bodi Buku Kulit Luar (Cover Leather Border & Stack) */}
           <div className="w-full h-full bg-[#422C1D] rounded-2xl p-2.5 sm:p-3 border-2 border-[#5E402B] shadow-[0_22px_55px_rgba(0,0,0,0.55)] relative flex flex-col justify-between overflow-hidden paper-shadow">
             
@@ -227,7 +268,7 @@ export function Segment4Kamus({ onComplete }) {
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
                     }}
-                    drag={isCoverOpen ? "x" : false}
+                    drag={isCoverOpen && !isClosingBook ? "x" : false}
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={0.35}
                     onDragStart={() => {
@@ -344,17 +385,29 @@ export function Segment4Kamus({ onComplete }) {
               </div>
             </div>
 
-            {/* 3. COVER DEPAN BUKU SAKU KULIT FISIK (BERPUTAR MEMBUKA 3D SAAT KANCING DIBUKA) */}
+            {/* 3. COVER DEPAN BUKU SAKU KULIT FISIK (BERPUTAR MEMBUKA / MENUTUP 3D) */}
             <AnimatePresence>
-              {!isCoverOpen && (
+              {(!isCoverOpen || isClosingBook) && (
                 <motion.div
                   style={{
                     transformOrigin: "left center",
                     transformStyle: "preserve-3d",
                   }}
-                  initial={{ rotate: 0, rotateY: 0, scale: 1 }}
+                  initial={
+                    isClosingBook
+                      ? { rotate: 0, rotateY: -140, scale: 1.02, opacity: 1 }
+                      : { rotate: 0, rotateY: 0, scale: 1, opacity: 1 }
+                  }
                   animate={
-                    isOpeningCover
+                    isClosingBook
+                      ? {
+                          rotate: 0,
+                          rotateY: 0,
+                          scale: 1,
+                          opacity: 1,
+                          transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+                        }
+                      : isOpeningCover
                       ? {
                           rotate: 0,
                           rotateY: -140,
@@ -404,20 +457,23 @@ export function Segment4Kamus({ onComplete }) {
                     </p>
                   </div>
 
-                  {/* Tali Pengunci dengan Kancing Kuningan Geser Fisik (Satu-satunya elemen yang dapat di-drag) */}
+                  {/* Tali Pengunci dengan Kancing Kuningan Geser Fisik */}
                   <div className="w-full flex flex-col items-center pl-4 z-20">
                     <div className="w-full max-w-[240px] h-11 bg-black/45 rounded-full p-1 border border-[#8C6D1F]/60 shadow-inner relative flex items-center justify-between">
                       {/* Label Jalur Geser Kancing */}
                       <span className="absolute inset-0 flex items-center justify-center text-[10px] font-mono text-[#D4AF7A]/85 font-black tracking-wider pointer-events-none pl-6">
-                        Geser Kancing ➔
+                        {isClosingBook ? "Buku Terkunci 🔒" : "Geser Kancing ➔"}
                       </span>
 
-                      {/* Kancing Kuningan Fisik yang Dapat Di-drag ke Kanan */}
+                      {/* Kancing Kuningan Fisik */}
                       <motion.div
-                        drag={isOpeningCover ? false : "x"}
+                        initial={isClosingBook ? { x: 120 } : { x: 0 }}
+                        animate={isClosingBook ? { x: 0 } : undefined}
+                        transition={isClosingBook ? { duration: 0.45, delay: 0.12 } : undefined}
+                        drag={!isCoverOpen && !isOpeningCover && !isClosingBook ? "x" : false}
                         dragConstraints={{ left: 0, right: 140 }}
                         dragElastic={0.15}
-                        dragSnapToOrigin={!isOpeningCover}
+                        dragSnapToOrigin={!isOpeningCover && !isClosingBook}
                         onDragEnd={(e, info) => {
                           if (info.offset.x > 50 || info.velocity.x > 140) {
                             handleOpenCover();
@@ -450,7 +506,7 @@ export function Segment4Kamus({ onComplete }) {
             <div className="bg-[#EFE4D6]/95 border border-[#D5C7B5] rounded-full px-3.5 py-1.5 shadow-2xs flex items-center justify-center gap-2 text-[#3A281A] font-sans-ui text-[10px] sm:text-[10.5px] font-bold text-center">
               <span>👆 Ketuk untuk stabilo</span>
               <span className="text-[#B5A38E]">•</span>
-              <span className="text-[#8C3E2D] font-black">👈 Geser lembaran terakhir untuk ke jendela kafe 🌧️</span>
+              <span className="text-[#8C3E2D] font-black">📕 Geser untuk menutup buku & lihat jendela kafe 🌧️</span>
             </div>
           ) : (
             <div className="bg-[#EFE4D6]/95 border border-[#D5C7B5] rounded-full px-3.5 py-1.5 shadow-2xs flex items-center justify-center gap-2 text-[#3A281A] font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center">
@@ -462,6 +518,35 @@ export function Segment4Kamus({ onComplete }) {
         </div>
 
       </div>
+
+      {/* 4. OVERLAY KABUT EMBUN & RINTIK HUJAN DINGIN (SAAT BUKU MENUTUP MENUJU SEGMEN 5) */}
+      <AnimatePresence>
+        {isClosingBook && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.45, duration: 0.9, ease: "easeInOut" }}
+            className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-center bg-gradient-to-b from-[#7595B7]/75 via-[#8FAECF]/85 to-[#6686A6]/95 backdrop-blur-md px-6 text-center"
+          >
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0, y: 12 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="flex flex-col items-center gap-2"
+            >
+              <div className="w-12 h-12 rounded-full bg-white/20 border border-white/35 flex items-center justify-center shadow-lg backdrop-blur-xs">
+                <CloudRain className="w-6 h-6 text-white animate-bounce" />
+              </div>
+              <p className="font-handwriting text-2xl sm:text-3xl text-white font-black drop-shadow-md tracking-wide">
+                Di Balik Jendela Kafe...
+              </p>
+              <p className="font-sans-ui text-[11px] sm:text-xs text-white/90 font-bold max-w-[240px] leading-relaxed">
+                Hujan sore itu mulai membasahi dan mengembunkan kaca jendela.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
