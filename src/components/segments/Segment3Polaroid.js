@@ -35,6 +35,9 @@ export function Segment3Polaroid({ onComplete }) {
   // Ref untuk mendeteksi apakah pengguna sedang men-drag foto (mencegah flip tidak sengaja)
   const isDraggingRef = useRef(false);
 
+  // Indikator visual real-time saat kartu sedang di-drag ('next' | 'prev' | null)
+  const [dragCue, setDragCue] = useState(null);
+
   // Fallback map untuk gambar lokal jika file JPG belum dimasukkan Tatwa
   const getPhotoSrc = (photo, idx) => {
     return `/images/polaroids/photo${idx + 1}.svg`;
@@ -285,11 +288,11 @@ export function Segment3Polaroid({ onComplete }) {
                     {/* Label interaktif halus skeuomorfik */}
                     <div className="flex items-center justify-between px-1 pt-1 text-[#8C3E2D]">
                       <span className="font-mono text-[9px] font-black tracking-wider flex items-center gap-1">
-                        <span>⤺</span>
+                        <span>👉</span>
                         <span>Foto 0{currentIndex}</span>
                       </span>
                       <span className="font-handwriting text-xs text-[#5A4839] font-bold">
-                        buka lagi ✨
+                        tarik kanan ✨
                       </span>
                     </div>
                   </div>
@@ -333,7 +336,17 @@ export function Segment3Polaroid({ onComplete }) {
                   onDragStart={() => {
                     isDraggingRef.current = true;
                   }}
+                  onDrag={(e, info) => {
+                    if (info.offset.x < -30) {
+                      setDragCue("next");
+                    } else if (info.offset.x > 30) {
+                      setDragCue("prev");
+                    } else {
+                      setDragCue(null);
+                    }
+                  }}
                   onDragEnd={(e, info) => {
+                    setDragCue(null);
                     // Deteksi jika hanya sentuhan ringan (tap) bukan drag
                     if (Math.abs(info.offset.x) > 5 || Math.abs(info.offset.y) > 5) {
                       isDraggingRef.current = true;
@@ -374,6 +387,32 @@ export function Segment3Polaroid({ onComplete }) {
                   className="absolute w-[275px] sm:w-[290px] h-[345px] sm:h-[360px] cursor-grab active:cursor-grabbing z-20"
                   style={{ perspective: "1000px" }}
                 >
+                  {/* INDIKATOR STAMP ARAH GESER REAL-TIME SAAT DRAG */}
+                  <AnimatePresence>
+                    {dragCue === "next" && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.85, rotate: 6 }}
+                        animate={{ opacity: 1, scale: 1, rotate: 6 }}
+                        exit={{ opacity: 0, scale: 0.85 }}
+                        className="absolute top-5 right-5 z-40 bg-[#8C3E2D]/95 text-[#FFF7ED] font-mono text-[10.5px] font-black px-3 py-1 rounded-md shadow-xl border border-white/40 pointer-events-none tracking-wider flex items-center gap-1.5"
+                      >
+                        <span>👈</span>
+                        <span>FOTO BERIKUTNYA</span>
+                      </motion.div>
+                    )}
+                    {dragCue === "prev" && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.85, rotate: -6 }}
+                        animate={{ opacity: 1, scale: 1, rotate: -6 }}
+                        exit={{ opacity: 0, scale: 0.85 }}
+                        className="absolute top-5 left-5 z-40 bg-[#2A180B]/95 text-[#F3E5AB] font-mono text-[10.5px] font-black px-3 py-1 rounded-md shadow-xl border border-[#D4AF37]/50 pointer-events-none tracking-wider flex items-center gap-1.5"
+                      >
+                        <span>👉</span>
+                        <span>{currentIndex > 0 ? "FOTO SEBELUMNYA" : "FOTO PERTAMA"}</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   {/* INNER 3D CONTAINER FOR FLIP */}
                   <motion.div
                     animate={{ rotateY: isFlipped ? 180 : 0 }}
@@ -478,18 +517,42 @@ export function Segment3Polaroid({ onComplete }) {
           )}
         </div>
 
-        {/* 3. PANDUAN INTERAKSI FISIK SKEUOMORFIK TUNGGAL (RINGKAS & NON-REDUNDAN) */}
+        {/* 3. PANDUAN INTERAKSI FISIK SKEUOMORFIK TUNGGAL (JELAS, TEGAS, KONTEKSTUAL) */}
         {!hasFinishedAll && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="z-20 select-none pointer-events-none"
+            className="z-20 select-none pointer-events-none w-full max-w-[325px]"
           >
-            <div className="bg-[#EFE4D6]/90 border border-[#D5C7B5] rounded-full px-3.5 py-1.5 shadow-2xs flex items-center gap-2 text-[#3A281A] font-sans-ui text-[11px] sm:text-[11.5px] font-bold">
-              <span>👆 Ketuk untuk membalik</span>
-              <span className="text-[#B5A38E]">•</span>
-              <span>👈👉 Geser untuk ganti foto</span>
+            <div className="bg-[#EFE4D6]/95 border border-[#D5C7B5] rounded-2xl px-3.5 py-1.5 shadow-2xs flex flex-col items-center gap-0.5 text-[#3A281A] font-sans-ui text-[11px] font-bold text-center">
+              {/* Baris 1: Petunjuk Membalik Kartu */}
+              <div className="flex items-center gap-1.5 text-[#2E2016]">
+                <span>👆</span>
+                <span>Ketuk foto untuk membalik catatan</span>
+              </div>
+
+              {/* Baris 2: Petunjuk Arah Geser yang Gamblang & Kontekstual */}
+              <div className="flex items-center justify-center gap-2 text-[10.5px] border-t border-[#D5C7B5]/60 pt-0.5 w-full">
+                {currentIndex > 0 ? (
+                  <>
+                    <span className="text-[#8C3E2D] font-black flex items-center gap-1">
+                      <span>👉</span>
+                      <span>Geser kanan: Sebelumnya</span>
+                    </span>
+                    <span className="text-[#B5A38E]">•</span>
+                    <span className="text-[#1E3A8A] font-black flex items-center gap-1">
+                      <span>👈</span>
+                      <span>Geser kiri: Lanjut</span>
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-[#1E3A8A] font-black flex items-center gap-1">
+                    <span>👈</span>
+                    <span>Geser kartu ke kiri untuk foto berikutnya</span>
+                  </span>
+                )}
+              </div>
             </div>
           </motion.div>
         )}
