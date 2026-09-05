@@ -9,23 +9,23 @@ import { useAudio } from "@/components/audio/AudioProvider";
 import { WashiTape } from "@/components/common/WashiTape";
 
 export function Segment1Prolog({ onComplete }) {
-  const [isOpened, setIsOpened] = useState(false);
-  const [dragProgress, setDragProgress] = useState(0);
+  const [isUnsealed, setIsUnsealed] = useState(false);
+  const [showLetter, setShowLetter] = useState(false);
   const { startBgm, playSfx } = useAudio();
 
-  // Membuka segel lilin amplop
-  const handleUnsealEnvelope = () => {
-    if (isOpened) return;
-    setIsOpened(true);
+  // Membuka segel lilin dan melipat tutup amplop ke atas
+  const handleOpenEnvelope = () => {
+    if (isUnsealed) return;
+    setIsUnsealed(true);
 
     playSfx("unboxing-chime");
     startBgm();
 
     try {
       confetti({
-        particleCount: 45,
-        spread: 80,
-        origin: { y: 0.52 },
+        particleCount: 50,
+        spread: 85,
+        origin: { y: 0.48 },
         colors: ["#E8B4B8", "#E2C275", "#B8C4B8", "#FAF7F2", "#C26D57"],
         disableForReducedMotion: true,
       });
@@ -35,52 +35,60 @@ export function Segment1Prolog({ onComplete }) {
           particleCount: 30,
           angle: 60,
           spread: 55,
-          origin: { x: 0.2, y: 0.55 },
+          origin: { x: 0.15, y: 0.5 },
           colors: ["#E8B4B8", "#FAF7F2", "#E2C275"],
         });
         confetti({
           particleCount: 30,
           angle: 120,
           spread: 55,
-          origin: { x: 0.8, y: 0.55 },
+          origin: { x: 0.85, y: 0.5 },
           colors: ["#E8B4B8", "#FAF7F2", "#E2C275"],
         });
-      }, 250);
+      }, 200);
     } catch (e) {
       console.log("Confetti trigger:", e);
     }
+
+    // Setelah tutup amplop melipat ke atas selama 0.75s, surat meluncur keluar mengambil fokus penuh
+    setTimeout(() => {
+      setShowLetter(true);
+    }, 750);
   };
 
   return (
     <section className="min-h-full flex flex-col items-center justify-center p-4 sm:p-6 select-none relative overflow-hidden my-auto">
       <AnimatePresence mode="wait">
-        {!isOpened ? (
-          /* TAMPILAN 1: AMPLOP SURAT VINTAGE DENGAN CAP SEGEL LILIN (WAX SEAL STAMP) */
+        {!showLetter ? (
+          /* TAMPILAN 1: AMPLOP SURAT VINTAGE DENGAN TUTUP 3D & PRANGKO ASLI */
           <motion.div
             key="envelope-view"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: -25, transition: { duration: 0.55, ease: "easeInOut" } }}
+            exit={{ opacity: 0, scale: 0.9, y: -20, transition: { duration: 0.5, ease: "easeInOut" } }}
             className="w-full max-w-[340px] flex flex-col items-center"
           >
-            {/* Header Judul Manis & Standout */}
-            <div className="text-center mb-5">
+            {/* Header Sapaan untuk Adiba */}
+            <div className="text-center mb-4">
               <span className="font-typewriter text-[11px] tracking-widest text-[#7D6B5A] uppercase font-bold block mb-1">
                 The Scrapbook of Us
               </span>
               <h1 className="font-handwriting text-4xl sm:text-5xl text-[#1E1915] font-bold tracking-wide">
                 Untuk Askiyaa, Pilkom '25
               </h1>
-              <p className="font-sans-ui text-xs text-[#6B5E52] mt-1.5">
+              <p className="font-sans-ui text-xs text-[#6B5E52] mt-1">
                 Ada sepucuk surat kenangan yang disegel khusus untukmu.
               </p>
             </div>
 
-            {/* BENTUK AMPLOP SURAT KRAFT DENGAN DETAIL VINTAGE AIRMAIL */}
-            <div className="relative w-full h-[230px] bg-[#E5D7C3] rounded-2xl shadow-2xl border-2 border-[#D1BFAB] paper-shadow-lifted overflow-hidden flex flex-col justify-between p-4">
-              {/* Garis Tepian Pos Klasik (Airmail Striping di Tepi Amplop) */}
+            {/* WADAH AMPLOP SURAT DENGAN PERSPEKTIF 3D */}
+            <div
+              className="relative w-full h-[250px] bg-[#E8DCB8] rounded-2xl shadow-2xl border-2 border-[#D1BFAB] paper-shadow-lifted overflow-visible flex flex-col justify-between p-4"
+              style={{ perspective: "1000px" }}
+            >
+              {/* Garis Tepian Pos Klasik (Airmail Striping) */}
               <div
-                className="absolute inset-0 opacity-15 pointer-events-none"
+                className="absolute inset-0 opacity-20 pointer-events-none rounded-2xl"
                 style={{
                   backgroundImage: `repeating-linear-gradient(45deg, #B8543D 0, #B8543D 10px, transparent 10px, transparent 18px, #3B5B88 18px, #3B5B88 28px, transparent 28px, transparent 36px)`,
                   backgroundSize: "100% 6px",
@@ -89,110 +97,124 @@ export function Segment1Prolog({ onComplete }) {
                 }}
               />
 
-              {/* Bagian Atas Amplop: Prangko Pos & Stempel Cap Tanggal */}
+              {/* Area Atas: Prangko Asli & Stempel Cap Pos */}
               <div className="flex items-start justify-between relative z-10">
                 {/* Cap Stempel Bundar Pos Bandung */}
-                <div className="w-14 h-14 rounded-full border-2 border-dashed border-[#5C4C3E]/60 p-1 flex flex-col items-center justify-center -rotate-12 opacity-85 select-none">
+                <div className="w-14 h-14 rounded-full border-2 border-dashed border-[#5C4C3E]/70 p-1 flex flex-col items-center justify-center -rotate-12 opacity-80 select-none">
                   <span className="font-typewriter text-[7px] text-[#5C4C3E] uppercase font-bold tracking-tighter">
                     PILKOM '25
                   </span>
-                  <div className="w-8 h-0.5 bg-[#5C4C3E]/40 my-0.5" />
+                  <div className="w-8 h-0.5 bg-[#5C4C3E]/50 my-0.5" />
                   <span className="font-typewriter text-[7px] text-[#5C4C3E] font-bold">
                     ARCHIVE
                   </span>
                   <span className="font-typewriter text-[5px] text-[#5C4C3E]/80">BANDUNG</span>
                 </div>
 
-                {/* Prangko Pos Vintage */}
-                <div className="bg-[#FAF5EC] border border-dashed border-[#A8947E] p-1 rounded shadow-xs rotate-3 flex flex-col items-center">
-                  <div className="w-9 h-10 bg-[#8C6D58] rounded-xs flex flex-col items-center justify-center text-[#FAF5EC]">
-                    <span className="text-xs">🕊️</span>
-                    <span className="font-typewriter text-[6px] font-bold mt-0.5">Rp 250</span>
-                  </div>
+                {/* GAMBAR PRANGKO ASLI DARI USER (public/images/prangko.webp) */}
+                <div className="relative group select-none">
+                  <img
+                    src="/images/prangko.webp"
+                    alt="Prangko Indonesia Vintage"
+                    className="w-18 sm:w-20 object-contain rounded-xs shadow-md border-2 border-white/80 -rotate-2"
+                  />
+                  {/* Cap Pos Tinta di atas Prangko */}
+                  <div className="absolute -bottom-2 -left-3 w-10 h-10 rounded-full border border-black/30 border-dashed pointer-events-none rotate-45" />
                 </div>
               </div>
 
-              {/* Tulisan Tangan Alamat Penerima & Pengirim di Atas Amplop */}
-              <div className="relative z-10 text-left font-handwriting pl-2 -mt-2">
+              {/* Area Bawah: Tulisan Tangan Alamat (100% Bersih & Bebas Halangan Komponen) */}
+              <div className="relative z-10 text-left font-handwriting pl-2 pb-1">
                 <span className="font-typewriter text-[9px] uppercase tracking-wider text-[#736354] block">
                   Penerima:
                 </span>
-                <span className="text-2xl text-[#1E1915] font-bold block leading-tight">
+                <span className="text-2xl sm:text-3xl text-[#1E1915] font-bold block leading-tight">
                   Adiba (Askiyaa)
                 </span>
-                <span className="text-xs text-[#594B3D] block font-sans-ui mb-1">
-                  Ilmu Komputer '25
+                <span className="text-xs text-[#594B3D] block font-sans-ui mt-0.5">
+                  Ilmu Komputer — Angkatan 2025
                 </span>
-                <span className="text-sm text-[#8C3E2D] font-bold block">
+                <span className="text-sm text-[#8C3E2D] font-bold block mt-1">
                   Dari: Tatwa
                 </span>
               </div>
 
-              {/* LIPATAN TUTUP AMPLOP SEGITIGA DENGAN CAP LILIN MERAH (WAX SEAL STAMP) */}
-              <div className="absolute inset-x-0 top-0 h-28 pointer-events-none flex items-center justify-center">
-                {/* Visual Segitiga Lipatan Amplop */}
+              {/* TUTUP SEGITIGA AMPLOP 3D (LID FLAP) YANG MELIPAT KE ATAS 180 DERAJAT */}
+              <motion.div
+                className="absolute inset-x-0 top-0 h-28 z-20 flex items-start justify-center overflow-visible"
+                style={{
+                  transformOrigin: "top center",
+                  transformStyle: "preserve-3d",
+                }}
+                animate={
+                  isUnsealed
+                    ? {
+                        rotateX: -180,
+                        zIndex: 0,
+                      }
+                    : {
+                        rotateX: 0,
+                        zIndex: 20,
+                      }
+                }
+                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {/* Segitiga Lipatan Amplop */}
                 <div
-                  className="w-full h-24 bg-[#DAC9B3] shadow-md border-b border-[#C4B19A]"
+                  className="w-full h-24 bg-[#DAC9B3] shadow-md border-b-2 border-[#C4B19A] relative flex items-end justify-center pb-2"
                   style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
                 />
-              </div>
 
-              {/* CAP SEGEL LILIN MERAH (WAX SEAL) YANG DAPAT DIGESER KE ATAS */}
-              <div className="absolute left-1/2 -translate-x-1/2 top-16 z-30 flex flex-col items-center">
-                <motion.div
-                  drag="y"
-                  dragConstraints={{ top: -75, bottom: 0 }}
-                  dragElastic={0.25}
-                  onDrag={(e, info) => {
-                    setDragProgress(Math.min(1, Math.max(0, -info.offset.y / 55)));
-                    if (info.offset.y < -55) {
-                      handleUnsealEnvelope();
-                    }
-                  }}
-                  onDragEnd={(e, info) => {
-                    if (info.offset.y < -40) {
-                      handleUnsealEnvelope();
-                    }
-                    setDragProgress(0);
-                  }}
-                  onClick={handleUnsealEnvelope}
-                  className="w-14 h-14 rounded-full bg-gradient-to-br from-[#A83226] via-[#8C2318] to-[#63140C] shadow-xl border-2 border-[#C94A3C]/40 flex items-center justify-center cursor-grab active:cursor-grabbing hover:scale-105 active:scale-95 transition-transform"
-                  whileHover={{ scale: 1.06 }}
-                >
-                  {/* Pinggiran Lelehan Lilin Alami */}
-                  <div className="w-11 h-11 rounded-full border border-amber-200/40 flex items-center justify-center shadow-inner">
-                    {/* Monogram Huruf 'A' Timbul Emas */}
-                    <span className="font-handwriting text-2xl font-bold text-amber-100 drop-shadow">
-                      A
-                    </span>
-                  </div>
-                </motion.div>
-
-                {/* Indikator Animasi Geser ke Atas */}
-                <motion.div
-                  animate={{ y: [0, -4, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}
-                  className="mt-2.5 px-3 py-1 rounded-full bg-[#1E1915] text-amber-200 font-sans-ui text-[11px] font-bold shadow-md flex items-center gap-1 border border-amber-300/30 whitespace-nowrap cursor-pointer pointer-events-auto"
-                  onClick={handleUnsealEnvelope}
-                >
-                  <ArrowUp className="w-3 h-3 text-amber-300 animate-bounce" />
-                  <span>Buka Segel Lilin</span>
-                </motion.div>
-              </div>
+                {/* CAP SEGEL LILIN MERAH (WAX SEAL) DI UJUNG SEGITIGA */}
+                <AnimatePresence>
+                  {!isUnsealed && (
+                    <motion.div
+                      className="absolute bottom-0 translate-y-1/2 z-30 cursor-pointer"
+                      drag="y"
+                      dragConstraints={{ top: -75, bottom: 0 }}
+                      dragElastic={0.25}
+                      onDragEnd={(e, info) => {
+                        if (info.offset.y < -35) {
+                          handleOpenEnvelope();
+                        }
+                      }}
+                      onClick={handleOpenEnvelope}
+                      whileHover={{ scale: 1.08 }}
+                      whileTap={{ scale: 0.95 }}
+                      exit={{ scale: 0, opacity: 0, transition: { duration: 0.3 } }}
+                    >
+                      {/* Cap Lilin Merah Hati Monogram 'A' */}
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#A83226] via-[#8C2318] to-[#63140C] shadow-xl border-2 border-[#C94A3C]/50 flex items-center justify-center select-none active:scale-95 transition-transform">
+                        <div className="w-11 h-11 rounded-full border border-amber-200/40 flex items-center justify-center shadow-inner">
+                          <span className="font-handwriting text-2xl font-bold text-amber-100 drop-shadow">
+                            A
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </div>
 
-            {/* Petunjuk Tambahan di Bawah */}
-            <p className="font-sans-ui text-xs text-[#7A6B5C] mt-4">
-              Sentuh atau <span className="text-[#A83226] font-bold">geser segel lilin merah ke atas</span> untuk membuka ✉️
-            </p>
+            {/* TEKS BANTUAN BERADA RAPI DI LUAR AMPLOP (TIDAK MENUTUPI ALAMAT) */}
+            <motion.div
+              animate={{ y: [0, -4, 0] }}
+              transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
+              className="mt-5 px-4 py-2 rounded-full bg-[#1E1915] text-amber-200 font-sans-ui text-xs font-semibold shadow-md flex items-center gap-1.5 border border-amber-300/30 cursor-pointer hover:bg-black transition-colors"
+              onClick={handleOpenEnvelope}
+            >
+              <ArrowUp className="w-3.5 h-3.5 text-amber-300 animate-bounce" />
+              <span>Sentuh atau geser segel lilin merah ke atas ✉️</span>
+            </motion.div>
           </motion.div>
         ) : (
-          /* TAMPILAN 2: SURAT PEMBUKA LEGA (TIPOGRAFI BESAR, STANDOUT, BEBAS OVERLAPPING) */
+          /* TAMPILAN 2: SURAT PEMBUKA LENGKAP & LEGA (BEBAS DARI KADO, TIPOGRAFI STANDOUT) */
           <motion.div
             key="letter-view"
-            initial={{ opacity: 0, scale: 0.94, y: 25 }}
+            initial={{ opacity: 0, scale: 0.92, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.65, ease: "easeOut" }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
             className="w-full max-w-[340px] bg-[#FFFDF8] rounded-3xl p-6 sm:p-7 shadow-2xl border border-[#E5DACB] text-[#1E1915] relative text-left paper-shadow-lifted my-auto"
           >
             {/* Washi Tape Nyata di Atas Surat */}
@@ -209,12 +231,12 @@ export function Segment1Prolog({ onComplete }) {
               </span>
             </div>
 
-            {/* Judul Sapaan Besar & Standout */}
+            {/* Judul Sapaan Standout & Besar */}
             <h2 className="font-handwriting text-3xl sm:text-4xl font-bold text-[#1E1915] mb-2 leading-tight">
               Untuk Adiba (Askiyaa),
             </h2>
 
-            {/* Isi Surat Terbaca Jelas & Hangat */}
+            {/* Isi Surat Terbaca Sangat Jelas & Menyentuh */}
             <div className="space-y-3 font-sans-ui text-sm text-[#382F26] leading-relaxed mb-6 font-normal">
               <p>
                 Selamat datang di buku kenangan kecil kita.

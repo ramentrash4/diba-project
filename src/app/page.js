@@ -44,12 +44,13 @@ function ScrapbookApp() {
   };
 
   return (
-    /* OUTER WRAPPER: Di Desktop memiliki latar belakang meja kafe hangat */
-    <div className="min-h-screen w-full flex justify-center items-center bg-[#1D1713] sm:p-4 overflow-hidden selection:bg-rose-200">
+    /* OUTER WRAPPER: Di Desktop bernuansa meja kafe kayu gelap hangat dengan sorotan lampu temaram */
+    <div className="min-h-screen w-full flex justify-center items-center bg-gradient-to-b from-[#1C1612] via-[#140F0C] to-[#0D0A08] sm:p-4 sm:py-6 overflow-hidden selection:bg-rose-200">
+      
       {/* STRICT MOBILE CANVAS: Di desktop terkunci dalam frame ponsel proporsional */}
-      <div className="w-full max-w-[412px] min-h-screen sm:min-h-[820px] sm:max-h-[92vh] sm:rounded-[36px] sm:shadow-[0_25px_80px_rgba(0,0,0,0.7)] sm:border-[6px] sm:border-[#2C231D] relative flex flex-col justify-center overflow-hidden bg-[#FAF7F2]">
+      <div className="w-full max-w-[412px] min-h-screen sm:min-h-[830px] sm:max-h-[92vh] sm:rounded-[38px] sm:shadow-[0_25px_90px_rgba(0,0,0,0.85),0_0_0_8px_#2B221A] relative flex flex-col justify-center overflow-hidden bg-transparent">
         
-        {/* Background Atmosfer Dinamis di dalam Frame Mobile */}
+        {/* Background Atmosfer Dinamis di dalam Frame Mobile (Bayangan Daun & Cahaya Sore) */}
         <AtmosphereBackdrop currentSegment={currentSegment} />
 
         {/* Konten Segmen Aktif */}

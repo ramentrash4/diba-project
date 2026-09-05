@@ -9,83 +9,101 @@ export function AtmosphereBackdrop({ currentSegment }) {
 
   return (
     <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden select-none">
-      {/* 1. Latar Belakang Warna Dinamis yang Mulus */}
+      {/* 1. Latar Belakang Warna Dinamis yang Mulus & Bernuansa Kertas Kraft Hangat */}
       <motion.div
         className="absolute inset-0"
         animate={{
-          backgroundColor: isNight
-            ? "#121724"
+          background: isNight
+            ? "radial-gradient(circle at 50% 35%, #182032 0%, #0E131E 100%)"
             : isDusk
-            ? "#262C3A"
-            : "#FAF6EE",
+            ? "radial-gradient(circle at 50% 40%, #2E3647 0%, #1E2330 100%)"
+            : "radial-gradient(circle at 85% 15%, #FDF4E3 0%, #F5EAE0 45%, #EBE0D2 100%)",
         }}
         transition={{ duration: 1.2, ease: "easeInOut" }}
       />
 
-      {/* 2. Tekstur Kertas Linen Halus */}
+      {/* 2. Tekstur Serat Kertas Scrapbook Nyata (Jelas Terlihat Halus) */}
       <div
-        className="absolute inset-0 opacity-[0.045] mix-blend-multiply"
+        className="absolute inset-0 opacity-20 mix-blend-multiply"
         style={{
-          backgroundImage: `radial-gradient(#2C2621 1px, transparent 1px)`,
-          backgroundSize: "16px 16px",
+          backgroundImage: `radial-gradient(#423424 0.9px, transparent 0.9px)`,
+          backgroundSize: "14px 14px",
         }}
       />
 
-      {/* 3. Sorotan Pendaran Cahaya Matahari Sore (Warm Sunbeam / Vignette) */}
+      {/* 3. Efek Siang Hari Sore (Warm Sunlight & Siluet Bayangan Daun Jendela yang Terlihat Jelas) */}
       <AnimatePresence>
         {!isNight && !isDusk && (
           <motion.div
-            key="day-sunbeam"
+            key="day-atmosphere"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1 }}
             className="absolute inset-0"
           >
-            {/* Pendaran emas lembut di sudut atas */}
-            <div className="absolute -top-16 -right-16 w-80 h-80 rounded-full bg-gradient-to-br from-[#FDE8B3]/50 to-transparent blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-gradient-to-tr from-[#E8B4B8]/25 to-transparent blur-3xl pointer-events-none" />
+            {/* Sorotan Berkas Cahaya Matahari Sore dari Kanan Atas (Visible Warm Sunbeam) */}
+            <div className="absolute -top-12 -right-12 w-96 h-96 rounded-full bg-gradient-to-br from-[#FFE7A8]/60 via-[#FCD385]/30 to-transparent blur-3xl pointer-events-none" />
+            <div className="absolute top-1/3 -left-16 w-80 h-80 rounded-full bg-gradient-to-tr from-[#E8B4B8]/35 to-transparent blur-3xl pointer-events-none" />
 
-            {/* Bayangan Dahan Dedaunan Jendela Kafe yang Bergoyang Lembut (Botanical Window Shadow) */}
+            {/* Bayangan Dahan Dedaunan Jendela Kafe yang Jelas Terlihat & Bergoyang Halus */}
             <motion.div
-              className="absolute -top-6 -left-8 w-64 h-64 opacity-[0.07] pointer-events-none"
+              className="absolute -top-4 -left-6 w-80 h-80 opacity-25 pointer-events-none"
               animate={{
-                rotate: [0, 1.5, 0, -1, 0],
-                x: [0, 4, 0, -3, 0],
+                rotate: [0, 2, 0, -1.5, 0],
+                x: [0, 6, 0, -4, 0],
+                y: [0, 3, 0, -2, 0],
               }}
               transition={{
                 repeat: Infinity,
-                duration: 9,
+                duration: 8,
                 ease: "easeInOut",
               }}
             >
-              <svg viewBox="0 0 200 200" fill="#2C2621" className="w-full h-full">
-                <path d="M40,20 Q60,60 100,80 Q140,100 180,110 Q140,115 100,100 Q60,85 40,20 Z" />
-                <path d="M70,45 Q110,40 140,25 Q125,50 90,60 Z" />
-                <path d="M100,75 Q145,70 175,55 Q155,85 120,95 Z" />
-                <path d="M125,100 Q170,105 195,90 Q170,120 140,125 Z" />
-                <path d="M50,70 Q90,95 120,130 Q90,120 60,95 Z" />
+              {/* SVG Siluet Dahan & Daun Jendela Kafe */}
+              <svg viewBox="0 0 240 240" fill="#3D2E1C" className="w-full h-full filter blur-[1.2px]">
+                {/* Batang utama */}
+                <path d="M10,20 Q60,70 110,110 Q160,150 220,180 Q160,165 110,125 Q60,85 10,20 Z" />
+                {/* Cabang 1 */}
+                <path d="M50,55 Q95,45 140,25 Q125,60 80,75 Z" />
+                <circle cx="140" cy="25" r="14" />
+                <circle cx="115" cy="40" r="18" />
+                {/* Cabang 2 */}
+                <path d="M90,95 Q145,85 185,65 Q160,105 115,115 Z" />
+                <circle cx="185" cy="65" r="16" />
+                <circle cx="150" cy="85" r="20" />
+                {/* Cabang 3 */}
+                <path d="M130,125 Q180,130 215,110 Q185,150 145,150 Z" />
+                <circle cx="215" cy="110" r="18" />
+                <circle cx="175" cy="135" r="22" />
+                {/* Ranting kecil */}
+                <path d="M70,75 Q40,115 25,160 Q55,130 85,100 Z" />
+                <circle cx="25" cy="160" r="15" />
+                <circle cx="45" cy="130" r="17" />
               </svg>
             </motion.div>
 
-            {/* Partikel Debu Cahaya Melayang (Floating Warm Dust Motes) */}
-            {[...Array(6)].map((_, i) => (
+            {/* Partikel Debu Cahaya Matahari Berputar Lembut (Golden Dust Motes) */}
+            {[...Array(8)].map((_, i) => (
               <motion.div
                 key={`mote-${i}`}
-                className="absolute rounded-full bg-[#C99052] opacity-25 blur-[0.5px]"
+                className="absolute rounded-full bg-[#E0A045] shadow-xs"
                 style={{
                   width: `${4 + (i % 3) * 2.5}px`,
                   height: `${4 + (i % 3) * 2.5}px`,
-                  top: `${12 + i * 14}%`,
-                  left: `${10 + (i * 17) % 80}%`,
+                  top: `${10 + i * 11}%`,
+                  left: `${8 + (i * 15) % 84}%`,
+                  opacity: 0.35,
+                  filter: "blur(0.5px)",
                 }}
                 animate={{
-                  y: [0, -20, 0],
-                  x: [0, (i % 2 === 0 ? 10 : -10), 0],
-                  opacity: [0.15, 0.4, 0.15],
+                  y: [0, -28, 0],
+                  x: [0, (i % 2 === 0 ? 14 : -14), 0],
+                  opacity: [0.2, 0.6, 0.2],
+                  scale: [0.9, 1.25, 0.9],
                 }}
                 transition={{
-                  duration: 5 + i * 1.5,
+                  duration: 4.5 + i * 1.2,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
@@ -95,7 +113,7 @@ export function AtmosphereBackdrop({ currentSegment }) {
         )}
       </AnimatePresence>
 
-      {/* 4. Efek Malam Temaram: Lampu Meja Hangat & Bokeh (Segmen 5 & 6) */}
+      {/* 4. Efek Malam Temaram: Sorot Lampu Belajar Hangat & Bokeh (Segmen 5 & 6) */}
       <AnimatePresence>
         {isNight && (
           <motion.div
@@ -106,27 +124,28 @@ export function AtmosphereBackdrop({ currentSegment }) {
             transition={{ duration: 1.2 }}
             className="absolute inset-0"
           >
-            {/* Sorotan Lampu Belajar Hangat (Amber Glow) */}
-            <div className="absolute top-[30%] left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-[#FFAA5A]/15 blur-[90px]" />
-            <div className="absolute top-[65%] left-1/3 w-64 h-64 rounded-full bg-[#3B5B88]/15 blur-[80px]" />
+            {/* Sorot Lampu Hangat Meja Belajar */}
+            <div className="absolute top-[28%] left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-[#FFAA5A]/20 blur-[90px]" />
+            <div className="absolute top-[68%] left-1/3 w-72 h-72 rounded-full bg-[#3B5B88]/20 blur-[85px]" />
 
-            {/* Lampu Bokeh Halus */}
-            {[...Array(5)].map((_, i) => (
+            {/* Bokeh Lampu Kota Malam Hari */}
+            {[...Array(6)].map((_, i) => (
               <motion.div
                 key={`bokeh-${i}`}
-                className="absolute rounded-full bg-[#FFD4A3] opacity-20 blur-[10px]"
+                className="absolute rounded-full bg-[#FFE2BD] blur-[10px]"
                 style={{
-                  width: `${20 + (i % 3) * 14}px`,
-                  height: `${20 + (i % 3) * 14}px`,
-                  top: `${20 + i * 15}%`,
-                  left: `${15 + (i * 20) % 75}%`,
+                  width: `${22 + (i % 3) * 16}px`,
+                  height: `${22 + (i % 3) * 16}px`,
+                  top: `${18 + i * 14}%`,
+                  left: `${12 + (i * 19) % 76}%`,
+                  opacity: 0.25,
                 }}
                 animate={{
-                  opacity: [0.1, 0.25, 0.1],
-                  scale: [0.95, 1.1, 0.95],
+                  opacity: [0.15, 0.35, 0.15],
+                  scale: [0.95, 1.15, 0.95],
                 }}
                 transition={{
-                  duration: 4 + i,
+                  duration: 3.5 + i,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
