@@ -12,8 +12,8 @@ export function Segment1Prolog({ onComplete }) {
   const [isUnsealed, setIsUnsealed] = useState(false);
   // isExtracted: amplop meluncur turun dan surat pembuka muncul di tengah
   const [isExtracted, setIsExtracted] = useState(false);
-  // isZoomingTape: animasi lakban terkelupas & kaset mini zoom membesar ke Segmen 2
-  const [isZoomingTape, setIsZoomingTape] = useState(false);
+  // isPeelingTape: animasi selotip washi terkelupas saat ditarik/diketuk & kaset mini terangkat
+  const [isPeelingTape, setIsPeelingTape] = useState(false);
 
   const { startBgm, playSfx } = useAudio();
 
@@ -61,17 +61,17 @@ export function Segment1Prolog({ onComplete }) {
     }, 500);
   };
 
-  // 2. Alur Transisi Morphing Alami Menuju Segmen 2 (Page 3)
-  const handleTriggerZoomTransition = () => {
-    if (isZoomingTape) return;
-    setIsZoomingTape(true);
+  // 2. Alur Transisi Opsi A: Gestur Kelupas Selotip Lakban Menuju Segmen 2
+  const handlePeelTape = () => {
+    if (isPeelingTape) return;
+    setIsPeelingTape(true);
 
-    playSfx("tape-click");
+    playSfx("tape-peel");
 
-    // Washi tape terkelupas 180ms, lalu beralih segmen memicu shared-element morph
+    // Washi tape terkelupas 320ms, kaset terangkat, lalu beralih segmen memicu morph
     setTimeout(() => {
       onComplete();
-    }, 180);
+    }, 360);
   };
 
   return (
@@ -242,8 +242,8 @@ export function Segment1Prolog({ onComplete }) {
               className="w-full flex flex-col items-center pointer-events-auto"
             >
               <motion.div
-                animate={isZoomingTape ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1 }}
-                transition={{ duration: 0.2 }}
+                animate={isPeelingTape ? { y: 100, opacity: 0.15, scale: 0.94 } : { y: 0, opacity: 1, scale: 1 }}
+                transition={{ duration: 0.38, ease: "easeInOut" }}
                 className="w-full bg-[#FFFDF8] rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#E5DACB] text-[#120C08] relative text-left paper-shadow-lifted z-30 flex flex-col pointer-events-auto"
               >
                 {/* Washi Tape di Sudut Atas Kertas Surat */}
@@ -279,45 +279,73 @@ export function Segment1Prolog({ onComplete }) {
                 </div>
 
                 {/* ========================================================= */}
-                {/* PEMUTAR KASET MINI DILAKBAN WASHI TAPE (KLIK KE PAGE 3)   */}
+                {/* PEMUTAR KASET MINI DILAKBAN WASHI TAPE (OPSI A: PEEL)     */}
                 {/* ========================================================= */}
                 <div className="mt-1 pt-2.5 border-t border-dashed border-[#DAC9B4] flex flex-col items-center relative w-full pointer-events-auto">
-                  {/* BUTTON PEMUTAR KASET MINI DENGAN SHARED ELEMENT LAYOUT ID */}
-                  <motion.button
+                  
+                  {/* BODI PEMUTAR KASET MINI (SHARED ELEMENT MORPH) */}
+                  <motion.div
                     layoutId="shared-tape-deck"
-                    type="button"
-                    onClick={handleTriggerZoomTransition}
-                    whileHover={!isZoomingTape ? { scale: 1.02, y: -2 } : {}}
-                    whileTap={!isZoomingTape ? { scale: 0.97 } : {}}
-                    className="relative w-full bg-[#201914] rounded-2xl p-3 border-2 border-[#483B30] shadow-xl cursor-pointer flex items-center justify-between overflow-hidden group select-none pointer-events-auto text-left"
+                    animate={
+                      isPeelingTape
+                        ? {
+                            scale: 1.18,
+                            y: -42,
+                            boxShadow: "0 30px 60px rgba(0,0,0,0.55)",
+                            transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] },
+                          }
+                        : { scale: 1, y: 0 }
+                    }
+                    className="relative w-full bg-[#201914] rounded-2xl p-3 border-2 border-[#483B30] shadow-xl flex items-center justify-between overflow-visible group select-none pointer-events-auto text-left"
                   >
-                    {/* LAKBAN WASHI TAPE 1: SUDUT KIRI ATAS */}
+                    {/* STRIP SELOTIP WASHI TAPE INTERAKTIF (GESTUR TARIK / KELUPAS) */}
                     <motion.div
-                      animate={
-                        isZoomingTape
-                          ? { rotate: -45, x: -30, opacity: 0, scale: 1.2 }
-                          : { rotate: -18, opacity: 0.9 }
-                      }
-                      transition={{ duration: 0.35 }}
-                      className="absolute -top-1.5 -left-3 w-14 h-4 bg-[#E2C275]/80 border-y border-amber-300/40 shadow-xs z-30 pointer-events-none"
-                      style={{
-                        clipPath: "polygon(0 0, 95% 5%, 100% 90%, 5% 100%)",
+                      drag="x"
+                      dragConstraints={{ left: 0, right: 120 }}
+                      dragElastic={0.25}
+                      onDragEnd={(e, info) => {
+                        if (info.offset.x > 35 || info.velocity.x > 200) {
+                          handlePeelTape();
+                        }
                       }}
-                    />
+                      onClick={handlePeelTape}
+                      animate={
+                        isPeelingTape
+                          ? {
+                              x: 140,
+                              rotateZ: 28,
+                              opacity: 0,
+                              scale: 1.15,
+                              transition: { duration: 0.35, ease: "easeOut" },
+                            }
+                          : { x: 0, rotateZ: -1.5 }
+                      }
+                      whileHover={!isPeelingTape ? { scale: 1.02, y: -1 } : {}}
+                      whileDrag={{ scale: 1.05, rotateZ: 4, zIndex: 999 }}
+                      className="absolute -top-2.5 -left-3 -right-3 h-8 bg-[#E2C275]/92 border-y border-[#C5A24D]/70 shadow-md z-40 cursor-grab active:cursor-grabbing flex items-center justify-between px-3 select-none rounded-xs backdrop-blur-2xs"
+                      style={{
+                        clipPath: "polygon(0 0, 98% 3%, 100% 95%, 2% 100%)",
+                      }}
+                    >
+                      {/* Tekstur Pola Selotip Transparan */}
+                      <div className="flex items-center gap-1.5 pointer-events-none">
+                        <Sparkles className="w-3.5 h-3.5 text-[#5C451D]" />
+                        <span className="font-mono text-[9px] text-[#5C451D] font-black uppercase tracking-wider">
+                          LAKBAN PEREKAT MEMORI
+                        </span>
+                      </div>
 
-                    {/* LAKBAN WASHI TAPE 2: SUDUT KANAN BAWAH */}
-                    <motion.div
-                      animate={
-                        isZoomingTape
-                          ? { rotate: 35, x: 30, opacity: 0, scale: 1.2 }
-                          : { rotate: 16, opacity: 0.9 }
-                      }
-                      transition={{ duration: 0.35 }}
-                      className="absolute -bottom-1.5 -right-3 w-14 h-4 bg-[#E8B4B8]/80 border-y border-rose-300/40 shadow-xs z-30 pointer-events-none"
-                      style={{
-                        clipPath: "polygon(5% 0, 100% 0, 95% 100%, 0 95%)",
-                      }}
-                    />
+                      {/* Tab Lipatan Sudut Kanan: Indikator Tarik / Kelupas */}
+                      <motion.div
+                        animate={{ x: [0, 3, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                        className="flex items-center gap-1 bg-[#F5E6BE] px-2 py-0.5 rounded-sm border border-[#C5A24D] text-[#5C451D] shadow-xs pointer-events-none"
+                      >
+                        <span className="font-typewriter text-[8.5px] font-black tracking-tight">
+                          Tarik Kelupas ➔
+                        </span>
+                      </motion.div>
+                    </motion.div>
 
                     {/* Spul Roda Mini Berputar Halus */}
                     <div className="flex items-center gap-1.5 shrink-0 pl-1 z-10 pointer-events-none">
@@ -341,7 +369,7 @@ export function Segment1Prolog({ onComplete }) {
                     <div className="flex-1 mx-2.5 bg-[#FAF5EC] border border-[#CBB69E] rounded px-2.5 py-1 shadow-xs flex flex-col justify-center text-left z-10 pointer-events-none">
                       <div className="flex items-center justify-between">
                         <span className="font-typewriter text-[7px] font-black uppercase text-[#8C3420] tracking-wider">
-                          SIDE A • MINI DECK
+                          SIDE A • TAPE DECK
                         </span>
                         <div className="flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -349,29 +377,29 @@ export function Segment1Prolog({ onComplete }) {
                         </div>
                       </div>
                       <span className="font-sans-ui text-xs font-black text-[#140E0A] leading-tight truncate">
-                        Ketuk Pemutar Kaset Ini 🎵
+                        Pemutar Kaset Perjalanan 🎵
                       </span>
                       <span className="font-typewriter text-[7.5px] text-[#635142] font-bold">
-                        Buka Lembaran Mixtape Kita
+                        Kelupas lakban di atas untuk memutar
                       </span>
                     </div>
 
                     {/* Ikon Aksi Play Mini */}
                     <div className="pr-1 z-10 pointer-events-none">
-                      <div className="w-6 h-6 rounded-full bg-[#8C3420] group-hover:bg-[#A83226] text-white flex items-center justify-center text-[10px] font-black shadow-xs transition-colors">
+                      <div className="w-6 h-6 rounded-full bg-[#8C3420] text-white flex items-center justify-center text-[10px] font-black shadow-xs">
                         ▶
                       </div>
                     </div>
-                  </motion.button>
+                  </motion.div>
 
                   {/* Teks Bantuan / Hint Berdenyut */}
                   <motion.div
                     animate={{ y: [0, -2, 0] }}
                     transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-                    className="mt-2 flex items-center gap-1 text-[#664C35] text-[10.5px] font-sans-ui font-bold pointer-events-none"
+                    className="mt-2.5 flex items-center gap-1.5 text-[#664C35] text-[10.5px] font-sans-ui font-bold pointer-events-none"
                   >
                     <Sparkles className="w-3 h-3 text-amber-600" />
-                    <span>Ketuk pemutar kaset yang dilakban ini untuk mulai memutar</span>
+                    <span>Tarik / usap selotip lakban ke kanan untuk melepas pemutar 🪄</span>
                   </motion.div>
                 </div>
               </motion.div>

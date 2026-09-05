@@ -71,12 +71,12 @@ function ScrapbookApp() {
 
         {/* KONTEN SEGMEN AKTIF DENGAN DUKUNGAN SHARED ELEMENT MORPHING */}
         <LayoutGroup id="scrapbook-morph-group">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode={isMorphTransition ? "popLayout" : "wait"}>
             <motion.div
               key={`segment-${currentSegment}`}
               initial={
                 isMorphTransition
-                  ? { opacity: 0 }
+                  ? { opacity: 0, scale: 0.98 }
                   : {
                       opacity: 0,
                       rotateY: 25,
@@ -98,7 +98,8 @@ function ScrapbookApp() {
                 isMorphTransition
                   ? {
                       opacity: 0,
-                      transition: { duration: 0.3 },
+                      scale: 0.95,
+                      transition: { duration: 0.35 },
                     }
                   : {
                       opacity: 0,

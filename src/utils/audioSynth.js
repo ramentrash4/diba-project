@@ -155,6 +155,14 @@ export function playSfx(name) {
       });
       break;
 
+    case "tape-peel":
+      // Suara gesekan adesif selotip terkelupas dari kertas bertekstur
+      [240, 380, 520, 680].forEach((freq, idx) => {
+        setTimeout(() => playSyntheticNote(freq, 0.07, "triangle", 0.12), idx * 22);
+      });
+      setTimeout(() => playSyntheticNote(840, 0.05, "sine", 0.08), 85);
+      break;
+
     default:
       playSyntheticNote(440, 0.15, "sine", 0.1);
   }
