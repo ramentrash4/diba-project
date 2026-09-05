@@ -11,6 +11,8 @@ import {
   FastForward,
   Sparkles,
   Music,
+  Camera,
+  Paperclip,
 } from "lucide-react";
 import Image from "next/image";
 import { scrapbookData } from "@/data/scrapbookData";
@@ -24,6 +26,19 @@ export function Segment2Soundtrack({ onComplete }) {
   const [insertedTape, setInsertedTape] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasPlayedAny, setHasPlayedAny] = useState(false);
+
+  // Status saat foto polaroid yang terselip ditarik keluar dari kotak kaset mika
+  const [isPullingOut, setIsPullingOut] = useState(false);
+
+  // Tarik foto polaroid keluar menuju Segmen 3
+  const handlePullPolaroid = () => {
+    if (isPullingOut) return;
+    setIsPullingOut(true);
+    playSfx("paper-swoosh");
+    setTimeout(() => {
+      onComplete();
+    }, 450);
+  };
 
   // Counter analog 3-digit retro (misal 042 -> 043 -> 044...)
   const [tapeCounter, setTapeCounter] = useState(42);
@@ -614,27 +629,110 @@ export function Segment2Soundtrack({ onComplete }) {
           </div>
         </motion.div>
 
-        {/* 6. TOMBOL LANJUT KE SEGMEN 3 (LEMBAR POLAROID) */}
+        {/* 6. WADAH KOTAK KASET MIKA DENGAN FOTO POLAROID TERSELIP (INTERAKSI KE SEGMEN 3) */}
         <AnimatePresence>
           {hasPlayedAny && (
             <motion.div
-              initial={{ opacity: 0, y: 15, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              initial={{ opacity: 0, y: 15, scale: 0.96 }}
+              animate={
+                isPullingOut
+                  ? { opacity: 0, y: 20, transition: { duration: 0.4 } }
+                  : { opacity: 1, y: 0, scale: 1 }
+              }
               transition={{ duration: 0.45, ease: "easeOut" }}
-              className="w-full mt-3.5 pb-1"
+              className="w-full mt-3 pb-1 flex flex-col items-center"
             >
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  playSfx("page-turn");
-                  onComplete();
-                }}
-                className="w-full py-3.5 px-4 rounded-xl bg-[#1C1510] hover:bg-black text-[#FAF2E6] font-sans-ui text-xs sm:text-sm font-black shadow-xl flex items-center justify-center gap-2 transition-all cursor-pointer border border-amber-300/30"
+              {/* KOTAK KASET MIKA JEWEL CASE DENGAN FOTO POLAROID TERSELIP */}
+              <div
+                onClick={handlePullPolaroid}
+                className="relative w-full h-[78px] bg-[#1E1712]/90 backdrop-blur-xs rounded-2xl border-2 border-[#524436] p-2.5 shadow-xl flex items-center justify-between cursor-pointer hover:border-amber-400/70 transition-all select-none group overflow-visible"
               >
-                <span>Lanjut ke Tumpukan Polaroid (Foto Kita)</span>
-                <ChevronRight className="w-4 h-4 text-amber-300" />
-              </motion.button>
+                {/* Efek Kilau Mika Akrilik */}
+                <div
+                  className="absolute inset-0 rounded-2xl pointer-events-none opacity-30"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)",
+                  }}
+                />
+
+                {/* Sisi Kiri: Label J-Card Kotak Kaset */}
+                <div className="flex flex-col text-left pl-1 z-10 overflow-hidden mr-2">
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className="font-mono text-[9px] text-amber-300 font-black uppercase tracking-wider bg-black/40 px-1.5 py-0.2 rounded border border-amber-400/30">
+                      J-CARD ARCHIVE
+                    </span>
+                    <Camera className="w-3 h-3 text-amber-300" />
+                  </div>
+                  <span className="font-sans-ui text-xs font-black text-[#FAF5EC] truncate leading-tight">
+                    Dokumentasi Visual 📸
+                  </span>
+                  <span className="font-typewriter text-[10px] text-[#C5B49E] font-bold truncate">
+                    Terselip tumpukan foto kita
+                  </span>
+                </div>
+
+                {/* Sisi Kanan: Foto Polaroid Mengintip dengan Klip Kertas Emas */}
+                <div className="relative shrink-0 pr-1 z-20">
+                  <motion.div
+                    drag="y"
+                    dragConstraints={{ top: -80, bottom: 0 }}
+                    dragElastic={0.25}
+                    dragSnapToOrigin={true}
+                    onDragEnd={(e, info) => {
+                      if (info.offset.y < -35) {
+                        handlePullPolaroid();
+                      }
+                    }}
+                    animate={
+                      isPullingOut
+                        ? {
+                            y: -180,
+                            scale: 1.5,
+                            rotate: -4,
+                            opacity: 1,
+                            transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
+                          }
+                        : { y: [0, -3, 0] }
+                    }
+                    transition={
+                      !isPullingOut
+                        ? { repeat: Infinity, duration: 2, ease: "easeInOut" }
+                        : undefined
+                    }
+                    whileHover={{ scale: 1.05, y: -4 }}
+                    className="relative w-[76px] h-[64px] bg-[#FFFDF8] rounded-sm p-1 border border-[#D5C7B5] shadow-lg -rotate-3 cursor-grab active:cursor-grabbing flex flex-col justify-between"
+                  >
+                    {/* Klip Kertas Emas Antik di Sudut */}
+                    <div className="absolute -top-2.5 left-2 z-30 pointer-events-none">
+                      <Paperclip className="w-4 h-4 text-amber-400 drop-shadow-xs rotate-45" />
+                    </div>
+
+                    {/* Area Gambar Polaroid Mini */}
+                    <div className="w-full h-[40px] bg-[#2E241E] rounded-xs relative overflow-hidden flex items-center justify-center border border-black/20">
+                      <Camera className="w-4 h-4 text-amber-200/80" />
+                      <span className="absolute bottom-0.5 text-[7.5px] font-mono text-amber-100 font-bold bg-black/60 px-1 rounded-xs">
+                        14 Okt
+                      </span>
+                    </div>
+
+                    {/* Teks Tulisan Tangan di Bawah Foto */}
+                    <span className="font-handwriting text-[10px] font-black text-[#140E0A] leading-none text-center truncate">
+                      Kita di Kafe ✨
+                    </span>
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Teks Bantuan / Hint Berdenyut */}
+              <motion.div
+                animate={{ y: [0, -2, 0] }}
+                transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                className="mt-1.5 flex items-center gap-1.5 text-[#3D2E1F] text-[10.5px] font-sans-ui font-bold"
+              >
+                <Sparkles className="w-3 h-3 text-amber-700" />
+                <span>Tarik foto yang terselip ke atas untuk membuka album foto 📸</span>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
