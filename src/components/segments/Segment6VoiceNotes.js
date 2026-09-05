@@ -11,6 +11,7 @@ import {
   MessageCircle,
   FileText,
   Volume2,
+  Headphones,
 } from "lucide-react";
 import { scrapbookData } from "@/data/scrapbookData";
 import { useAudio } from "@/components/audio/AudioProvider";
@@ -101,6 +102,21 @@ export function Segment6VoiceNotes({ onComplete }) {
       
       {/* 1. HEADER SEGMEN: REKAMAN SUARA & TAWA */}
       <div className="w-full max-w-[340px] flex flex-col items-center text-center mt-1 z-20">
+        {/* Indikator Kesinambungan Jack Earphone yang Tersambung dari Segmen 5 */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center gap-2 text-emerald-300 font-mono text-[9px] font-bold uppercase tracking-wider mb-2 bg-[#0F1824]/90 px-3 py-1 rounded-full border border-emerald-500/30 shadow-xs"
+        >
+          <div className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          </div>
+          <span>Jack 3.5mm Terhubung • Audio Live</span>
+          <Headphones className="w-3 h-3 text-emerald-400 ml-0.5" />
+        </motion.div>
+
         <div className="flex items-center gap-1.5 text-emerald-300 font-mono text-[10px] font-black uppercase tracking-wider mb-1 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-800/40">
           <Mic className="w-3.5 h-3.5 text-emerald-400" />
           <span>Voice Archive • Pilkom '25</span>

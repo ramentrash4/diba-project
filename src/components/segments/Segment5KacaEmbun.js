@@ -7,6 +7,7 @@ import {
   Droplets,
   Wind,
   Sparkles,
+  Headphones,
 } from "lucide-react";
 import { scrapbookData } from "@/data/scrapbookData";
 import { useAudio } from "@/components/audio/AudioProvider";
@@ -29,6 +30,10 @@ export function Segment5KacaEmbun({ onComplete }) {
 
   // Status transisi penyelesaian ke Segmen 6
   const [isFinishing, setIsFinishing] = useState(false);
+
+  // Status interaksi colokan jack earphone (Kaca #3)
+  const [isPluggedIn, setIsPluggedIn] = useState(false);
+  const [jackDragX, setJackDragX] = useState(0);
 
   const canvasRef = useRef(null);
   const isDrawing = useRef(false);
@@ -59,15 +64,30 @@ export function Segment5KacaEmbun({ onComplete }) {
       setTimeout(() => {
         setIsReFrosting(false);
       }, 700);
-    } else {
-      // Kaca terakhir (Hal Kecil #3) -> Transisi membuka jendela kafe ke Segmen 6
+    }
+  }, [activeTab, isReFrosting, isFinishing, memories.length, playSfx]);
+
+  // Interaksi Menancapkan Colokan Jack Audio ke Port (Kaca #3)
+  const handlePlugIn = useCallback(() => {
+    if (isPluggedIn || isFinishing) return;
+    setIsPluggedIn(true);
+    playSfx("clasp-open");
+
+    // Efek audio desis statis radio lembut
+    setTimeout(() => {
+      playSfx("mist-wipe");
+    }, 200);
+
+    // Buka jendela ke Segmen 6
+    setTimeout(() => {
       setIsFinishing(true);
       playSfx("paper-swoosh");
-      setTimeout(() => {
-        onComplete();
-      }, 1200);
-    }
-  }, [activeTab, isReFrosting, isFinishing, memories.length, onComplete, playSfx]);
+    }, 850);
+
+    setTimeout(() => {
+      onComplete();
+    }, 1800);
+  }, [isPluggedIn, isFinishing, onComplete, playSfx]);
 
   // Inisialisasi kanvas kaca berembun setiap kali berpindah tab
   const drawFog = useCallback(() => {
@@ -233,10 +253,10 @@ export function Segment5KacaEmbun({ onComplete }) {
     lastPoint.current = currentPoint;
   };
 
-  // Ketukan pada kaca yang sudah bersih untuk beralih ke jendela berikutnya
+  // Ketukan pada kaca yang sudah bersih untuk beralih ke jendela berikutnya (Hanya Kaca #1 & #2)
   const handleTapGlass = () => {
-    // JEDA PENGAMAN: Abaikan jika jari baru saja diangkat dari mengusap (< 500ms)
-    // Pengguna harus benar-benar melakukan ketukan baru yang terpisah untuk berpindah
+    // Kaca #3 transisi HANYA lewat colokan jack earphone!
+    if (activeTab === memories.length - 1) return;
     if (Date.now() - lastWipeEndTime.current < 500) return;
     if (!isCurrentCleared || isReFrosting || isFinishing) return;
     handleProceedNext();
@@ -284,7 +304,9 @@ export function Segment5KacaEmbun({ onComplete }) {
         <div
           onClick={handleTapGlass}
           className={`w-full max-w-[320px] sm:max-w-[335px] h-[375px] sm:h-[390px] relative z-10 flex flex-col items-center justify-center bg-[#1F1711] rounded-2xl p-2.5 sm:p-3 border-4 border-[#3D2E24] shadow-[0_22px_55px_rgba(0,0,0,0.85)] select-none transition-all duration-300 ${
-            isCurrentCleared ? "cursor-pointer ring-2 ring-amber-400/40" : "cursor-default"
+            isCurrentCleared && activeTab < memories.length - 1
+              ? "cursor-pointer ring-2 ring-amber-400/40"
+              : "cursor-default"
           }`}
         >
           {/* Siluet Tetesan Air Hujan di Luar Kaca */}
@@ -301,16 +323,106 @@ export function Segment5KacaEmbun({ onComplete }) {
             </div>
 
             {/* Pesan Manis yang Tersingkap */}
-            <div className="my-auto px-2 py-4 flex flex-col items-center justify-center">
+            <div className="my-auto px-2 py-3 flex flex-col items-center justify-center">
               <p className="font-handwriting text-xl sm:text-2xl text-amber-100 font-bold leading-relaxed drop-shadow-sm">
                 "{currentItem.hiddenText}"
               </p>
             </div>
 
-            {/* Footer Mini Elegan di Balik Kaca */}
-            <div className="flex items-center justify-center border-t border-white/10 pt-2 text-[10px] font-sans-ui text-blue-200/60 font-medium">
-              <span>Kafe Malam • Hujan Reda</span>
-            </div>
+            {/* JIKA KACA #3 (TERAKHIR) & SUDAH BERSIH: DOCK COLOKAN AUDIO JACK INTERAKTIF */}
+            {activeTab === memories.length - 1 && isCurrentCleared ? (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="w-full pt-2 border-t border-white/15 flex flex-col items-center"
+              >
+                <div className="w-full h-12 bg-[#0F1724]/90 rounded-xl border border-amber-400/30 p-2 relative flex items-center justify-between overflow-hidden shadow-inner">
+                  {/* Garis Kabel Fleksibel SVG */}
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+                    <path
+                      d={`M 15 24 C 40 24, ${35 + jackDragX * 0.4} ${24 + Math.sin(jackDragX * 0.1) * 6}, ${50 + jackDragX} 24`}
+                      fill="none"
+                      stroke="#4B5563"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+
+                  {/* Ujung Jack Audio 3.5mm yang Dapat Diseret */}
+                  <div className="relative z-10 flex items-center">
+                    <motion.div
+                      drag={!isPluggedIn ? "x" : false}
+                      dragConstraints={{ left: 0, right: 130 }}
+                      dragElastic={0.08}
+                      animate={isPluggedIn ? { x: 130 } : undefined}
+                      onDrag={(e, info) => {
+                        setJackDragX(Math.max(0, info.offset.x));
+                      }}
+                      onDragEnd={(e, info) => {
+                        if (info.offset.x >= 85 || info.velocity.x > 120) {
+                          setJackDragX(130);
+                          handlePlugIn();
+                        } else {
+                          setJackDragX(0);
+                        }
+                      }}
+                      className={`flex items-center cursor-grab active:cursor-grabbing select-none touch-none ${
+                        isPluggedIn ? "pointer-events-none" : ""
+                      }`}
+                    >
+                      {/* Bodi Jack Logika Logam */}
+                      <div className="flex items-center shadow-md">
+                        {/* Kabel strain relief */}
+                        <div className="w-2.5 h-3 bg-slate-800 rounded-l-xs border-y border-l border-slate-600" />
+                        {/* Bodi kuningan pegangan */}
+                        <div className="px-2 py-0.5 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-800 rounded-xs border border-amber-400/60 flex items-center gap-1 shadow-xs">
+                          <Headphones className="w-2.5 h-2.5 text-amber-200" />
+                          <span className="font-mono text-[8.5px] font-black text-amber-100 uppercase tracking-tighter">
+                            Audio
+                          </span>
+                        </div>
+                        {/* Pin Colokan Jack 3.5mm Emas dengan Garis Isolator */}
+                        <div className="w-5 h-2 bg-gradient-to-r from-amber-300 via-amber-100 to-amber-400 rounded-r-xs border border-amber-500 flex items-center justify-evenly">
+                          <span className="w-0.5 h-full bg-slate-900" />
+                          <span className="w-0.5 h-full bg-slate-900" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  {/* Lubang Port Audio 3.5mm di Sebelah Kanan */}
+                  <div className="relative z-10 flex items-center gap-1.5 mr-1">
+                    <span className="font-mono text-[8px] font-bold text-slate-400 uppercase tracking-wider">
+                      Port In
+                    </span>
+                    <div
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                        isPluggedIn
+                          ? "border-emerald-400 bg-emerald-950 shadow-[0_0_12px_rgba(52,211,153,0.8)] scale-105"
+                          : "border-amber-400/80 bg-slate-950 shadow-[0_0_8px_rgba(251,191,36,0.3)] animate-pulse"
+                      }`}
+                    >
+                      {/* Lubang Jack */}
+                      <div
+                        className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                          isPluggedIn ? "bg-emerald-400" : "bg-black"
+                        }`}
+                      />
+                      {/* Riak Gelombang saat Dicolokkan */}
+                      {isPluggedIn && (
+                        <div className="absolute inset-0 rounded-full border-2 border-emerald-400 animate-ping pointer-events-none" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              /* Footer Mini Standar di Balik Kaca untuk Kaca #1 dan #2 */
+              <div className="flex items-center justify-center border-t border-white/10 pt-2 text-[10px] font-sans-ui text-blue-200/60 font-medium">
+                <span>Kafe Malam • Hujan Reda</span>
+              </div>
+            )}
           </div>
 
           {/* LAPISAN KANVAS KACA BEREMBUN (DAPAT DIUSAP DENGAN JARI) */}
@@ -353,14 +465,16 @@ export function Segment5KacaEmbun({ onComplete }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className="absolute inset-0 rounded-2xl bg-black/85 backdrop-blur-sm flex flex-col items-center justify-center z-40 text-center p-5 text-white pointer-events-none"
+                className="absolute inset-0 rounded-2xl bg-black/90 backdrop-blur-md flex flex-col items-center justify-center z-40 text-center p-5 text-white pointer-events-none"
               >
-                <Sparkles className="w-8 h-8 text-amber-300 animate-pulse mb-2" />
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center mb-3 shadow-[0_0_20px_rgba(52,211,153,0.4)]">
+                  <Headphones className="w-6 h-6 text-emerald-300 animate-bounce" />
+                </div>
                 <h4 className="font-handwriting text-2xl text-amber-200 font-black mb-1">
-                  Membuka Jendela Kafe...
+                  Audio Jack Terhubung 🎧
                 </h4>
-                <p className="font-sans-ui text-xs text-blue-200">
-                  Mendengarkan rekaman suara voice notes kita 🎙️
+                <p className="font-sans-ui text-xs text-emerald-200/90 font-medium">
+                  Menyalakan rekaman suara voice notes kita...
                 </p>
               </motion.div>
             )}
@@ -375,10 +489,17 @@ export function Segment5KacaEmbun({ onComplete }) {
               <span>Usap kaca untuk menghapus embun</span>
             </div>
           ) : activeTab === memories.length - 1 ? (
-            <div className="bg-[#182333]/95 border border-amber-400/40 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-amber-200 font-sans-ui text-xs font-bold text-center backdrop-blur-xs">
-              <span>🎙️</span>
-              <span>Ketuk kaca untuk rekaman suara kita ✨</span>
-            </div>
+            isPluggedIn ? (
+              <div className="bg-[#182333]/95 border border-emerald-400/40 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-emerald-200 font-sans-ui text-xs font-bold text-center backdrop-blur-xs">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-spin" />
+                <span>Audio terhubung! Menyalakan rekaman suara...</span>
+              </div>
+            ) : (
+              <div className="bg-[#182333]/95 border border-amber-400/40 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-amber-200 font-sans-ui text-xs font-bold text-center backdrop-blur-xs">
+                <span>🎧</span>
+                <span>Tarik colokan jack ke port audio di kanan ➔</span>
+              </div>
+            )
           ) : (
             <div className="bg-[#182333]/90 border border-blue-300/30 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-blue-100 font-sans-ui text-xs font-bold text-center backdrop-blur-xs">
               <span>❄️</span>
