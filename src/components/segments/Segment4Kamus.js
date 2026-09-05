@@ -214,7 +214,7 @@ export function Segment4Kamus({ onComplete }) {
               </div>
 
               {/* KONTEN ENTRI KOSAKATA DENGAN ANIMASI MEMBALIK LEMBARAN KERTAS 3D MURNI & SWIPE (ZERO BUTTONS) */}
-              <div className="flex-1 relative flex flex-col justify-center overflow-hidden py-1">
+              <div className="flex-1 relative flex flex-col justify-start overflow-hidden pt-1.5 pb-0.5">
                 <AnimatePresence mode="wait" custom={turnDirection}>
                   <motion.div
                     key={currentEntry.word}
@@ -245,7 +245,7 @@ export function Segment4Kamus({ onComplete }) {
                       }
                     }}
                     onClick={() => handleToggleHighlight(activeWordIndex)}
-                    className="w-full h-full flex flex-col justify-center cursor-pointer select-none relative"
+                    className="w-full h-full flex flex-col justify-start cursor-pointer select-none relative"
                   >
                     {/* Judul Kata dengan Efek Stabilo Kuning Halus */}
                     <div className="relative inline-block mb-1">
@@ -275,7 +275,7 @@ export function Segment4Kamus({ onComplete }) {
                     <div className="w-full h-px bg-[#EFE4D6] mb-1.5" />
 
                     {/* Definisi Resmi Versi Tatwa & Adiba */}
-                    <p className="font-sans-ui text-[11.5px] sm:text-xs text-[#2C2117] font-bold leading-relaxed mb-2">
+                    <p className="font-sans-ui text-[11.5px] sm:text-xs text-[#2C2117] font-bold leading-relaxed mb-1.5">
                       {currentEntry.definition}
                     </p>
 
@@ -284,30 +284,37 @@ export function Segment4Kamus({ onComplete }) {
                       "{currentEntry.example}"
                     </div>
 
-                    {/* Catatan Rahasia Tambahan yang Muncul saat Distabilo */}
-                    <AnimatePresence>
-                      {isHighlighted ? (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="mt-2 bg-[#FFF9E6] border border-amber-300/80 p-2 rounded-lg text-left shadow-2xs"
-                        >
-                          <p className="font-handwriting text-[13px] sm:text-[14px] text-[#1E3A8A] font-bold leading-snug">
-                            {secretFootnotes[activeWordIndex]}
-                          </p>
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          animate={{ opacity: [0.55, 0.95, 0.55] }}
-                          transition={{ repeat: Infinity, duration: 2.2 }}
-                          className="mt-2 flex items-center gap-1 text-[9.5px] font-sans-ui text-[#8C7A6B] font-bold"
-                        >
-                          <Highlighter className="w-3 h-3 text-amber-600" />
-                          <span>Ketuk teks untuk menstabilo catatan rahasia ✍️</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    {/* Catatan Rahasia Tambahan yang Muncul saat Distabilo (Stabil, Terkunci di Bawah Tanpa Menggeser Teks Atas) */}
+                    <div className="mt-2 min-h-[52px] relative flex flex-col justify-start">
+                      <AnimatePresence mode="wait">
+                        {isHighlighted ? (
+                          <motion.div
+                            key="footnote"
+                            initial={{ opacity: 0, y: 3 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -3 }}
+                            transition={{ duration: 0.2 }}
+                            className="bg-[#FFF9E6] border border-amber-300/80 p-2 rounded-lg text-left shadow-2xs"
+                          >
+                            <p className="font-handwriting text-[13px] sm:text-[14px] text-[#1E3A8A] font-bold leading-snug">
+                              {secretFootnotes[activeWordIndex]}
+                            </p>
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="cue"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: [0.55, 0.95, 0.55] }}
+                            exit={{ opacity: 0 }}
+                            transition={{ repeat: Infinity, duration: 2.2 }}
+                            className="py-1 flex items-center gap-1 text-[9.5px] font-sans-ui text-[#8C7A6B] font-bold"
+                          >
+                            <Highlighter className="w-3 h-3 text-amber-600" />
+                            <span>Ketuk teks untuk menstabilo catatan rahasia ✍️</span>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
 
                     {/* Affordance Sudut Lembaran Kertas Terlipat (Dog-Ear Corner) di Pojok Kanan Bawah */}
                     <div className="absolute -bottom-1 -right-1 w-6 h-6 overflow-hidden pointer-events-none opacity-85">
