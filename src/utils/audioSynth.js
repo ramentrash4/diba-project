@@ -111,6 +111,19 @@ export function playSfx(name) {
       setTimeout(() => playSyntheticNote(350, 0.15, "triangle", 0.08), 50);
       break;
 
+    case "btn-toggle":
+      // Suara klik pegas tombol play/pause mekanik
+      playSyntheticNote(480, 0.04, "triangle", 0.18);
+      setTimeout(() => playSyntheticNote(280, 0.06, "sine", 0.15), 30);
+      break;
+
+    case "tape-rewind":
+      // Suara desing roda pita berputar cepat (ffwd/rewind)
+      [300, 380, 460, 540, 620].forEach((freq, idx) => {
+        setTimeout(() => playSyntheticNote(freq, 0.05, "triangle", 0.08), idx * 25);
+      });
+      break;
+
     default:
       playSyntheticNote(440, 0.15, "sine", 0.1);
   }

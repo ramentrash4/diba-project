@@ -32,6 +32,8 @@ export const scrapbookData = {
       artist: "Nadin Amizah / Hindia",
       duration: "3:24",
       src: "/audio/songs/song1.mp3",
+      coverImage: "/images/albums/album1.svg",
+      tag: "Side A • Folk",
       memoryText: "Lagu pertama yang kita dengar di cafe waktu ngerjain tugas sampai sore itu...",
     },
     {
@@ -40,6 +42,8 @@ export const scrapbookData = {
       artist: "Yura Yunita",
       duration: "4:02",
       src: "/audio/songs/song2.mp3",
+      coverImage: "/images/albums/album2.svg",
+      tag: "Side B • Ballad",
       memoryText: "Waktu nemenin kamu pulang naik motor pas jalanan lagi sepi dan dingin.",
     },
     {
@@ -48,6 +52,8 @@ export const scrapbookData = {
       artist: "Sheila on 7",
       duration: "3:50",
       src: "/audio/songs/song3.mp3",
+      coverImage: "/images/albums/album3.svg",
+      tag: "Side A • Anthem",
       memoryText: "Karena setiap babak selalu punya cara manisnya sendiri untuk dikenang.",
     },
   ],

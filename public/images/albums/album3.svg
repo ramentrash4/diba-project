@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="sageGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#40634C"/>
+      <stop offset="50%" stop-color="#5B8267"/>
+      <stop offset="100%" stop-color="#769F82"/>
+    </linearGradient>
+    <linearGradient id="lensGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1F2922"/>
+      <stop offset="50%" stop-color="#3A5043"/>
+      <stop offset="100%" stop-color="#141E17"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base Sage Green Background -->
+  <rect width="200" height="200" rx="8" fill="url(#sageGrad)"/>
+
+  <!-- Vintage Film Strip Banner on Top/Right -->
+  <g transform="translate(130, 20) rotate(15)">
+    <rect width="60" height="110" rx="3" fill="#1C1814" stroke="#4B4237" stroke-width="1.5"/>
+    <!-- Sprocket holes -->
+    <rect x="4" y="8" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+    <rect x="4" y="24" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+    <rect x="4" y="40" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+    <rect x="4" y="56" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+    <rect x="4" y="72" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+    <rect x="4" y="88" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+    
+    <rect x="51" y="8" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+    <rect x="51" y="24" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+    <rect x="51" y="40" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+    <rect x="51" y="56" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+    <rect x="51" y="72" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+    <rect x="51" y="88" width="5" height="7" rx="1" fill="#FFF" opacity="0.8"/>
+
+    <!-- Film Frame Inside -->
+    <rect x="13" y="16" width="34" height="26" fill="#C5D3C8" opacity="0.9"/>
+    <rect x="13" y="50" width="34" height="26" fill="#E8DED1" opacity="0.9"/>
+    <text x="16" y="32" font-family="monospace" font-size="5" font-weight="bold" fill="#2D4B39">#PILKOM25</text>
+    <text x="16" y="66" font-family="monospace" font-size="5" font-weight="bold" fill="#8C412C">MEMORIES</text>
+  </g>
+
+  <!-- Retro Rangefinder Camera Body (Center-Left) -->
+  <rect x="25" y="85" width="95" height="62" rx="6" fill="#EFE8DA" stroke="#314236" stroke-width="2"/>
+  <!-- Leatherette Band -->
+  <rect x="25" y="105" width="95" height="32" fill="#3D4F42"/>
+  <rect x="25" y="85" width="95" height="20" fill="#D3C9B6"/>
+  <!-- Shutter Button & Dial -->
+  <rect x="35" y="78" width="12" height="7" rx="2" fill="#999"/>
+  <rect x="85" y="80" width="18" height="5" rx="1.5" fill="#888"/>
+  <circle cx="108" cy="95" r="4" fill="#B91C1C"/>
+
+  <!-- Lens Mount and Circles -->
+  <circle cx="72" cy="118" r="23" fill="#D3C9B6" stroke="#25352A" stroke-width="2"/>
+  <circle cx="72" cy="118" r="18" fill="url(#lensGrad)"/>
+  <circle cx="72" cy="118" r="11" fill="#141E17" stroke="#4E705A" stroke-width="1.5"/>
+  <!-- Lens reflection -->
+  <path d="M63,110 A12,12 0 0 1 81,114" stroke="#86EFAC" stroke-width="2" fill="none" opacity="0.75" stroke-linecap="round"/>
+
+  <!-- Vintage Album Header Label -->
+  <rect x="14" y="14" width="75" height="15" rx="3" fill="#1C2E22" fill-opacity="0.9"/>
+  <text x="18" y="24.5" font-family="monospace" font-size="7.5" font-weight="900" fill="#D1FAE5" letter-spacing="1">SIDE A • ANTHEM</text>
+
+  <!-- Title Badge -->
+  <rect x="14" y="165" width="112" height="23" rx="3" fill="#FAF5EC" fill-opacity="0.95"/>
+  <text x="20" y="176" font-family="sans-serif" font-size="9" font-weight="900" fill="#24120A">KISAH KLASIK</text>
+  <text x="20" y="184.5" font-family="monospace" font-size="6" font-weight="700" fill="#065F46">SHEILA ON 7</text>
+
+  <!-- Frame Border -->
+  <rect x="2" y="2" width="196" height="196" rx="7" fill="none" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="2"/>
+</svg>
