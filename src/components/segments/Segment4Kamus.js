@@ -86,9 +86,10 @@ export function Segment4Kamus({ onComplete }) {
       playSfx("clasp-open");
     }, 450);
 
+    // Durasi nyaman ~3.8 detik agar teks pengantar jendela kafe terbaca tenang
     setTimeout(() => {
       onComplete();
-    }, 1500);
+    }, 3800);
   };
 
   // Navigasi fisik membalik lembaran kata ke depan (3D Page Turn)
@@ -525,24 +526,28 @@ export function Segment4Kamus({ onComplete }) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.45, duration: 0.9, ease: "easeInOut" }}
-            className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-center bg-gradient-to-b from-[#7595B7]/75 via-[#8FAECF]/85 to-[#6686A6]/95 backdrop-blur-md px-6 text-center"
+            transition={{ delay: 0.45, duration: 0.85, ease: "easeInOut" }}
+            onClick={onComplete}
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-[#6D8DAE]/85 via-[#8BA9CA]/90 to-[#5E7F9E]/95 backdrop-blur-md px-6 text-center cursor-pointer select-none"
           >
             <motion.div
               initial={{ scale: 0.92, opacity: 0, y: 12 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-              className="flex flex-col items-center gap-2"
+              transition={{ delay: 0.6, duration: 0.7 }}
+              className="flex flex-col items-center gap-2.5"
             >
-              <div className="w-12 h-12 rounded-full bg-white/20 border border-white/35 flex items-center justify-center shadow-lg backdrop-blur-xs">
-                <CloudRain className="w-6 h-6 text-white animate-bounce" />
+              <div className="w-13 h-13 rounded-full bg-white/20 border border-white/40 flex items-center justify-center shadow-lg backdrop-blur-xs">
+                <CloudRain className="w-7 h-7 text-white animate-bounce" />
               </div>
-              <p className="font-handwriting text-2xl sm:text-3xl text-white font-black drop-shadow-md tracking-wide">
-                Di Balik Jendela Kafe...
-              </p>
-              <p className="font-sans-ui text-[11px] sm:text-xs text-white/90 font-bold max-w-[240px] leading-relaxed">
+              <h3 className="font-handwriting text-3xl sm:text-4xl text-white font-black drop-shadow-md tracking-wide">
+                Di Balik Jendela Kafe... 🌧️
+              </h3>
+              <p className="font-sans-ui text-xs sm:text-[13px] text-white/95 font-bold max-w-[260px] leading-relaxed drop-shadow-sm">
                 Hujan sore itu mulai membasahi dan mengembunkan kaca jendela.
               </p>
+              <span className="font-mono text-[9px] text-white/65 tracking-wider pt-2">
+                Menuju kaca berembun...
+              </span>
             </motion.div>
           </motion.div>
         )}

@@ -6,15 +6,9 @@ import {
   CloudRain,
   Sparkles,
   Droplets,
-  ChevronRight,
-  ChevronLeft,
-  RotateCcw,
-  Mic,
-  Eye,
 } from "lucide-react";
 import { scrapbookData } from "@/data/scrapbookData";
 import { useAudio } from "@/components/audio/AudioProvider";
-import { WashiTape } from "@/components/common/WashiTape";
 
 export function Segment5KacaEmbun({ onComplete }) {
   const { playSfx } = useAudio();
@@ -22,6 +16,9 @@ export function Segment5KacaEmbun({ onComplete }) {
 
   // Jendela memori yang aktif saat ini (0, 1, 2)
   const [activeTab, setActiveTab] = useState(0);
+
+  // Arah perpindahan jendela ('next' | 'prev') untuk animasi geser
+  const [slideDirection, setSlideDirection] = useState("next");
 
   // Status bersihnya embun untuk tiap jendela
   const [clearedTabs, setClearedTabs] = useState({ 0: false, 1: false, 2: false });
@@ -51,24 +48,24 @@ export function Segment5KacaEmbun({ onComplete }) {
     ctx.globalCompositeOperation = "source-over";
     ctx.clearRect(0, 0, width, height);
 
-    // Lapisan embun kaca dingin frosted tebal
+    // Lapisan embun kaca dingin frosted tebal bernuansa malam kafe
     const grad = ctx.createLinearGradient(0, 0, width, height);
-    grad.addColorStop(0, "rgba(200, 218, 240, 0.95)");
-    grad.addColorStop(0.5, "rgba(180, 202, 230, 0.92)");
-    grad.addColorStop(1, "rgba(160, 185, 215, 0.96)");
+    grad.addColorStop(0, "rgba(205, 222, 242, 0.96)");
+    grad.addColorStop(0.5, "rgba(182, 204, 232, 0.93)");
+    grad.addColorStop(1, "rgba(162, 187, 218, 0.97)");
 
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, width, height);
 
-    // Bintik-bintik butiran air embun dingin
-    for (let i = 0; i < 70; i++) {
+    // Butiran-butiran air embun dingin realistis
+    for (let i = 0; i < 75; i++) {
       const rx = (Math.sin(i * 99 + activeTab * 17) * 0.5 + 0.5) * width;
       const ry = (Math.cos(i * 33 + activeTab * 11) * 0.5 + 0.5) * height;
       const radius = 1.5 + (i % 3);
 
       ctx.beginPath();
       ctx.arc(rx, ry, radius, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.45)";
       ctx.fill();
     }
 
@@ -111,7 +108,7 @@ export function Segment5KacaEmbun({ onComplete }) {
       const percent = Math.round((emptyPixels / totalSampled) * 100);
       setClearedPercent(percent);
 
-      if (percent >= 38 && !clearedTabs[activeTab]) {
+      if (percent >= 35 && !clearedTabs[activeTab]) {
         playSfx("sparkle");
         setClearedTabs((prev) => ({ ...prev, [activeTab]: true }));
       }
@@ -178,177 +175,207 @@ export function Segment5KacaEmbun({ onComplete }) {
     lastPoint.current = currentPoint;
   };
 
-  // Bersihkan langsung (Aksesibilitas / Fail-safe)
-  const handleInstantClear = () => {
-    playSfx("sparkle");
-    setClearedTabs((prev) => ({ ...prev, [activeTab]: true }));
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      }
+  // Navigasi geser kaca ke hal kecil berikutnya (Zero Buttons)
+  const handleNextWindow = () => {
+    if (activeTab + 1 < memories.length) {
+      playSfx("mist-wipe");
+      setSlideDirection("next");
+      setActiveTab((prev) => prev + 1);
+    } else {
+      // Pada kaca terakhir, geser mengalirkan transisi ke Segmen 6 (Voice Notes)
+      playSfx("paper-swoosh");
+      onComplete();
     }
-    setClearedPercent(100);
   };
 
-  // Ganti tab hal kecil
-  const handleSelectTab = (idx) => {
-    playSfx("mist-wipe");
-    setActiveTab(idx);
+  // Navigasi geser kaca ke hal kecil sebelumnya
+  const handlePrevWindow = () => {
+    if (activeTab > 0) {
+      playSfx("mist-wipe");
+      setSlideDirection("prev");
+      setActiveTab((prev) => prev - 1);
+    }
+  };
+
+  // Varian animasi pergantian jendela kaca
+  const windowVariants = {
+    enter: (dir) => ({
+      x: dir === "next" ? 60 : -60,
+      opacity: 0,
+      scale: 0.96,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.38,
+        ease: [0.22, 1, 0.36, 1],
+      },
+    },
+    exit: (dir) => ({
+      x: dir === "next" ? -60 : 60,
+      opacity: 0,
+      scale: 0.96,
+      transition: {
+        duration: 0.28,
+        ease: [0.4, 0, 0.2, 1],
+      },
+    }),
   };
 
   return (
-    <section className="min-h-screen w-full flex flex-col justify-between items-center px-3.5 py-4 select-none relative overflow-hidden bg-gradient-to-b from-[#141B28] via-[#0E131E] to-[#080B12] text-white">
-      
-      {/* 1. HEADER SEGMEN: SUASANA MALAM BEREMBUN & HUJAN */}
-      <div className="w-full max-w-[340px] flex flex-col items-center text-center mt-1 z-20">
-        <div className="flex items-center gap-1.5 text-blue-300 font-mono text-[10px] font-black uppercase tracking-wider mb-1 bg-blue-950/60 px-2.5 py-0.5 rounded-full border border-blue-800/40">
-          <CloudRain className="w-3.5 h-3.5 text-blue-400" />
-          <span>Malam Dingin di Kafe • 14 Oktober</span>
-        </div>
-
-        <h2 className="font-handwriting text-2xl sm:text-3xl text-amber-200 font-black tracking-wide drop-shadow-md">
-          Hal-hal Kecil Tentangmu ✨
-        </h2>
-
-        <p className="font-sans-ui text-[11px] text-blue-200/75 font-semibold mt-0.5">
-          Usap embun di jendela kaca ini dengan jarimu...
-        </p>
-
-        {/* 3 Tab Pilihan Hal Kecil */}
-        <div className="mt-2.5 flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10 shadow-lg">
-          {memories.map((item, idx) => (
-            <button
-              key={item.id}
-              onClick={() => handleSelectTab(idx)}
-              className={`px-2.5 py-1 rounded-lg font-mono text-[10px] font-black transition-all cursor-pointer flex items-center gap-1 ${
-                activeTab === idx
-                  ? "bg-amber-400 text-slate-950 shadow-md scale-102"
-                  : "text-white/70 hover:bg-white/10"
-              }`}
-            >
-              <span>#{idx + 1}</span>
-              {clearedTabs[idx] && <span className="text-[9px]">✨</span>}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 2. BINGKAI JENDELA KACA BEREMBUN INTERAKTIF */}
-      <div className="w-full max-w-[325px] sm:max-w-[340px] h-[370px] sm:h-[390px] my-auto relative z-10 flex flex-col items-center justify-center">
+    <section className="w-full flex-1 flex flex-col items-center justify-center px-4 py-2 sm:py-3 select-none relative overflow-hidden my-auto bg-gradient-to-b from-[#121A27] via-[#0D131E] to-[#070A10] text-white">
+      {/* WRAPPER TENGAH LAYAR TERFOKUS: Merapatkan elemen agar seimbang secara visual di tengah */}
+      <div className="w-full max-w-[340px] flex flex-col items-center justify-center gap-2.5 sm:gap-3 my-auto">
         
-        {/* Frame Jendela Kayu Gelap Klasik */}
-        <div className="w-full h-full bg-[#201812] rounded-2xl p-3 border-4 border-[#3D2E24] shadow-[0_25px_60px_rgba(0,0,0,0.85)] relative flex flex-col justify-between overflow-hidden">
-          
-          {/* Siluet Tetesan Air Hujan di Luar Kaca */}
-          <div className="absolute inset-0 bg-radial from-blue-900/20 via-transparent to-black/60 pointer-events-none z-0" />
-
-          {/* KONTEN TERSEMBUNYI DI BALIK KACA (TEKS MEMORI TULISAN TANGAN) */}
-          <div className="w-full h-full bg-gradient-to-b from-[#1C2536] to-[#0F1622] rounded-xl p-4 sm:p-5 border border-white/15 flex flex-col justify-between text-center relative overflow-hidden z-10">
-            {/* Header Mini di Balik Kaca */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-2">
-              <span className="font-mono text-[9px] text-amber-300 font-bold uppercase tracking-wider">
-                {currentItem.title}
-              </span>
-              <Droplets className="w-3.5 h-3.5 text-blue-300/80" />
-            </div>
-
-            {/* Pesan Manis yang Tersingkap */}
-            <div className="my-auto px-1 py-3 flex flex-col items-center justify-center">
-              <p className="font-handwriting text-xl sm:text-2xl text-amber-100 font-bold leading-relaxed drop-shadow-sm">
-                "{currentItem.hiddenText}"
-              </p>
-              <span className="font-sans-ui text-[10.5px] text-amber-300/80 font-bold mt-2">
-                — Hal sederhana yang paling berkesan.
-              </span>
-            </div>
-
-            {/* Footer Mini di Balik Kaca */}
-            <div className="flex items-center justify-between border-t border-white/10 pt-2 text-[9.5px] font-mono text-white/50">
-              <span>PILKOM 25 MEMORY</span>
-              <span>TATWA ARCHIVE</span>
-            </div>
+        {/* 1. HEADER SEGMEN: SUASANA MALAM DINGIN & INDIKATOR JENDELA (MURNI VISUAL, BEBAS TOMBOL) */}
+        <div className="w-full flex flex-col items-center text-center z-20">
+          <div className="flex items-center gap-1.5 text-blue-300 font-mono text-[9.5px] font-black uppercase tracking-wider mb-1 bg-blue-950/70 px-2.5 py-0.5 rounded-full border border-blue-800/40 shadow-xs">
+            <CloudRain className="w-3.5 h-3.5 text-blue-400" />
+            <span>Malam Dingin di Kafe • 14 Oktober</span>
           </div>
 
-          {/* LAPISAN CANVAS KACA BEREMBUN (DAPAT DIUSAP DENGAN JARI) */}
-          <canvas
-            ref={canvasRef}
-            onMouseDown={startWiping}
-            onMouseMove={wipe}
-            onMouseUp={stopWiping}
-            onMouseLeave={stopWiping}
-            onTouchStart={startWiping}
-            onTouchMove={wipe}
-            onTouchEnd={stopWiping}
-            className={`absolute inset-3 w-[calc(100%-24px)] h-[calc(100%-24px)] rounded-xl cursor-pointer z-20 transition-opacity duration-500 ${
-              isCurrentCleared ? "pointer-events-none opacity-0" : "opacity-100"
-            }`}
-          />
+          <h2 className="font-handwriting text-2xl sm:text-3xl text-amber-200 font-black tracking-wide drop-shadow-md">
+            Hal-hal Kecil Tentangmu ✨
+          </h2>
 
-          {/* Teks Bantuan Usap Berkedip di Atas Embun */}
-          {!isCurrentCleared && (
+          {/* Indikator Posisi Jendela Kaca (Murni Visual Dots, Bukan Tombol) */}
+          <div className="mt-1 flex items-center gap-1.5 bg-black/40 px-3 py-1 rounded-full border border-white/10 shadow-xs">
+            <span className="font-mono text-[10px] font-black text-blue-200/80">
+              Kaca 0{activeTab + 1} / 0{memories.length}
+            </span>
+            <div className="flex items-center gap-1 ml-1">
+              {memories.map((_, i) => (
+                <div
+                  key={`dot-${i}`}
+                  className={`h-1.5 rounded-full transition-all ${
+                    i === activeTab
+                      ? "bg-amber-400 w-3"
+                      : clearedTabs[i]
+                      ? "bg-blue-400 w-1.5"
+                      : "bg-white/20 w-1.5"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 2. BINGKAI JENDELA KACA BEREMBUN INTERAKTIF DENGAN DUKUNGAN SWIPE (ZERO BUTTONS) */}
+        <div className="w-full max-w-[320px] sm:max-w-[335px] h-[375px] sm:h-[390px] relative z-10 flex flex-col items-center justify-center">
+          <AnimatePresence mode="wait" custom={slideDirection}>
             <motion.div
-              animate={{ opacity: [0.6, 1, 0.6] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-30 text-slate-800"
+              key={`window-${activeTab}`}
+              custom={slideDirection}
+              variants={windowVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              drag={isCurrentCleared ? "x" : false}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.35}
+              onDragEnd={(e, info) => {
+                if (info.offset.x < -35 || info.velocity.x < -120) {
+                  handleNextWindow();
+                } else if (info.offset.x > 35 || info.velocity.x > 120) {
+                  handlePrevWindow();
+                }
+              }}
+              className="w-full h-full bg-[#1F1711] rounded-2xl p-2.5 sm:p-3 border-4 border-[#3D2E24] shadow-[0_22px_55px_rgba(0,0,0,0.85)] relative flex flex-col justify-between overflow-hidden cursor-default select-none"
             >
-              <div className="bg-white/80 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-white/50 shadow-md flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-blue-700" />
-                <span className="font-sans-ui text-xs font-black">
-                  Usap dengan jari untuk menghapus embun 🌧️
-                </span>
+              {/* Siluet Tetesan Air Hujan di Luar Kaca */}
+              <div className="absolute inset-0 bg-radial from-blue-900/25 via-transparent to-black/60 pointer-events-none z-0" />
+
+              {/* KONTEN TERSEMBUNYI DI BALIK KACA (TEKS MEMORI TULISAN TANGAN) */}
+              <div className="w-full h-full bg-gradient-to-b from-[#1C2536] to-[#0F1622] rounded-xl p-4 sm:p-5 border border-white/15 flex flex-col justify-between text-center relative overflow-hidden z-10">
+                {/* Header Mini di Balik Kaca */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="font-mono text-[9px] text-amber-300 font-bold uppercase tracking-wider">
+                    {currentItem.title}
+                  </span>
+                  <Droplets className="w-3.5 h-3.5 text-blue-300/80" />
+                </div>
+
+                {/* Pesan Manis yang Tersingkap */}
+                <div className="my-auto px-1 py-3 flex flex-col items-center justify-center">
+                  <p className="font-handwriting text-xl sm:text-2xl text-amber-100 font-bold leading-relaxed drop-shadow-sm">
+                    "{currentItem.hiddenText}"
+                  </p>
+                  <span className="font-sans-ui text-[10.5px] text-amber-300/80 font-bold mt-2">
+                    — Hal sederhana yang paling berkesan.
+                  </span>
+                </div>
+
+                {/* Footer Mini di Balik Kaca */}
+                <div className="flex items-center justify-between border-t border-white/10 pt-2 text-[9.5px] font-mono text-white/50">
+                  <span>PILKOM 25 MEMORY</span>
+                  <span>TATWA ARCHIVE</span>
+                </div>
               </div>
+
+              {/* LAPISAN CANVAS KACA BEREMBUN (DAPAT DIUSAP DENGAN JARI) */}
+              <canvas
+                ref={canvasRef}
+                onMouseDown={startWiping}
+                onMouseMove={wipe}
+                onMouseUp={stopWiping}
+                onMouseLeave={stopWiping}
+                onTouchStart={startWiping}
+                onTouchMove={wipe}
+                onTouchEnd={stopWiping}
+                className={`absolute inset-2.5 sm:inset-3 w-[calc(100%-20px)] sm:w-[calc(100%-24px)] h-[calc(100%-20px)] sm:h-[calc(100%-24px)] rounded-xl cursor-pointer z-20 transition-opacity duration-500 ${
+                  isCurrentCleared ? "pointer-events-none opacity-0" : "opacity-100"
+                }`}
+              />
+
+              {/* Teks Bantuan Usap Berkedip di Atas Embun */}
+              {!isCurrentCleared && (
+                <motion.div
+                  animate={{ opacity: [0.65, 1, 0.65] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-30 text-slate-800"
+                >
+                  <div className="bg-white/85 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-white/50 shadow-md flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-700" />
+                    <span className="font-sans-ui text-xs font-black">
+                      Usap dengan jari untuk menghapus embun 🌧️
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Petunjuk Geser di Sudut Kanan Bawah saat Kaca Sudah Bersih */}
+              {isCurrentCleared && (
+                <div className="absolute bottom-4 right-4 pointer-events-none z-30 flex items-center gap-1 text-[9.5px] font-mono text-amber-300/80 bg-black/50 px-2 py-0.5 rounded-md border border-amber-400/20">
+                  <span>👈 Geser kaca</span>
+                </div>
+              )}
             </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* 3. PANDUAN INTERAKSI FISIK TUNGGAL (RINGKAS, TANGIBLE & BEBAS TOMBOL) */}
+        <div className="w-full max-w-[325px] flex items-center justify-center z-20 pointer-events-none">
+          {!isCurrentCleared ? (
+            <div className="bg-[#182333]/90 border border-blue-400/30 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-blue-100 font-sans-ui text-[11px] font-bold text-center backdrop-blur-xs">
+              <span>🌧️</span>
+              <span>Usap kaca dengan jari untuk menghapus embun</span>
+            </div>
+          ) : activeTab === memories.length - 1 ? (
+            <div className="bg-[#182333]/95 border border-amber-400/40 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-amber-200 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs">
+              <span>✨</span>
+              <span className="font-black">👈 Geser kaca terakhir untuk dengarkan rekaman suara 🎙️</span>
+            </div>
+          ) : (
+            <div className="bg-[#182333]/90 border border-blue-300/30 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-blue-100 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs">
+              <span>✨ Kaca bersih!</span>
+              <span className="text-blue-300/40">•</span>
+              <span>👈 Geser kaca ke kiri untuk hal berikutnya</span>
+            </div>
           )}
         </div>
-      </div>
 
-      {/* 3. TOMBOL AKSI & TRANSISI KE SEGMEN 6 (VOICE NOTES) */}
-      <div className="w-full max-w-[340px] flex flex-col items-center gap-2 mb-1 z-20">
-        
-        {/* Tombol Aksesibilitas Hapus Embun Cepat */}
-        {!isCurrentCleared && (
-          <button
-            onClick={handleInstantClear}
-            className="text-[11px] font-sans-ui text-blue-200/80 hover:text-white font-bold underline cursor-pointer"
-          >
-            Bersihkan embun langsung 🫧
-          </button>
-        )}
-
-        {/* Jika Jendela Ini Sudah Bersih -> Tombol Lanjut ke Hal Berikutnya atau Voice Notes */}
-        {isCurrentCleared && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full flex items-center justify-between gap-2 px-1"
-          >
-            {activeTab < memories.length - 1 ? (
-              <motion.button
-                whileTap={{ scale: 0.94 }}
-                onClick={() => handleSelectTab(activeTab + 1)}
-                className="w-full h-11 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-sans-ui text-xs font-black shadow-lg flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Buka Hal Kecil Berikutnya (#{activeTab + 2})</span>
-                <ChevronRight className="w-4 h-4" />
-              </motion.button>
-            ) : (
-              /* DI HAL KECIL TERAKHIR: TRANSISI FISIK KE SEGMEN 6 VOICE NOTES */
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onComplete}
-                className="w-full h-11 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-sans-ui text-xs sm:text-[13px] font-black shadow-xl flex items-center justify-center gap-2 border border-emerald-400/40 cursor-pointer"
-              >
-                <Mic className="w-4 h-4 text-emerald-200" />
-                <span>Dengarkan Rekaman Voice Notes Kita 🎙️</span>
-                <ChevronRight className="w-4 h-4" />
-              </motion.button>
-            )}
-          </motion.div>
-        )}
       </div>
     </section>
   );
