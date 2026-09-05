@@ -52,7 +52,9 @@ function ScrapbookApp() {
     (prevSegment === 1 && currentSegment === 2) ||
     (prevSegment === 2 && currentSegment === 1) ||
     (prevSegment === 2 && currentSegment === 3) ||
-    (prevSegment === 3 && currentSegment === 2);
+    (prevSegment === 3 && currentSegment === 2) ||
+    (prevSegment === 3 && currentSegment === 4) ||
+    (prevSegment === 4 && currentSegment === 3);
 
   return (
     /* OUTER WRAPPER: Di Desktop bernuansa meja kafe kayu gelap hangat dengan sorotan lampu temaram */
@@ -118,7 +120,7 @@ function ScrapbookApp() {
               <Segment2Soundtrack onComplete={() => goToNextSegment(3, true)} />
             )}
             {currentSegment === 3 && (
-              <Segment3Polaroid onComplete={() => goToNextSegment(4)} />
+              <Segment3Polaroid onComplete={() => goToNextSegment(4, true)} />
             )}
             {currentSegment === 4 && (
               <Segment4Kamus onComplete={() => goToNextSegment(5)} />

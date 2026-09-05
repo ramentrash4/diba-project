@@ -130,6 +130,31 @@ export function playSfx(name) {
       });
       break;
 
+    case "mist-wipe":
+      // Suara gesekan lembut jari menghapus embun kaca dingin
+      playSyntheticNote(520, 0.14, "sine", 0.06);
+      setTimeout(() => playSyntheticNote(420, 0.1, "triangle", 0.05), 30);
+      break;
+
+    case "pencil-scratch":
+      // Suara goresan pensil / stabilo di atas kertas
+      playSyntheticNote(340, 0.06, "triangle", 0.1);
+      setTimeout(() => playSyntheticNote(290, 0.05, "sine", 0.08), 25);
+      break;
+
+    case "clasp-open":
+      // Suara kancing kuningan buku saku terlepas
+      playSyntheticNote(580, 0.07, "triangle", 0.2);
+      setTimeout(() => playSyntheticNote(740, 0.09, "sine", 0.15), 35);
+      break;
+
+    case "ticket-tear":
+      // Suara sobekan perforasi tiket kertas
+      [320, 400, 360, 480].forEach((freq, idx) => {
+        setTimeout(() => playSyntheticNote(freq, 0.06, "triangle", 0.09), idx * 20);
+      });
+      break;
+
     default:
       playSyntheticNote(440, 0.15, "sine", 0.1);
   }

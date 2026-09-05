@@ -126,51 +126,70 @@ export function Segment3Polaroid({ onComplete }) {
       {/* 2. TUMPUKAN KARTU POLAROID FISIK REALISTIS */}
       <div className="w-full max-w-[325px] sm:max-w-[340px] h-[375px] sm:h-[395px] relative flex items-center justify-center my-auto z-10">
         
-        {/* KONDISI A: PENGGUNA SUDAH MENYELESAIKAN SEMUA FOTO (KARTU PENUTUP SEGMEN 3) */}
+        {/* KONDISI A: PENGGUNA SUDAH MENYELESAIKAN SEMUA FOTO -> BUKU SAKU KAMUS KITA TERGELETAK DI BAWAH TUMPUKAN */}
         {hasFinishedAll ? (
           <motion.div
+            layoutId="shared-pocket-book"
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: "easeOut" }}
-            className="w-full bg-[#FFFDF8] border-2 border-[#D8C7B0] rounded-2xl p-5 shadow-2xl text-center flex flex-col items-center justify-between relative paper-shadow"
+            onClick={() => {
+              playSfx("clasp-open");
+              setTimeout(() => onComplete(), 300);
+            }}
+            className="w-full max-w-[295px] sm:max-w-[310px] h-[360px] sm:h-[375px] bg-gradient-to-b from-[#4A3222] via-[#3B2516] to-[#2B190D] rounded-2xl p-4 sm:p-5 border-4 border-[#6E4B33] shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col justify-between relative paper-shadow cursor-pointer select-none group hover:scale-[1.02] transition-transform"
           >
-            <WashiTape color="rose" angle={1.5} className="absolute -top-3 left-1/2 -translate-x-1/2" />
-            
-            <div className="w-12 h-12 rounded-full bg-[#FAF1E6] border border-[#D5C7B5] flex items-center justify-center text-[#8C3E2D] shadow-inner mb-2 mt-1">
-              <Sparkles className="w-6 h-6" />
+            {/* Tekstur Jahitan Buku Kulit (Stitching) */}
+            <div className="absolute inset-2 rounded-xl border border-dashed border-[#8C6549]/50 pointer-events-none" />
+
+            {/* Tulang Buku Kiri (Spine) */}
+            <div className="absolute left-3.5 top-0 bottom-0 w-3 bg-black/25 border-r border-[#6E4B33]" />
+
+            {/* Pita Pembatas Buku Merah Terjulur di Bawah */}
+            <div className="absolute -bottom-5 right-8 w-4 h-9 bg-[#A83226] shadow-md rounded-b-xs transform -rotate-6 pointer-events-none z-30 flex items-end justify-center pb-1">
+              <div className="w-2 h-2 border-b-2 border-r-2 border-[#FFE8E8]/70 transform rotate-45 mb-0.5" />
             </div>
 
-            <div className="space-y-1.5">
-              <span className="font-typewriter text-[10px] uppercase tracking-wider text-[#8C3E2D] font-black bg-[#FAF0E6] px-2 py-0.5 rounded border border-[#E8DACB]">
-                Semua Memori Terbuka ✨
+            {/* Bagian Atas Sampul: Stempel Emas Pos */}
+            <div className="flex items-center justify-between pl-4 z-10">
+              <span className="font-mono text-[9px] text-[#F3D39B] font-black uppercase tracking-wider bg-black/40 px-2 py-0.5 rounded border border-[#C59F60]/40">
+                LIMITED EDITION • 01/01
               </span>
-              <h3 className="font-handwriting text-2xl text-[#140E0A] font-black">
-                Terima kasih sudah mengingatnya.
+              <BookOpen className="w-4 h-4 text-[#F3D39B]" />
+            </div>
+
+            {/* Bagian Tengah Sampul: Judul Emboss Emas Mewah */}
+            <div className="text-center pl-4 my-auto z-10 space-y-1">
+              <span className="font-typewriter text-[10.5px] uppercase tracking-widest text-[#D4AF7A] font-black block">
+                Buku Saku
+              </span>
+              <h3 className="font-handwriting text-3xl sm:text-4xl text-[#FFF6E5] font-black tracking-wide leading-tight drop-shadow-md">
+                Kamus Bahasa Kita 📖
               </h3>
-              <p className="font-sans-ui text-xs text-[#5A4839] font-bold leading-relaxed px-2">
-                Setiap foto punya lagunya sendiri, dan setiap cerita punya bahasa khususnya.
+              <p className="font-sans-ui text-[11px] text-[#D8C2A7] font-bold leading-relaxed pt-1 max-w-[220px] mx-auto">
+                Hanya kita berdua yang tahu arti setiap kata di dalamnya.
               </p>
             </div>
 
-            {/* Tombol Aksi Utama: Lanjut ke Kamus Bahasa Kita */}
-            <div className="w-full space-y-2 mt-4">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={onComplete}
-                className="w-full h-11 rounded-xl bg-[#8C3E2D] hover:bg-[#773324] text-white font-sans-ui text-xs sm:text-[13px] font-black shadow-lg flex items-center justify-center gap-2 border border-[#6B281A] cursor-pointer"
+            {/* Kancing Pengunci Kuningan Fisik (Brass Clasp) */}
+            <div className="w-full flex flex-col items-center pl-4 z-10">
+              <motion.div
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#AA771C] text-[#2A180B] font-sans-ui text-xs font-black shadow-lg flex items-center gap-2 border border-[#8C6D1F]"
               >
-                <BookOpen className="w-4 h-4" />
-                <span>Buka Kamus Bahasa Kita 📖</span>
-                <ChevronRight className="w-4 h-4" />
-              </motion.button>
+                <div className="w-2.5 h-2.5 rounded-full bg-[#3D2513] border border-white/60 shadow-inner" />
+                <span>Buka Kancing Buku ➔</span>
+              </motion.div>
 
               <button
-                onClick={handleResetStack}
-                className="w-full h-9 rounded-lg bg-[#EFE6D8] hover:bg-[#E4D7C4] text-[#3D2E1F] font-sans-ui text-[11px] font-black flex items-center justify-center gap-1.5 border border-[#CBB69E] cursor-pointer transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleResetStack();
+                }}
+                className="mt-2 text-[10.5px] font-sans-ui text-[#D4AF7A] hover:text-white font-bold underline cursor-pointer"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Buka & Lihat Foto Lagi ↺</span>
+                ↺ Lihat foto lagi
               </button>
             </div>
           </motion.div>
