@@ -35,27 +35,13 @@ export function Segment5KacaEmbun({ onComplete }) {
   const lastPoint = useRef(null);
   const wipeAudioCooldown = useRef(0);
   const totalWipeDistance = useRef(0);
-  const autoTransitionTimer = useRef(null);
 
   const currentItem = memories[activeTab];
   const isCurrentCleared = !!clearedTabs[activeTab];
 
-  // Bersihkan timer transisi otomatis jika komponen unmount atau tab berganti
-  useEffect(() => {
-    return () => {
-      if (autoTransitionTimer.current) {
-        clearTimeout(autoTransitionTimer.current);
-      }
-    };
-  }, [activeTab]);
-
-  // Transisi Re-Frosting: Mengalirkan uap dingin ke jendela berikutnya
+  // Transisi Re-Frosting: Mengalirkan uap dingin ke jendela berikutnya (HANYA via interaksi pengguna)
   const handleProceedNext = useCallback(() => {
     if (isReFrosting || isFinishing) return;
-    if (autoTransitionTimer.current) {
-      clearTimeout(autoTransitionTimer.current);
-      autoTransitionTimer.current = null;
-    }
 
     if (activeTab + 1 < memories.length) {
       // Masih ada kaca berikutnya -> Uap dingin mengembun kembali
@@ -163,27 +149,15 @@ export function Segment5KacaEmbun({ onComplete }) {
       if (isWipedEnough && !clearedTabs[activeTab]) {
         playSfx("sparkle");
         setClearedTabs((prev) => ({ ...prev, [activeTab]: true }));
-
-        // Transisi otomatis ke jendela berikutnya setelah jeda waktu membaca yang pas (~2.5s)
-        if (!autoTransitionTimer.current) {
-          autoTransitionTimer.current = setTimeout(() => {
-            handleProceedNext();
-          }, 2400);
-        }
       }
     } catch {
       // Fallback jika getImageData gagal: gunakan total distance
       if (totalWipeDistance.current > 180 && !clearedTabs[activeTab]) {
         playSfx("sparkle");
         setClearedTabs((prev) => ({ ...prev, [activeTab]: true }));
-        if (!autoTransitionTimer.current) {
-          autoTransitionTimer.current = setTimeout(() => {
-            handleProceedNext();
-          }, 2400);
-        }
       }
     }
-  }, [activeTab, clearedTabs, handleProceedNext, playSfx]);
+  }, [activeTab, clearedTabs, playSfx]);
 
   // Logika mengusap kaca (Scratch / Wiper)
   const getCanvasCoordinates = (e) => {
@@ -257,7 +231,7 @@ export function Segment5KacaEmbun({ onComplete }) {
     }
   };
 
-  // Ketukan pada kaca yang sudah bersih untuk langsung melompat tanpa menunggu timer
+  // Ketukan pada kaca yang sudah bersih untuk beralih ke jendela berikutnya
   const handleTapGlass = () => {
     if (!isCurrentCleared || isReFrosting || isFinishing) return;
     handleProceedNext();
@@ -329,6 +303,23 @@ export function Segment5KacaEmbun({ onComplete }) {
               <span className="font-sans-ui text-[10.5px] text-amber-300/80 font-bold mt-2">
                 — Hal sederhana yang paling berkesan.
               </span>
+
+              {/* Tanda interaksi halus untuk lanjut saat kaca sudah bersih & selesai dibaca */}
+              {isCurrentCleared && !isReFrosting && !isFinishing && (
+                <motion.div
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-3 flex items-center gap-1.5 bg-blue-900/40 border border-blue-400/30 px-3 py-1 rounded-full text-[10.5px] font-sans-ui font-bold text-blue-200 shadow-xs"
+                >
+                  <span>❄️</span>
+                  <span>
+                    {activeTab === memories.length - 1
+                      ? "Ketuk kaca untuk rekaman suara 🎙️"
+                      : "Ketuk kaca untuk hal berikutnya ❄️"}
+                  </span>
+                </motion.div>
+              )}
             </div>
 
             {/* Footer Mini di Balik Kaca */}
@@ -405,13 +396,13 @@ export function Segment5KacaEmbun({ onComplete }) {
           ) : activeTab === memories.length - 1 ? (
             <div className="bg-[#182333]/95 border border-amber-400/40 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-amber-200 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs">
               <span>🎙️</span>
-              <span className="font-black">Kaca bersih! Membuka rekaman suara sebentar lagi... ✨</span>
+              <span className="font-black">Pesan terbaca • Ketuk kaca untuk membuka rekaman suara ✨</span>
             </div>
           ) : (
             <div className="bg-[#182333]/90 border border-blue-300/30 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-blue-100 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs">
               <span>✨ Kaca bersih!</span>
               <span className="text-blue-300/40">•</span>
-              <span>Lanjut sebentar lagi (atau ketuk kaca) ❄️</span>
+              <span>Ketuk kaca untuk mengembunkan hal berikutnya ❄️</span>
             </div>
           )}
         </div>
