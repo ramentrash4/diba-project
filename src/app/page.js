@@ -31,10 +31,8 @@ function ScrapbookApp() {
     setCurrentSegment(nextNum);
   };
 
-  // Handler khusus Segmen 1 (Buka Kado)
+  // Handler khusus Segmen 1 (Buka Kado/Amplop)
   const handlePrologComplete = () => {
-    playSfx("unboxing-chime");
-    startBgm();
     goToNextSegment(2);
   };
 
@@ -46,20 +44,23 @@ function ScrapbookApp() {
   };
 
   return (
-    <main className="relative min-h-screen w-full flex justify-center items-center overflow-x-hidden selection:bg-rose-200">
-      {/* Background Atmosfer Dinamis */}
-      <AtmosphereBackdrop currentSegment={currentSegment} />
+    /* OUTER WRAPPER: Di Desktop memiliki latar belakang meja kafe hangat */
+    <div className="min-h-screen w-full flex justify-center items-center bg-[#1D1713] sm:p-4 overflow-hidden selection:bg-rose-200">
+      {/* STRICT MOBILE CANVAS: Di desktop terkunci dalam frame ponsel proporsional */}
+      <div className="w-full max-w-[412px] min-h-screen sm:min-h-[820px] sm:max-h-[92vh] sm:rounded-[36px] sm:shadow-[0_25px_80px_rgba(0,0,0,0.7)] sm:border-[6px] sm:border-[#2C231D] relative flex flex-col justify-center overflow-hidden bg-[#FAF7F2]">
+        
+        {/* Background Atmosfer Dinamis di dalam Frame Mobile */}
+        <AtmosphereBackdrop currentSegment={currentSegment} />
 
-      {/* Kontainer Mobile Viewport (Aesthetic Card Frame di Desktop, Fullscreen di Mobile) */}
-      <div className="w-full max-w-md min-h-screen relative flex flex-col justify-center">
+        {/* Konten Segmen Aktif */}
         <AnimatePresence mode="wait">
           <motion.div
             key={`segment-${currentSegment}`}
-            initial={{ opacity: 0, y: 15, scale: 0.98 }}
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -15, scale: 0.98 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-full flex-1 flex flex-col justify-center"
+            exit={{ opacity: 0, y: -12, scale: 0.98 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className="w-full flex-1 flex flex-col justify-center relative z-10"
           >
             {currentSegment === 1 && (
               <Segment1Prolog onComplete={handlePrologComplete} />
@@ -87,9 +88,30 @@ function ScrapbookApp() {
             )}
           </motion.div>
         </AnimatePresence>
+
+        {/* Overlay Putih Mutlak Penutup Lembaran (Whiteout Closure) */}
+        <AnimatePresence>
+          {isWhiteoutLocked && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 2.2, ease: "easeInOut" }}
+              className="absolute inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 text-center select-none cursor-default pointer-events-auto"
+            >
+              <motion.p
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1.8, duration: 1.5, ease: "easeOut" }}
+                className="font-handwriting text-3xl sm:text-4xl text-[#2C2621] tracking-wide"
+              >
+                Berbahagialah. — Tatwa
+              </motion.p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Dev Segment Navigator (Dapat digunakan untuk melompat antar segmen saat proses revisi) */}
+      {/* Dev Segment Navigator (Mengambang di Luar Frame Mobile) */}
       {!isWhiteoutLocked && (
         <DevNavigator
           currentSegment={currentSegment}
@@ -104,28 +126,7 @@ function ScrapbookApp() {
           onToggleStrictLock={() => setIsStrictLock(!isStrictLock)}
         />
       )}
-
-      {/* Overlay Putih Mutlak Penutup Lembaran (Whiteout Closure) */}
-      <AnimatePresence>
-        {isWhiteoutLocked && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 2.2, ease: "easeInOut" }}
-            className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 text-center select-none cursor-default pointer-events-auto"
-          >
-            <motion.p
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.8, duration: 1.5, ease: "easeOut" }}
-              className="font-handwriting text-3xl sm:text-4xl text-[#2C2621] tracking-wide"
-            >
-              Berbahagialah. — Tatwa
-            </motion.p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </main>
+    </div>
   );
 }
 
