@@ -35,6 +35,7 @@ export function Segment5KacaEmbun({ onComplete }) {
   const lastPoint = useRef(null);
   const wipeAudioCooldown = useRef(0);
   const totalWipeDistance = useRef(0);
+  const lastWipeEndTime = useRef(0);
 
   const currentItem = memories[activeTab];
   const isCurrentCleared = !!clearedTabs[activeTab];
@@ -118,7 +119,7 @@ export function Segment5KacaEmbun({ onComplete }) {
     }
   }, [activeTab, drawFog]);
 
-  // Hitung persentase embun yang terhapus
+  // Hitung persentase embun yang terhapus (HANYA dievaluasi saat jari diangkat)
   const checkClearedPercentage = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -143,8 +144,8 @@ export function Segment5KacaEmbun({ onComplete }) {
       const percent = Math.round((emptyPixels / totalSampled) * 100);
       setClearedPercent(percent);
 
-      // Cukup 10% atau jarak usap > 180px untuk membuka pesan secara responsif
-      const isWipedEnough = percent >= 10 || totalWipeDistance.current > 180;
+      // Cukup 10% atau jarak usap > 150px untuk membuka pesan saat jari diangkat
+      const isWipedEnough = percent >= 10 || totalWipeDistance.current > 150;
 
       if (isWipedEnough && !clearedTabs[activeTab]) {
         playSfx("sparkle");
@@ -152,7 +153,7 @@ export function Segment5KacaEmbun({ onComplete }) {
       }
     } catch {
       // Fallback jika getImageData gagal: gunakan total distance
-      if (totalWipeDistance.current > 180 && !clearedTabs[activeTab]) {
+      if (totalWipeDistance.current > 150 && !clearedTabs[activeTab]) {
         playSfx("sparkle");
         setClearedTabs((prev) => ({ ...prev, [activeTab]: true }));
       }
@@ -183,11 +184,17 @@ export function Segment5KacaEmbun({ onComplete }) {
     if (!isDrawing.current) return;
     isDrawing.current = false;
     lastPoint.current = null;
+    lastWipeEndTime.current = Date.now();
+    // Kaca HANYA dievaluasi ketika jari diangkat, bukan saat sedang aktif mengusap
     checkClearedPercentage();
   };
 
   const wipe = (e) => {
     if (!isDrawing.current || isCurrentCleared || isReFrosting || isFinishing) return;
+    if (e && e.cancelable && e.type === "touchmove") {
+      e.preventDefault();
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -224,15 +231,13 @@ export function Segment5KacaEmbun({ onComplete }) {
     ctx.stroke();
 
     lastPoint.current = currentPoint;
-
-    // Cek berkala saat mengusap jika usapan sudah cukup panjang
-    if (totalWipeDistance.current > 220 && !clearedTabs[activeTab]) {
-      checkClearedPercentage();
-    }
   };
 
   // Ketukan pada kaca yang sudah bersih untuk beralih ke jendela berikutnya
   const handleTapGlass = () => {
+    // JEDA PENGAMAN: Abaikan jika jari baru saja diangkat dari mengusap (< 500ms)
+    // Pengguna harus benar-benar melakukan ketukan baru yang terpisah untuk berpindah
+    if (Date.now() - lastWipeEndTime.current < 500) return;
     if (!isCurrentCleared || isReFrosting || isFinishing) return;
     handleProceedNext();
   };
