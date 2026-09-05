@@ -301,36 +301,15 @@ export function Segment5KacaEmbun({ onComplete }) {
             </div>
 
             {/* Pesan Manis yang Tersingkap */}
-            <div className="my-auto px-1 py-3 flex flex-col items-center justify-center">
+            <div className="my-auto px-2 py-4 flex flex-col items-center justify-center">
               <p className="font-handwriting text-xl sm:text-2xl text-amber-100 font-bold leading-relaxed drop-shadow-sm">
                 "{currentItem.hiddenText}"
               </p>
-              <span className="font-sans-ui text-[10.5px] text-amber-300/80 font-bold mt-2">
-                — Hal sederhana yang paling berkesan.
-              </span>
-
-              {/* Tanda interaksi halus untuk lanjut saat kaca sudah bersih & selesai dibaca */}
-              {isCurrentCleared && !isReFrosting && !isFinishing && (
-                <motion.div
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="mt-3 flex items-center gap-1.5 bg-blue-900/40 border border-blue-400/30 px-3 py-1 rounded-full text-[10.5px] font-sans-ui font-bold text-blue-200 shadow-xs"
-                >
-                  <span>❄️</span>
-                  <span>
-                    {activeTab === memories.length - 1
-                      ? "Ketuk kaca untuk rekaman suara 🎙️"
-                      : "Ketuk kaca untuk hal berikutnya ❄️"}
-                  </span>
-                </motion.div>
-              )}
             </div>
 
-            {/* Footer Mini di Balik Kaca */}
-            <div className="flex items-center justify-between border-t border-white/10 pt-2 text-[9.5px] font-mono text-white/50">
-              <span>PILKOM 25 MEMORY</span>
-              <span>TATWA ARCHIVE</span>
+            {/* Footer Mini Elegan di Balik Kaca */}
+            <div className="flex items-center justify-center border-t border-white/10 pt-2 text-[10px] font-sans-ui text-blue-200/60 font-medium">
+              <span>Kafe Malam • Hujan Reda</span>
             </div>
           </div>
 
@@ -359,12 +338,9 @@ export function Segment5KacaEmbun({ onComplete }) {
                 transition={{ duration: 0.35, ease: "easeInOut" }}
                 className="absolute inset-2.5 sm:inset-3 rounded-xl bg-gradient-to-b from-[#BED3EB]/95 via-[#ACC8E8]/90 to-[#99BEDF]/95 backdrop-blur-md flex flex-col items-center justify-center z-30 pointer-events-none text-blue-950 shadow-inner px-4 text-center"
               >
-                <Wind className="w-8 h-8 text-blue-700 animate-pulse mb-1.5" />
-                <span className="font-sans-ui text-xs font-black tracking-wide text-blue-950">
+                <Wind className="w-7 h-7 text-blue-700 animate-pulse mb-1.5" />
+                <span className="font-sans-ui text-xs font-bold tracking-wide text-blue-950">
                   Uap dingin mengembun kembali... ❄️
-                </span>
-                <span className="font-mono text-[9.5px] text-blue-900/80 font-bold mt-1">
-                  Menyiapkan kaca hal kecil berikutnya
                 </span>
               </motion.div>
             )}
@@ -391,23 +367,22 @@ export function Segment5KacaEmbun({ onComplete }) {
           </AnimatePresence>
         </div>
 
-        {/* 3. PANDUAN INTERAKSI FISIK TUNGGAL (RINGKAS, TANGIBLE & BEBAS TOMBOL) */}
+        {/* 3. PANDUAN INTERAKSI TUNGGAL (RINGKAS, TANGIBLE & BEBAS REDUNDANSI) */}
         <div className="w-full max-w-[325px] flex items-center justify-center z-20 pointer-events-none">
           {!isCurrentCleared ? (
-            <div className="bg-[#182333]/90 border border-blue-400/30 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-blue-100 font-sans-ui text-[11px] font-bold text-center backdrop-blur-xs">
+            <div className="bg-[#182333]/90 border border-blue-400/30 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-blue-100 font-sans-ui text-xs font-bold text-center backdrop-blur-xs">
               <span>🌧️</span>
-              <span>Usap kaca dengan jari untuk menghapus embun</span>
+              <span>Usap kaca untuk menghapus embun</span>
             </div>
           ) : activeTab === memories.length - 1 ? (
-            <div className="bg-[#182333]/95 border border-amber-400/40 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-amber-200 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs">
+            <div className="bg-[#182333]/95 border border-amber-400/40 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-amber-200 font-sans-ui text-xs font-bold text-center backdrop-blur-xs">
               <span>🎙️</span>
-              <span className="font-black">Pesan terbaca • Ketuk kaca untuk membuka rekaman suara ✨</span>
+              <span>Ketuk kaca untuk rekaman suara kita ✨</span>
             </div>
           ) : (
-            <div className="bg-[#182333]/90 border border-blue-300/30 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-blue-100 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs">
-              <span>✨ Kaca bersih!</span>
-              <span className="text-blue-300/40">•</span>
-              <span>Ketuk kaca untuk mengembunkan hal berikutnya ❄️</span>
+            <div className="bg-[#182333]/90 border border-blue-300/30 rounded-full px-4 py-1.5 shadow-md flex items-center justify-center gap-2 text-blue-100 font-sans-ui text-xs font-bold text-center backdrop-blur-xs">
+              <span>❄️</span>
+              <span>Ketuk kaca untuk memori berikutnya</span>
             </div>
           )}
         </div>
