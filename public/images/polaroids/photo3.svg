@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sky-campus" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3B4F68" />
+      <stop offset="60%" stop-color="#7B8CA3" />
+      <stop offset="100%" stop-color="#D6A582" />
+    </linearGradient>
+    <linearGradient id="ground-walkway" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8C7A6B" />
+      <stop offset="100%" stop-color="#544438" />
+    </linearGradient>
+  </defs>
+
+  <!-- Langit Kampus Sore -->
+  <rect width="400" height="300" fill="url(#sky-campus)" />
+
+  <!-- Siluet Gedung Fakultas Pilkom di Kejauhan -->
+  <polygon points="40,210 40,90 140,90 140,210" fill="#2D3B4E" opacity="0.85" />
+  <polygon points="140,210 140,65 240,65 240,210" fill="#232F3E" opacity="0.95" />
+  <polygon points="240,210 240,110 320,110 320,210" fill="#2D3B4E" opacity="0.85" />
+  <!-- Jendela-jendela Lab Komputer Menyala Kuning Hangat -->
+  <rect x="155" y="80" width="12" height="16" fill="#FEE5B0" opacity="0.8" />
+  <rect x="180" y="80" width="12" height="16" fill="#FEE5B0" opacity="0.8" />
+  <rect x="205" y="80" width="12" height="16" fill="#FEE5B0" opacity="0.8" />
+  <rect x="155" y="110" width="12" height="16" fill="#FEE5B0" opacity="0.8" />
+  <rect x="180" y="110" width="12" height="16" fill="#FEE5B0" opacity="0.6" />
+  <rect x="205" y="110" width="12" height="16" fill="#FEE5B0" opacity="0.8" />
+  <rect x="155" y="140" width="12" height="16" fill="#FEE5B0" opacity="0.8" />
+  <rect x="180" y="140" width="12" height="16" fill="#FEE5B0" opacity="0.8" />
+  <rect x="205" y="140" width="12" height="16" fill="#FEE5B0" opacity="0.7" />
+
+  <!-- Jalan Setapak Kampus (Paving Walkway) -->
+  <polygon points="130,300 180,200 220,200 270,300" fill="url(#ground-walkway)" />
+  <line x1="200" y1="200" x2="200" y2="300" stroke="#FAF5EC" stroke-width="2" stroke-dasharray="10 8" opacity="0.4" />
+
+  <!-- Rumput & Taman Kampus -->
+  <polygon points="0,210 180,200 130,300 0,300" fill="#3D5A45" />
+  <polygon points="400,210 220,200 270,300 400,300" fill="#36503E" />
+
+  <!-- Pohon Rindang di Tepi Jalan -->
+  <!-- Pohon Kiri -->
+  <path d="M 60 250 L 60 160 L 50 250" stroke="#3A271D" stroke-width="8" stroke-linecap="round" />
+  <circle cx="60" cy="140" r="45" fill="#4B7055" />
+  <circle cx="85" cy="125" r="35" fill="#5C8668" />
+  <circle cx="40" cy="120" r="32" fill="#3F5F48" />
+
+  <!-- Pohon Kanan -->
+  <path d="M 340 260 L 340 150 L 350 260" stroke="#3A271D" stroke-width="10" stroke-linecap="round" />
+  <circle cx="340" cy="130" r="50" fill="#43664C" />
+  <circle cx="315" cy="115" r="40" fill="#537C5E" />
+  <circle cx="365" cy="110" r="38" fill="#37553F" />
+
+  <!-- Bangku Taman Kayu di Sebelah Jalan -->
+  <rect x="80" y="235" width="45" height="12" rx="2" fill="#9E6E48" stroke="#5E3D23" stroke-width="2" />
+  <line x1="88" y1="247" x2="88" y2="265" stroke="#422916" stroke-width="3" />
+  <line x1="117" y1="247" x2="117" y2="265" stroke="#422916" stroke-width="3" />
+  <rect x="82" y="222" width="41" height="8" rx="2" fill="#875B39" stroke="#5E3D23" stroke-width="2" />
+
+  <!-- Tiang Lampu Kampus Bulat Retro -->
+  <line x1="300" y1="180" x2="300" y2="270" stroke="#2B2119" stroke-width="3" />
+  <circle cx="300" cy="176" r="9" fill="#FFF2B8" stroke="#D18928" stroke-width="1.5" />
+  <circle cx="300" cy="176" r="22" fill="#FFF2B8" opacity="0.25" />
+
+  <!-- Daun-daun Gugur di Jalan -->
+  <ellipse cx="165" cy="255" rx="4" ry="2" fill="#D9823B" />
+  <ellipse cx="230" cy="270" rx="5" ry="2.5" fill="#C7672B" />
+  <ellipse cx="190" cy="285" rx="4" ry="2" fill="#D9823B" />
+
+  <!-- Badge Vintage Overlay -->
+  <rect x="15" y="15" width="125" height="24" rx="4" fill="#000000" opacity="0.4" />
+  <text x="77" y="31" font-family="monospace" font-size="11" font-weight="bold" fill="#FCE7C8" text-anchor="middle" letter-spacing="1">PILKOM WALKWAY</text>
+</svg>

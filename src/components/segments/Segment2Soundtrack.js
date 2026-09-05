@@ -675,6 +675,7 @@ export function Segment2Soundtrack({ onComplete }) {
                 {/* Sisi Kanan: Foto Polaroid Mengintip dengan Klip Kertas Emas */}
                 <div className="relative shrink-0 pr-1 z-20">
                   <motion.div
+                    layoutId="shared-polaroid-lead"
                     drag="y"
                     dragConstraints={{ top: -80, bottom: 0 }}
                     dragElastic={0.25}
@@ -708,10 +709,16 @@ export function Segment2Soundtrack({ onComplete }) {
                       <Paperclip className="w-4 h-4 text-amber-400 drop-shadow-xs rotate-45" />
                     </div>
 
-                    {/* Area Gambar Polaroid Mini */}
+                    {/* Area Gambar Polaroid Mini dengan Cover SVG Cantik */}
                     <div className="w-full h-[40px] bg-[#2E241E] rounded-xs relative overflow-hidden flex items-center justify-center border border-black/20">
-                      <Camera className="w-4 h-4 text-amber-200/80" />
-                      <span className="absolute bottom-0.5 text-[7.5px] font-mono text-amber-100 font-bold bg-black/60 px-1 rounded-xs">
+                      <Image
+                        src="/images/polaroids/photo1.svg"
+                        alt="Polaroid Preview"
+                        fill
+                        className="object-cover"
+                        sizes="70px"
+                      />
+                      <span className="absolute bottom-0.5 right-1 text-[7.5px] font-mono text-amber-100 font-bold bg-black/60 px-1 rounded-xs">
                         14 Okt
                       </span>
                     </div>

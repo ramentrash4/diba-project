@@ -68,6 +68,12 @@ export function playSfx(name) {
       playSyntheticNote(320, 0.12, "sine", 0.08);
       break;
 
+    case "card-flip":
+      // Suara membalik kartu foto polaroid (sentuhan kertas tebal)
+      playSyntheticNote(380, 0.07, "triangle", 0.14);
+      setTimeout(() => playSyntheticNote(460, 0.05, "sine", 0.1), 35);
+      break;
+
     case "unboxing-chime":
       // Melodi pembuka kado: nada C5 -> E5 -> G5 -> B5 -> C6
       [523.25, 659.25, 783.99, 987.77, 1046.5].forEach((freq, idx) => {

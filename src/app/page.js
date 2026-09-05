@@ -48,8 +48,11 @@ function ScrapbookApp() {
     setIsWhiteoutLocked(true);
   };
 
-  const isMorphBetween1And2 =
-    (prevSegment === 1 && currentSegment === 2) || (prevSegment === 2 && currentSegment === 1);
+  const isMorphTransition =
+    (prevSegment === 1 && currentSegment === 2) ||
+    (prevSegment === 2 && currentSegment === 1) ||
+    (prevSegment === 2 && currentSegment === 3) ||
+    (prevSegment === 3 && currentSegment === 2);
 
   return (
     /* OUTER WRAPPER: Di Desktop bernuansa meja kafe kayu gelap hangat dengan sorotan lampu temaram */
@@ -70,7 +73,7 @@ function ScrapbookApp() {
             <motion.div
               key={`segment-${currentSegment}`}
               initial={
-                isMorphBetween1And2
+                isMorphTransition
                   ? { opacity: 0 }
                   : {
                       opacity: 0,
@@ -85,12 +88,12 @@ function ScrapbookApp() {
                 scale: 1,
                 filter: "brightness(1)",
                 transition: {
-                  duration: isMorphBetween1And2 ? 0.45 : 0.65,
+                  duration: isMorphTransition ? 0.45 : 0.65,
                   ease: [0.22, 1, 0.36, 1],
                 },
               }}
               exit={
-                currentSegment === 1
+                isMorphTransition
                   ? {
                       opacity: 0,
                       transition: { duration: 0.3 },
@@ -106,14 +109,13 @@ function ScrapbookApp() {
                       },
                     }
               }
-              style={{ transformOrigin: "center center" }}
-              className="w-full flex-1 flex flex-col justify-center relative z-10"
+              className="w-full flex-1 flex flex-col justify-center relative z-10 origin-center"
             >
             {currentSegment === 1 && (
               <Segment1Prolog onComplete={handlePrologComplete} />
             )}
             {currentSegment === 2 && (
-              <Segment2Soundtrack onComplete={() => goToNextSegment(3)} />
+              <Segment2Soundtrack onComplete={() => goToNextSegment(3, true)} />
             )}
             {currentSegment === 3 && (
               <Segment3Polaroid onComplete={() => goToNextSegment(4)} />

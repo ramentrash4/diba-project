@@ -166,9 +166,8 @@ export function Segment1Prolog({ onComplete }) {
 
                 {/* Tutup Segitiga Amplop 3D (Lid Flap) */}
                 <motion.div
-                  className="absolute inset-x-0 top-0 h-28 z-20 flex items-start justify-center overflow-visible"
+                  className="absolute inset-x-0 top-0 h-28 z-20 flex items-start justify-center overflow-visible origin-top"
                   style={{
-                    transformOrigin: "top center",
                     transformStyle: "preserve-3d",
                   }}
                   animate={
