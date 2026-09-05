@@ -75,7 +75,6 @@ function ScrapbookApp() {
                   : {
                       opacity: 0,
                       rotateY: 25,
-                      transformOrigin: "left center",
                       scale: 0.97,
                       filter: "brightness(0.96)",
                     }
@@ -99,7 +98,6 @@ function ScrapbookApp() {
                   : {
                       opacity: 0,
                       rotateY: -25,
-                      transformOrigin: "right center",
                       scale: 0.97,
                       filter: "brightness(0.92)",
                       transition: {
@@ -108,6 +106,7 @@ function ScrapbookApp() {
                       },
                     }
               }
+              style={{ transformOrigin: "center center" }}
               className="w-full flex-1 flex flex-col justify-center relative z-10"
             >
             {currentSegment === 1 && (

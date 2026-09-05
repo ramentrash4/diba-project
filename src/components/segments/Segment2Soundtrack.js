@@ -113,7 +113,7 @@ export function Segment2Soundtrack({ onComplete }) {
         setIsTyping(false);
         clearInterval(timer);
       }
-    }, 22);
+    }, 20);
 
     return () => clearInterval(timer);
   }, [insertedTape]);
@@ -124,23 +124,23 @@ export function Segment2Soundtrack({ onComplete }) {
   const counterFormatted = String(tapeCounter).padStart(3, "0");
 
   return (
-    <section className="min-h-full flex flex-col items-center justify-center p-3 sm:p-5 select-none relative overflow-hidden my-auto">
+    <section className="w-full h-full flex-1 flex flex-col items-center justify-center p-3 sm:p-4 select-none relative overflow-y-auto scrollbar-none my-auto">
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-[345px] flex flex-col items-center"
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full max-w-[345px] flex flex-col items-center my-auto py-1"
       >
-        {/* Header Segmen 2 Standout */}
-        <div className="text-center mb-2.5">
-          <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#FFF9EE] border border-[#CDB9A0] text-[#524132] font-black text-[10px] font-sans-ui tracking-wider uppercase shadow-xs mb-1">
+        {/* Header Segmen 2 Standout & Jelas */}
+        <div className="text-center mb-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#FFF9EE] border border-[#CDB9A0] text-[#423222] font-black text-[10.5px] font-sans-ui tracking-wide uppercase shadow-xs mb-1">
             <Disc className="w-3.5 h-3.5 text-[#A83226] animate-spin-slow" />
             <span>Side A: Mixtape Kenangan</span>
           </span>
-          <h2 className="font-handwriting text-3xl sm:text-4xl font-black text-[#120C08] tracking-wide">
+          <h2 className="font-handwriting text-3xl sm:text-4xl font-black text-[#120C08] tracking-wide leading-tight">
             Soundtrack Perjalanan
           </h2>
-          <p className="font-sans-ui text-xs text-[#423425] font-semibold mt-0.5">
+          <p className="font-sans-ui text-[11px] sm:text-xs text-[#3D2E1F] font-bold mt-0.5">
             {insertedTape
               ? "Kaset sedang berputar di dalam player 🎵"
               : "Tarik kaset ke pemutar di atas atau ketuk untuk memutar 👇"}
@@ -158,22 +158,22 @@ export function Segment2Soundtrack({ onComplete }) {
           }`}
         >
           {/* Sekrup Sudut Mekanik */}
-          <div className="absolute top-2 left-2.5 w-2 h-2 rounded-full bg-[#4D3F33] border border-black/70 flex items-center justify-center text-[5px] text-[#A8947E] font-mono">✕</div>
-          <div className="absolute top-2 right-2.5 w-2 h-2 rounded-full bg-[#4D3F33] border border-black/70 flex items-center justify-center text-[5px] text-[#A8947E] font-mono">✕</div>
-          <div className="absolute bottom-2 left-2.5 w-2 h-2 rounded-full bg-[#4D3F33] border border-black/70 flex items-center justify-center text-[5px] text-[#A8947E] font-mono">✕</div>
-          <div className="absolute bottom-2 right-2.5 w-2 h-2 rounded-full bg-[#4D3F33] border border-black/70 flex items-center justify-center text-[5px] text-[#A8947E] font-mono">✕</div>
+          <div className="absolute top-2 left-2.5 w-2 h-2 rounded-full bg-[#4D3F33] border border-black/70 flex items-center justify-center text-[6px] text-[#C2AF9B] font-mono">✕</div>
+          <div className="absolute top-2 right-2.5 w-2 h-2 rounded-full bg-[#4D3F33] border border-black/70 flex items-center justify-center text-[6px] text-[#C2AF9B] font-mono">✕</div>
+          <div className="absolute bottom-2 left-2.5 w-2 h-2 rounded-full bg-[#4D3F33] border border-black/70 flex items-center justify-center text-[6px] text-[#C2AF9B] font-mono">✕</div>
+          <div className="absolute bottom-2 right-2.5 w-2 h-2 rounded-full bg-[#4D3F33] border border-black/70 flex items-center justify-center text-[6px] text-[#C2AF9B] font-mono">✕</div>
 
-          {/* Panel Atas: Merek Deck, Counter Analog 3-Digit & LED Status */}
+          {/* Panel Atas: Merek Deck, Counter Analog 3-Digit & LED Status (Font Kontras Tinggi) */}
           <div className="flex items-center justify-between px-1.5 pb-2 border-b border-[#3D3227] z-10">
-            {/* Branding Retro */}
-            <div className="flex items-center gap-1.5">
-              <span className="font-mono text-[9px] font-black text-amber-200/90 tracking-widest uppercase">
+            {/* Branding Retro & Status */}
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10.5px] font-black text-amber-200 tracking-wider uppercase">
                 DIBA DECK • T-25
               </span>
               {/* LED Power/Play */}
-              <div className="flex items-center gap-1 ml-1">
+              <div className="flex items-center gap-1 ml-0.5 bg-[#120E0B] px-1.5 py-0.5 rounded border border-[#3E3228]">
                 <div
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                     isCurrentActive
                       ? "bg-emerald-400 shadow-[0_0_8px_#34D399]"
                       : insertedTape
@@ -181,7 +181,7 @@ export function Segment2Soundtrack({ onComplete }) {
                       : "bg-[#524133]"
                   }`}
                 />
-                <span className="font-typewriter text-[7px] text-[#A8947E] font-extrabold uppercase">
+                <span className="font-typewriter text-[9.5px] text-[#D8C7B4] font-black uppercase">
                   {isCurrentActive ? "RUN" : insertedTape ? "PAUSE" : "EMPTY"}
                 </span>
               </div>
@@ -189,10 +189,10 @@ export function Segment2Soundtrack({ onComplete }) {
 
             {/* Counter Analog 3-Digit Realistis */}
             <div className="flex items-center gap-1 bg-[#100D0A] px-2 py-0.5 rounded border border-[#3E3228] shadow-inner">
-              <span className="font-typewriter text-[7px] text-[#7A6959] font-bold uppercase mr-0.5">
+              <span className="font-typewriter text-[9px] text-[#BAA794] font-black uppercase mr-0.5">
                 TAPE
               </span>
-              <div className="flex gap-0.5 font-mono text-[10px] font-black text-amber-300 tracking-wider">
+              <div className="flex gap-0.5 font-mono text-[11px] font-black text-amber-300 tracking-wider">
                 <span className="bg-[#221B15] px-1 py-0.2 rounded-xs border border-black/80">{counterFormatted[0]}</span>
                 <span className="bg-[#221B15] px-1 py-0.2 rounded-xs border border-black/80">{counterFormatted[1]}</span>
                 <span className="bg-[#221B15] px-1 py-0.2 rounded-xs border border-black/80">{counterFormatted[2]}</span>
@@ -234,39 +234,39 @@ export function Segment2Soundtrack({ onComplete }) {
             {insertedTape ? (
               /* KONDISI A: KASET BERADA DI DALAM PEMUTAR & BERPUTAR */
               <motion.div
-                initial={{ y: 50, opacity: 0, scale: 0.94 }}
+                initial={{ y: 40, opacity: 0, scale: 0.94 }}
                 animate={{ y: 0, opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
                 className="relative w-full h-full rounded-lg bg-gradient-to-b from-[#2B231C] to-[#171310] border border-[#4F4134] p-2 flex flex-col justify-between overflow-hidden shadow-inner"
               >
-                {/* Header Label Kaset Aktif dengan Cover Album Mini & Judul Tebal */}
+                {/* Header Label Kaset Aktif dengan Cover Album Mini & Teks Sangat Terbaca */}
                 <div className="w-full bg-[#FAF5EC] border border-[#CBB69E] rounded-md px-2 py-1 shadow-sm flex items-center justify-between z-10">
                   <div className="flex items-center gap-2 overflow-hidden mr-1">
                     {/* Cover Album Thumbnail di Player */}
-                    <div className="w-8 h-8 rounded shrink-0 overflow-hidden border border-[#BFA78E] relative shadow-xs">
+                    <div className="w-9 h-9 rounded shrink-0 overflow-hidden border border-[#BFA78E] relative shadow-xs bg-white">
                       <Image
                         src={insertedTape.coverImage}
                         alt={insertedTape.title}
                         fill
                         className="object-cover"
-                        sizes="32px"
+                        sizes="36px"
                       />
                     </div>
                     <div className="flex flex-col text-left overflow-hidden">
-                      <span className="font-typewriter text-[7px] uppercase tracking-wider text-[#73604E] font-black">
+                      <span className="font-typewriter text-[9.5px] uppercase tracking-wider text-[#735F4C] font-black">
                         {insertedTape.tag} • {insertedTape.duration}
                       </span>
-                      <span className="font-sans-ui text-xs font-black text-[#140E0A] truncate leading-tight">
+                      <span className="font-sans-ui text-xs sm:text-[13px] font-black text-[#140E0A] truncate leading-tight">
                         {insertedTape.title}
                       </span>
-                      <span className="font-typewriter text-[8px] text-[#5A4839] font-bold truncate">
+                      <span className="font-typewriter text-[10px] text-[#4A3B2E] font-bold truncate">
                         {insertedTape.artist}
                       </span>
                     </div>
                   </div>
 
                   {/* Stereo Badge */}
-                  <span className="font-mono text-[7px] bg-[#E8DCCF] text-[#3D2E1C] font-black px-1.5 py-0.5 rounded uppercase shrink-0">
+                  <span className="font-mono text-[8.5px] bg-[#E8DCCF] text-[#3D2E1C] font-black px-1.5 py-0.5 rounded uppercase shrink-0">
                     STEREO
                   </span>
                 </div>
@@ -289,7 +289,7 @@ export function Segment2Soundtrack({ onComplete }) {
                     <div className="absolute h-full w-0.5 bg-[#CBB69E]" />
                   </motion.div>
 
-                  {/* Visualizer Stereo VU Meter Realistis (2 Saluran L & R) */}
+                  {/* Visualizer Stereo VU Meter Realistis */}
                   <div className="flex flex-col gap-1 items-center z-10">
                     <div className="flex items-center gap-0.5 h-4">
                       {[...Array(6)].map((_, i) => (
@@ -311,7 +311,7 @@ export function Segment2Soundtrack({ onComplete }) {
                         />
                       ))}
                     </div>
-                    <span className="font-mono text-[6px] text-amber-300/80 font-bold uppercase tracking-widest">
+                    <span className="font-mono text-[7.5px] text-amber-300 font-bold uppercase tracking-wider">
                       VU LEVEL
                     </span>
                   </div>
@@ -331,7 +331,7 @@ export function Segment2Soundtrack({ onComplete }) {
                 </div>
               </motion.div>
             ) : (
-              /* KONDISI B: SLOT KOSONG - DROP TARGET YANG MENGUNDANG */
+              /* KONDISI B: SLOT KOSONG - DROP TARGET */
               <div
                 className={`w-full h-full border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-2 text-center transition-all ${
                   isDropTargetActive
@@ -344,11 +344,11 @@ export function Segment2Soundtrack({ onComplete }) {
                   transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
                   className="flex flex-col items-center"
                 >
-                  <Disc className="w-8 h-8 text-amber-300/80 mb-1" />
-                  <span className="font-mono text-[10px] text-amber-200 font-black uppercase tracking-wider">
+                  <Disc className="w-8 h-8 text-amber-300/90 mb-1" />
+                  <span className="font-mono text-[11px] text-amber-200 font-black uppercase tracking-wider">
                     {isDropTargetActive ? "LEPASKAN KASET DI SINI" : "SLOT KASET KOSONG"}
                   </span>
-                  <span className="font-sans-ui text-[9px] text-[#B59F89] font-bold mt-0.5">
+                  <span className="font-sans-ui text-[10px] text-[#C5B09A] font-bold mt-0.5">
                     Tarik kaset ke sini atau ketuk kaset di rak bawah
                   </span>
                 </motion.div>
@@ -356,70 +356,70 @@ export function Segment2Soundtrack({ onComplete }) {
             )}
           </div>
 
-          {/* 3. PANEL TOMBOL KONTROL MEKANIK FISIK (TAPE DECK CONTROLS) */}
-          <div className="flex items-center justify-between px-1 pt-1 z-10">
+          {/* 3. PANEL TOMBOL KONTROL MEKANIK FISIK (TOUCH TARGET TINGGI 36PX-40PX) */}
+          <div className="flex items-center justify-between px-0.5 pt-1.5 z-10">
             {/* Tombol Play / Pause & FFWD */}
             <div className="flex items-center gap-1.5">
-              {/* Tombol Play / Pause */}
+              {/* Tombol Play / Pause (Tinggi 36px) */}
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.92 }}
                 onClick={handleTogglePlay}
                 disabled={!insertedTape}
-                className={`h-7 px-2.5 rounded-md font-sans-ui text-[10px] font-bold shadow flex items-center gap-1 border transition-colors cursor-pointer ${
+                className={`h-9 px-3 rounded-lg font-sans-ui text-[11px] font-black shadow-md flex items-center gap-1.5 border transition-colors cursor-pointer ${
                   !insertedTape
-                    ? "bg-[#2A211B] text-[#6E5C4E] border-[#3D3027] cursor-not-allowed opacity-50"
+                    ? "bg-[#2A211B] text-[#7A6757] border-[#3D3027] cursor-not-allowed opacity-50"
                     : isPlaying
-                    ? "bg-[#3D2E1C] text-amber-300 border-amber-500/40 hover:bg-[#4E3B24]"
-                    : "bg-emerald-800 text-emerald-100 border-emerald-600 hover:bg-emerald-700"
+                    ? "bg-[#3D2E1C] text-amber-300 border-amber-500/50 hover:bg-[#4E3B24]"
+                    : "bg-emerald-700 text-white border-emerald-500 hover:bg-emerald-600"
                 }`}
               >
                 {isPlaying ? (
                   <>
-                    <Pause className="w-3 h-3 fill-current" />
+                    <Pause className="w-3.5 h-3.5 fill-current" />
                     <span>Pause</span>
                   </>
                 ) : (
                   <>
-                    <Play className="w-3 h-3 fill-current" />
+                    <Play className="w-3.5 h-3.5 fill-current" />
                     <span>Play</span>
                   </>
                 )}
               </motion.button>
 
-              {/* Tombol Rewind & Fast Forward */}
-              <div className="flex items-center gap-0.5">
+              {/* Tombol Rewind & Fast Forward (Masing-masing 32x36px) */}
+              <div className="flex items-center gap-1">
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={handleRewind}
                   disabled={!insertedTape}
                   title="Rewind"
-                  className="w-6 h-7 rounded bg-[#2A211B] hover:bg-[#3B3026] text-[#A8947E] border border-[#3E3228] flex items-center justify-center cursor-pointer disabled:opacity-40"
+                  className="w-8 h-9 rounded-lg bg-[#2A211B] hover:bg-[#3B3026] text-[#D8C7B4] border border-[#483B2F] flex items-center justify-center cursor-pointer disabled:opacity-40"
                 >
-                  <RotateCcw className="w-2.5 h-2.5" />
+                  <RotateCcw className="w-3.5 h-3.5" />
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={handleFastForward}
                   disabled={!insertedTape}
                   title="Fast Forward"
-                  className="w-6 h-7 rounded bg-[#2A211B] hover:bg-[#3B3026] text-[#A8947E] border border-[#3E3228] flex items-center justify-center cursor-pointer disabled:opacity-40"
+                  className="w-8 h-9 rounded-lg bg-[#2A211B] hover:bg-[#3B3026] text-[#D8C7B4] border border-[#483B2F] flex items-center justify-center cursor-pointer disabled:opacity-40"
                 >
-                  <FastForward className="w-2.5 h-2.5" />
+                  <FastForward className="w-3.5 h-3.5" />
                 </motion.button>
               </div>
             </div>
 
-            {/* Tombol Eject Mekanik Berwarna Oranye/Amber */}
+            {/* Tombol Eject Mekanik (Tinggi 36px) */}
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.94 }}
               onClick={handleEjectTape}
               disabled={!insertedTape}
-              className={`h-7 px-3 rounded-md font-sans-ui text-[10px] font-black shadow flex items-center gap-1.5 border transition-all cursor-pointer ${
+              className={`h-9 px-3.5 rounded-lg font-sans-ui text-[11px] font-black shadow-md flex items-center gap-1.5 border transition-all cursor-pointer ${
                 insertedTape
-                  ? "bg-[#A83226] hover:bg-[#BD3B2E] text-white border-[#87251B] shadow-md"
-                  : "bg-[#281F19] text-[#6E5C4E] border-[#3D3027] cursor-not-allowed opacity-40"
+                  ? "bg-[#A83226] hover:bg-[#BD3B2E] text-white border-[#87251B]"
+                  : "bg-[#281F19] text-[#7A6757] border-[#3D3027] cursor-not-allowed opacity-40"
               }`}
             >
               <span>EJECT</span>
@@ -436,18 +436,18 @@ export function Segment2Soundtrack({ onComplete }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.96 }}
               transition={{ duration: 0.35 }}
-              className="w-full mt-2.5 bg-[#FFFDF8] border border-[#E5DACB] p-3 rounded-xl shadow-sm text-left relative paper-shadow"
+              className="w-full mt-2.5 bg-[#FFFDF8] border border-[#E5DACB] p-3 sm:p-3.5 rounded-xl shadow-sm text-left relative paper-shadow"
             >
               <WashiTape color="mustard" angle={-1.5} className="absolute -top-2 left-6" />
               <div className="flex items-center justify-between mb-1 pt-0.5">
-                <span className="font-typewriter text-[9.5px] uppercase tracking-wider text-[#8C3E2D] font-black">
+                <span className="font-typewriter text-[11px] uppercase tracking-wider text-[#8C3E2D] font-black">
                   Catatan Memori ✍️
                 </span>
-                <span className="font-typewriter text-[9px] text-[#6B5A4B] font-bold">
+                <span className="font-typewriter text-[10.5px] text-[#5A4839] font-bold">
                   {insertedTape.duration}
                 </span>
               </div>
-              <p className="font-typewriter text-xs text-[#140E0A] font-bold leading-relaxed min-h-[34px]">
+              <p className="font-typewriter text-xs sm:text-[13px] text-[#140E0A] font-bold leading-relaxed min-h-[34px]">
                 "{typedText}"
                 {isTyping && (
                   <span className="inline-block w-1.5 h-3 bg-[#8C3E2D] ml-0.5 animate-pulse align-middle" />
@@ -462,13 +462,13 @@ export function Segment2Soundtrack({ onComplete }) {
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
-          className="w-full mt-3"
+          className="w-full mt-2.5"
         >
           <div className="text-left mb-1.5 px-1 flex items-center justify-between">
-            <span className="font-typewriter text-[9.5px] uppercase tracking-wider text-[#4E3F32] font-black">
+            <span className="font-typewriter text-[10.5px] uppercase tracking-wider text-[#3D2E1F] font-black">
               Rak Kaset Fisik:
             </span>
-            <span className="font-sans-ui text-[9px] text-[#786450] font-bold italic">
+            <span className="font-sans-ui text-[10px] text-[#5A4839] font-bold italic">
               (Tarik kaset ke pemutar atau ketuk)
             </span>
           </div>
@@ -505,27 +505,27 @@ export function Segment2Soundtrack({ onComplete }) {
               return (
                 <div
                   key={tape.id}
-                  className="relative w-full h-[62px] rounded-xl"
+                  className="relative w-full h-[64px] rounded-xl"
                 >
                   {/* TAMPILAN KETIKA KASET SEDANG DI DALAM PEMUTAR: CERUK RAK KOSONG */}
                   {isLoadedInPlayer ? (
-                    <div className="w-full h-full rounded-xl border-2 border-dashed border-[#C5B49E] bg-[#EFE6D8]/60 flex items-center justify-between px-3.5 shadow-inner">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded border border-dashed border-[#BBA790] flex items-center justify-center text-amber-700/60 font-mono text-[9px]">
+                    <div className="w-full h-full rounded-xl border-2 border-dashed border-[#C5B49E] bg-[#EFE6D8]/70 flex items-center justify-between px-3 shadow-inner">
+                      <div className="flex items-center gap-2 overflow-hidden mr-2">
+                        <div className="w-8 h-8 rounded border border-dashed border-[#A8947E] flex items-center justify-center text-amber-900 font-mono text-[10px] font-black shrink-0">
                           0{idx + 1}
                         </div>
-                        <div className="flex flex-col text-left">
-                          <span className="font-typewriter text-[8px] font-black uppercase text-[#8C7A68]">
+                        <div className="flex flex-col text-left overflow-hidden">
+                          <span className="font-typewriter text-[9.5px] font-black uppercase text-[#735F4C]">
                             SLOT 0{idx + 1} KOSONG
                           </span>
-                          <span className="font-sans-ui text-[10px] font-bold text-[#4E3F32]">
-                            "{tape.title}" sedang di dalam pemutar 🎵
+                          <span className="font-sans-ui text-[11px] font-bold text-[#261C14] truncate">
+                            "{tape.title}" sedang di player 🎵
                           </span>
                         </div>
                       </div>
                       <button
                         onClick={handleEjectTape}
-                        className="px-2 py-1 rounded bg-[#E4D8C6] hover:bg-[#D8C7B0] text-[#4E3F32] font-sans-ui text-[9px] font-black border border-[#C5B49E] shadow-xs cursor-pointer"
+                        className="h-8 px-2.5 rounded-md bg-[#E4D8C6] hover:bg-[#D8C7B0] text-[#33251A] font-sans-ui text-[10.5px] font-black border border-[#C5B49E] shadow-xs cursor-pointer shrink-0"
                       >
                         Kembalikan ⏏
                       </button>
@@ -546,7 +546,6 @@ export function Segment2Soundtrack({ onComplete }) {
                       }}
                       onDragEnd={(e, info) => {
                         setIsDropTargetActive(false);
-                        // Jika ditarik ke atas melewati batas player (offset.y < -70)
                         if (info.offset.y < -70) {
                           handleInsertTape(tape);
                         }
@@ -564,36 +563,36 @@ export function Segment2Soundtrack({ onComplete }) {
                         style.bg
                       } ${style.border}`}
                     >
-                      {/* Cover Album Realistis */}
-                      <div className="w-10 h-10 rounded-md overflow-hidden shrink-0 border border-black/20 shadow relative bg-white">
+                      {/* Cover Album Realistis & Jelas */}
+                      <div className="w-11 h-11 rounded-md overflow-hidden shrink-0 border border-black/25 shadow-sm relative bg-white">
                         <Image
                           src={tape.coverImage}
                           alt={tape.title}
                           fill
                           className="object-cover"
-                          sizes="40px"
+                          sizes="44px"
                         />
                       </div>
 
-                      {/* Label Kertas Tengah dengan Judul Extra Bold */}
+                      {/* Label Kertas Tengah dengan Judul Extra Bold & Jelas */}
                       <div
-                        className={`flex-1 mx-2 h-[44px] rounded px-2 py-0.5 border border-[#CBB69E] shadow-xs flex flex-col justify-center text-left ${style.labelBg}`}
+                        className={`flex-1 mx-2 h-[46px] rounded px-2.5 py-0.5 border border-[#CBB69E] shadow-xs flex flex-col justify-center text-left ${style.labelBg}`}
                       >
                         <div className="flex items-center justify-between">
                           <span
-                            className="font-typewriter text-[7px] font-black uppercase tracking-wider"
+                            className="font-typewriter text-[9.5px] font-black uppercase tracking-wider"
                             style={{ color: style.accent }}
                           >
                             TRACK 0{idx + 1} • {tape.duration}
                           </span>
-                          <span className="font-mono text-[6.5px] bg-[#E5D7C7] text-[#4E3F32] font-black px-1 rounded">
+                          <span className="font-mono text-[8.5px] bg-[#E5D7C7] text-[#3D2E1F] font-black px-1.5 py-0.2 rounded">
                             {tape.tag}
                           </span>
                         </div>
-                        <span className="font-sans-ui text-xs font-black text-[#140E0A] truncate leading-tight">
+                        <span className="font-sans-ui text-xs sm:text-[13px] font-black text-[#140E0A] truncate leading-tight">
                           {tape.title}
                         </span>
-                        <span className="font-typewriter text-[8px] text-[#4A3B2E] font-bold truncate">
+                        <span className="font-typewriter text-[10px] text-[#453629] font-bold truncate">
                           {tape.artist}
                         </span>
                       </div>
@@ -603,7 +602,7 @@ export function Segment2Soundtrack({ onComplete }) {
                         <div className="w-4 h-4 rounded-full bg-white border border-[#3D2E1C] flex items-center justify-center">
                           <div className="w-1.5 h-1.5 rounded-full bg-[#3D2E1C]" />
                         </div>
-                        <div className="w-5 h-5 rounded-full bg-black/25 text-white flex items-center justify-center text-[10px] font-black shadow-xs">
+                        <div className="w-6 h-6 rounded-full bg-black/30 text-white flex items-center justify-center text-xs font-black shadow-xs">
                           ↑
                         </div>
                       </div>
@@ -615,14 +614,14 @@ export function Segment2Soundtrack({ onComplete }) {
           </div>
         </motion.div>
 
-        {/* 6. TOMBOL LANJUT KE SEGMEN 3 DENGAN TRANSISI MEMBALIK LEMBARAN */}
+        {/* 6. TOMBOL LANJUT KE SEGMEN 3 (LEMBAR POLAROID) */}
         <AnimatePresence>
           {hasPlayedAny && (
             <motion.div
               initial={{ opacity: 0, y: 15, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.45, ease: "easeOut" }}
-              className="w-full mt-4"
+              className="w-full mt-3.5 pb-1"
             >
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -631,7 +630,7 @@ export function Segment2Soundtrack({ onComplete }) {
                   playSfx("page-turn");
                   onComplete();
                 }}
-                className="w-full py-3.5 px-4 rounded-xl bg-[#1C1510] hover:bg-black text-[#FAF2E6] font-sans-ui text-xs sm:text-sm font-bold shadow-xl flex items-center justify-center gap-2 transition-all cursor-pointer border border-amber-300/30"
+                className="w-full py-3.5 px-4 rounded-xl bg-[#1C1510] hover:bg-black text-[#FAF2E6] font-sans-ui text-xs sm:text-sm font-black shadow-xl flex items-center justify-center gap-2 transition-all cursor-pointer border border-amber-300/30"
               >
                 <span>Lanjut ke Tumpukan Polaroid (Foto Kita)</span>
                 <ChevronRight className="w-4 h-4 text-amber-300" />
