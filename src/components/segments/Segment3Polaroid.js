@@ -183,16 +183,18 @@ export function Segment3Polaroid({ onComplete }) {
                 </div>
               </div>
 
-              {/* 2. COVER DEPAN BUKU SAKU KULIT FISIK (DAPAT DI-SWIPE / DIBUKA DENGAN KANCING DALAM 3D) */}
+              {/* 2. COVER DEPAN BUKU SAKU KULIT FISIK (LURUS, TEGAK, HANYA KANCING YANG DAPAT DIGESER) */}
               <motion.div
                 layoutId="shared-pocket-book"
                 style={{
                   transformOrigin: "left center",
                   transformStyle: "preserve-3d",
                 }}
+                initial={{ rotate: 0, rotateY: 0, scale: 1, x: 0, y: 0 }}
                 animate={
                   isBookOpening
                     ? {
+                        rotate: 0,
                         rotateY: -115,
                         opacity: [1, 1, 0.15],
                         scale: 1.02,
@@ -200,21 +202,15 @@ export function Segment3Polaroid({ onComplete }) {
                         transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
                       }
                     : {
+                        rotate: 0,
                         rotateY: 0,
-                        opacity: 1,
                         scale: 1,
                         x: 0,
+                        y: 0,
+                        opacity: 1,
                       }
                 }
-                drag={isBookOpening ? false : "x"}
-                dragConstraints={{ left: -100, right: 0 }}
-                dragElastic={0.3}
-                onDragEnd={(e, info) => {
-                  if (info.offset.x < -50 || info.velocity.x < -180) {
-                    handleUnlockAndOpenBook();
-                  }
-                }}
-                className="w-full h-full bg-gradient-to-b from-[#4A3222] via-[#3B2516] to-[#2B190D] rounded-2xl p-4 sm:p-5 border-4 border-[#6E4B33] shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col justify-between relative paper-shadow select-none z-10 cursor-grab active:cursor-grabbing"
+                className="w-full h-full bg-gradient-to-b from-[#4A3222] via-[#3B2516] to-[#2B190D] rounded-2xl p-4 sm:p-5 border-4 border-[#6E4B33] shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col justify-between relative paper-shadow select-none z-10"
               >
                 {/* Tekstur Jahitan Buku Kulit (Stitching) */}
                 <div className="absolute inset-2 rounded-xl border border-dashed border-[#8C6549]/50 pointer-events-none z-10" />
@@ -222,8 +218,8 @@ export function Segment3Polaroid({ onComplete }) {
                 {/* Tulang Buku Kiri (Spine) */}
                 <div className="absolute left-3.5 top-0 bottom-0 w-3 bg-black/25 border-r border-[#6E4B33] z-10" />
 
-                {/* Pita Pembatas Buku Merah Terjulur di Bawah */}
-                <div className="absolute -bottom-5 right-8 w-4 h-9 bg-[#A83226] shadow-md rounded-b-xs transform -rotate-6 pointer-events-none z-30 flex items-end justify-center pb-1">
+                {/* Pita Pembatas Buku Merah Terjulur Lurus di Bawah */}
+                <div className="absolute -bottom-5 right-8 w-4 h-8 bg-[#A83226] shadow-md rounded-b-xs pointer-events-none z-30 flex items-end justify-center pb-1">
                   <div className="w-2 h-2 border-b-2 border-r-2 border-[#FFE8E8]/70 transform rotate-45 mb-0.5" />
                 </div>
 
@@ -248,7 +244,7 @@ export function Segment3Polaroid({ onComplete }) {
                   </p>
                 </div>
 
-                {/* Tali Pengunci dengan Kancing Kuningan Geser Fisik (Interactive Clasp Slider) */}
+                {/* Tali Pengunci dengan Kancing Kuningan Geser Fisik (Satu-satunya elemen yang dapat di-drag) */}
                 <div className="w-full flex flex-col items-center pl-4 z-20">
                   <div className="w-full max-w-[240px] h-11 bg-black/45 rounded-full p-1 border border-[#8C6D1F]/60 shadow-inner relative flex items-center justify-between">
                     {/* Label Jalur Geser Kancing */}
@@ -260,13 +256,14 @@ export function Segment3Polaroid({ onComplete }) {
                     <motion.div
                       drag={isBookOpening ? false : "x"}
                       dragConstraints={{ left: 0, right: 140 }}
-                      dragElastic={0.2}
+                      dragElastic={0.15}
+                      dragSnapToOrigin={!isBookOpening}
                       onDragEnd={(e, info) => {
-                        if (info.offset.x > 55 || info.velocity.x > 150) {
+                        if (info.offset.x > 50 || info.velocity.x > 140) {
                           handleUnlockAndOpenBook();
                         }
                       }}
-                      whileHover={{ scale: 1.1 }}
+                      whileHover={{ scale: 1.08 }}
                       whileTap={{ scale: 0.95 }}
                       className="w-9 h-9 rounded-full bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#AA771C] border-2 border-white/70 shadow-lg cursor-grab active:cursor-grabbing flex items-center justify-center z-30"
                     >
