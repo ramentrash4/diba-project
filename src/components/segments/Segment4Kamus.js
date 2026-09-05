@@ -285,17 +285,24 @@ export function Segment4Kamus({ onComplete }) {
                     </div>
 
                     {/* Catatan Rahasia Tambahan yang Muncul saat Distabilo (Stabil, Terkunci di Bawah Tanpa Menggeser Teks Atas) */}
-                    <div className="mt-2 min-h-[52px] relative flex flex-col justify-start">
-                      <AnimatePresence mode="wait">
+                    <div className="mt-2 min-h-[58px] relative flex flex-col justify-start">
+                      <AnimatePresence>
                         {isHighlighted ? (
                           <motion.div
-                            key="footnote"
-                            initial={{ opacity: 0, y: 3 }}
+                            key={`footnote-${activeWordIndex}`}
+                            initial={{ opacity: 0, y: 4 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -3 }}
-                            transition={{ duration: 0.2 }}
-                            className="bg-[#FFF9E6] border border-amber-300/80 p-2 rounded-lg text-left shadow-2xs"
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.22, ease: "easeOut" }}
+                            className="bg-[#FFF8E7] border border-amber-300/90 rounded-lg p-2 text-left shadow-xs relative"
                           >
+                            {/* Label Badge Kecil Catatan Rahasia Tatwa */}
+                            <div className="flex items-center gap-1 mb-0.5">
+                              <Sparkles className="w-3 h-3 text-amber-600" />
+                              <span className="font-mono text-[8.5px] font-black uppercase tracking-wider text-[#8C3E2D]">
+                                Catatan Rahasia Tatwa ✨
+                              </span>
+                            </div>
                             <p className="font-handwriting text-[13px] sm:text-[14px] text-[#1E3A8A] font-bold leading-snug">
                               {secretFootnotes[activeWordIndex]}
                             </p>
@@ -304,13 +311,13 @@ export function Segment4Kamus({ onComplete }) {
                           <motion.div
                             key="cue"
                             initial={{ opacity: 0 }}
-                            animate={{ opacity: [0.55, 0.95, 0.55] }}
+                            animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            transition={{ repeat: Infinity, duration: 2.2 }}
-                            className="py-1 flex items-center gap-1 text-[9.5px] font-sans-ui text-[#8C7A6B] font-bold"
+                            transition={{ duration: 0.15 }}
+                            className="py-1.5 flex items-center gap-1.5 text-[10px] font-sans-ui text-[#8C7A6B] font-bold"
                           >
-                            <Highlighter className="w-3 h-3 text-amber-600" />
-                            <span>Ketuk teks untuk menstabilo catatan rahasia ✍️</span>
+                            <Highlighter className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                            <span className="animate-pulse">Ketuk teks untuk menstabilo catatan rahasia ✍️</span>
                           </motion.div>
                         )}
                       </AnimatePresence>
