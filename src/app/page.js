@@ -23,8 +23,9 @@ function ScrapbookApp() {
 
   const { startBgm, fadeOutAll, playSfx } = useAudio();
 
-  // Transisi maju ke segmen berikutnya
+  // Transisi maju ke segmen berikutnya dengan efek suara membalik lembaran kertas
   const goToNextSegment = (nextNum) => {
+    playSfx("page-turn");
     if (nextNum > unlockedSegment) {
       setUnlockedSegment(nextNum);
     }
@@ -48,19 +49,46 @@ function ScrapbookApp() {
     <div className="min-h-screen w-full flex justify-center items-center bg-gradient-to-b from-[#1C1612] via-[#140F0C] to-[#0D0A08] sm:p-4 sm:py-6 overflow-hidden selection:bg-rose-200">
       
       {/* STRICT MOBILE CANVAS: Di desktop terkunci dalam frame ponsel proporsional dengan latar kertas solid */}
-      <div className="w-full max-w-[412px] min-h-screen sm:min-h-[830px] sm:max-h-[92vh] sm:rounded-[38px] sm:shadow-[0_25px_90px_rgba(0,0,0,0.85),0_0_0_8px_#2B221A] relative flex flex-col justify-center overflow-hidden bg-[#FAF6EE] isolate">
+      <div
+        className="w-full max-w-[412px] min-h-screen sm:min-h-[830px] sm:max-h-[92vh] sm:rounded-[38px] sm:shadow-[0_25px_90px_rgba(0,0,0,0.85),0_0_0_8px_#2B221A] relative flex flex-col justify-center overflow-hidden bg-[#FAF6EE] isolate"
+        style={{ perspective: "1200px" }}
+      >
         
         {/* Background Atmosfer Dinamis di dalam Frame Mobile (Bayangan Daun & Cahaya Sore) */}
         <AtmosphereBackdrop currentSegment={currentSegment} />
 
-        {/* Konten Segmen Aktif */}
+        {/* KONTEN SEGMEN AKTIF DENGAN TRANSISI MEMBALIK LEMBARAN SCRAPBOOK 3D */}
         <AnimatePresence mode="wait">
           <motion.div
             key={`segment-${currentSegment}`}
-            initial={{ opacity: 0, y: 12, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -12, scale: 0.98 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
+            initial={{
+              opacity: 0,
+              rotateY: 25,
+              transformOrigin: "left center",
+              scale: 0.97,
+              filter: "brightness(0.96)",
+            }}
+            animate={{
+              opacity: 1,
+              rotateY: 0,
+              scale: 1,
+              filter: "brightness(1)",
+              transition: {
+                duration: 0.65,
+                ease: [0.22, 1, 0.36, 1], // kurva elastis membalik kertas alami
+              },
+            }}
+            exit={{
+              opacity: 0,
+              rotateY: -25,
+              transformOrigin: "right center",
+              scale: 0.97,
+              filter: "brightness(0.92)",
+              transition: {
+                duration: 0.45,
+                ease: "easeInOut",
+              },
+            }}
             className="w-full flex-1 flex flex-col justify-center relative z-10"
           >
             {currentSegment === 1 && (

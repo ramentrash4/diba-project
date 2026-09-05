@@ -92,6 +92,25 @@ export function playSfx(name) {
       setTimeout(() => playSyntheticNote(850, 0.12, "sine", 0.15), 50);
       break;
 
+    case "tape-insert":
+      // Suara mechanical clack/snap kaset masuk ke dalam deck
+      playSyntheticNote(160, 0.09, "triangle", 0.35);
+      setTimeout(() => playSyntheticNote(340, 0.06, "sine", 0.22), 35);
+      setTimeout(() => playSyntheticNote(220, 0.08, "triangle", 0.18), 70);
+      break;
+
+    case "tape-eject":
+      // Suara pegas mekanik kaset keluar dari deck
+      playSyntheticNote(320, 0.08, "sine", 0.2);
+      setTimeout(() => playSyntheticNote(180, 0.12, "triangle", 0.25), 45);
+      break;
+
+    case "page-turn":
+      // Suara gesekan membalik lembaran kertas scrapbook
+      playSyntheticNote(280, 0.18, "sine", 0.12);
+      setTimeout(() => playSyntheticNote(350, 0.15, "triangle", 0.08), 50);
+      break;
+
     default:
       playSyntheticNote(440, 0.15, "sine", 0.1);
   }
