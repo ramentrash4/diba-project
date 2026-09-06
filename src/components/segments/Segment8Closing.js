@@ -55,7 +55,7 @@ export function Segment8Closing({ onFinalLock }) {
   return (
     <section className="w-full flex-1 flex flex-col items-center justify-center px-3 sm:px-4 py-3 select-none relative overflow-hidden my-auto text-[#1E1712]">
       {/* WRAPPER TERFOKUS TEPAT DI TENGAH OPTIKAL LAYAR DENGAN PROPORSI SEIMBANG */}
-      <div className="w-full max-w-[345px] sm:max-w-[355px] flex flex-col items-center justify-center gap-2.5 my-auto z-10">
+      <div className="w-full max-w-[355px] sm:max-w-[370px] flex flex-col items-center justify-center gap-2.5 my-auto z-10">
         
         {/* 1. HEADER SEGMEN: TIKET DOA & PENUTUP */}
         <div className="w-full flex flex-col items-center text-center relative z-20">
@@ -198,8 +198,11 @@ export function Segment8Closing({ onFinalLock }) {
                     className="w-[94%] -mt-6 bg-[#FEFDF9] rounded-b-2xl border-x-2 border-b-2 border-[#E5D7C3] shadow-lg relative z-10 pt-8 pb-3 px-3 cursor-grab active:cursor-grabbing select-none touch-none paper-shadow group hover:shadow-xl transition-shadow"
                   >
                     {/* Cuplikan Fisik Lembaran Surat Tulisan Tangan Tatwa */}
-                    <div className="w-full border-t border-dashed border-[#8C6D4F]/35 pt-1.5 flex flex-col items-center text-center">
-                      <div className="w-full px-2.5 py-1.5 bg-[#FAF6EE] rounded-xl border border-[#EADBBD] text-left">
+                    <div
+                      onClick={handlePullLetter}
+                      className="w-full border-t border-dashed border-[#8C6D4F]/35 pt-1.5 flex flex-col items-center text-center cursor-pointer"
+                    >
+                      <div className="w-full px-2.5 py-1.5 bg-[#FAF6EE] rounded-xl border border-[#EADBBD] text-left hover:border-[#8C3E2D]/50 transition-colors">
                         <div className="flex items-center justify-between pb-1 border-b border-[#F0E6CE]">
                           <div className="flex items-center gap-1.5 text-[#8C3E2D]">
                             <Mail className="w-3.5 h-3.5" />
@@ -211,14 +214,14 @@ export function Segment8Closing({ onFinalLock }) {
                         </div>
                         {/* Teks tulisan tangan asli yang mengintip di balik tiket */}
                         <p className="font-handwriting text-xs sm:text-[13px] text-[#1E1712]/85 font-bold italic line-clamp-2 mt-1 leading-snug">
-                          "{closing.letter.slice(0, 80)}..."
+                          "{typeof closing.letter === "object" ? closing.letter.previewText || closing.letter.greeting : closing.letter.slice(0, 80)}..."
                         </p>
                       </div>
 
-                      {/* Petunjuk Tarik Lembaran Surat */}
+                      {/* Petunjuk Tarik / Ketuk Lembaran Surat */}
                       <div className="mt-2 flex items-center justify-center gap-1.5 text-[#8C3E2D] font-sans-ui text-[11px] font-bold">
                         <span className="w-2 h-2 rounded-full bg-[#8C2318] animate-ping" />
-                        <span>Tarik lembaran surat ini ke bawah</span>
+                        <span>Tarik atau ketuk surat ini ke bawah</span>
                         <span className="text-amber-600 animate-bounce">⬇️</span>
                       </div>
                     </div>
@@ -233,48 +236,122 @@ export function Segment8Closing({ onFinalLock }) {
                 animate={{ opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } }}
                 className="w-full flex flex-col items-center"
               >
-                {/* SURAT TULISAN TANGAN TERAKHIR TATWA */}
-                <div className="w-full bg-[#FFFDF8] rounded-2xl p-4 sm:p-4.5 border-2 border-[#EADBBD] shadow-2xl text-left space-y-2.5 relative paper-shadow">
+                {/* SURAT TULISAN TANGAN TERAKHIR TATWA (DESAIN ERGONOMIS & MUAT DI MOBILE) */}
+                <div className="w-full bg-[#FFFDF8] rounded-2xl border-2 border-[#EADBBD] shadow-2xl text-left relative paper-shadow flex flex-col overflow-hidden">
                   {/* Washi tape sudut kanan */}
                   <WashiTape color="rose" angle={-2} className="absolute -top-2.5 right-6 z-20 pointer-events-none scale-90" />
 
-                  {/* Header Surat */}
-                  <div className="flex items-center justify-between border-b border-[#F0E6CE] pb-1.5">
+                  {/* Header Surat (Fixed di Puncak Lembaran Kertas) */}
+                  <div className="flex items-center justify-between border-b border-[#F0E6CE] px-4 pt-3.5 pb-2 bg-[#FFFDF8] z-10">
                     <div className="flex items-center gap-1.5">
                       <Heart className="w-3.5 h-3.5 text-[#8C3E2D] fill-current" />
-                      <span className="font-typewriter text-[10.5px] font-black text-[#8C3E2D] uppercase tracking-wider">
-                        Surat Perpisahan & Doa ✍️
+                      <span className="font-typewriter text-[10px] sm:text-[10.5px] font-black text-[#8C3E2D] uppercase tracking-wider">
+                        Surat Terakhir & Doa ✍️
                       </span>
                     </div>
-                    <span className="font-mono text-[8.5px] text-[#8C7A6B] font-bold bg-[#8C5D1E]/10 px-2 py-0.5 rounded">
-                      Untuk Askiyaa
+                    <span className="font-mono text-[8.5px] text-[#8C7A6B] font-bold bg-[#8C5D1E]/10 px-2 py-0.5 rounded-full border border-[#8C5D1E]/20">
+                      Untuk Adiba
                     </span>
                   </div>
 
-                  {/* Isi Surat Refleksi */}
-                  <p className="font-handwriting text-[15.5px] sm:text-[16.5px] text-[#140E0A] font-bold leading-relaxed">
-                    "{closing.letter}"
-                  </p>
+                  {/* Area Isi Surat yang Dapat Di-scroll Halus (Preserving Intimacy & No Overflow) */}
+                  <div className="max-h-[320px] sm:max-h-[350px] overflow-y-auto px-4 py-3 space-y-3 relative text-left scrollbar-thin scrollbar-thumb-[#D8C2A7]/60">
+                    
+                    {/* Pembuka / Sapaan Hangat */}
+                    <div className="space-y-0.5 pb-1">
+                      <h3 className="font-handwriting text-2xl text-[#8C2318] font-black leading-tight">
+                        Haiii lagiii... Cantikkkk
+                      </h3>
+                      <p className="font-handwriting text-[15px] sm:text-[16px] text-[#1E1712] font-bold leading-snug">
+                        Lucu yaaa perjalananyaaa...
+                      </p>
+                      <p className="font-handwriting text-[14px] sm:text-[15px] text-[#5A4839] font-bold leading-snug">
+                        Okeeee dari semuaaa itu ada 2 kata terakhir dari akuuu dibb
+                      </p>
+                    </div>
 
-                  {/* Doa Kelancaran Kuliah di Pilkom 25 */}
-                  <p className="font-handwriting text-[14.5px] sm:text-[15.5px] text-[#1E3A8A] font-bold leading-relaxed border-t border-[#F0E6CE] pt-2">
-                    "{closing.prayer}"
-                  </p>
+                    {/* BUTIR 1: MAKASIH */}
+                    <div className="bg-[#FAF5ED] rounded-xl p-3 border border-[#EADBBD] shadow-2xs space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-[#8C2318]" />
+                        <h4 className="font-handwriting text-lg text-[#8C2318] font-black">
+                          1. Makasih
+                        </h4>
+                      </div>
+                      <p className="font-sans-ui text-xs sm:text-[12.5px] text-[#2D2319] leading-relaxed font-medium pl-3.5">
+                        makasihhh atas semuaa kesempatan yg kamu kasih buat akuu, makasih atas waktu kamu pada saat kita masih barenggg, makasih atas hati kamuuu yg pada saat itu tulus di dekat akuuu dan aku rasakan ituuu🤍
+                      </p>
+                    </div>
 
-                  {/* Tanda Tangan Penutup */}
-                  <div className="text-right pt-0.5">
-                    <span className="font-handwriting text-lg text-[#140E0A] font-black">
-                      {closing.finalSignoff}
-                    </span>
+                    {/* BUTIR 2: MAAF */}
+                    <div className="bg-[#FAF5ED] rounded-xl p-3 border border-[#EADBBD] shadow-2xs space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-[#8C2318]" />
+                        <h4 className="font-handwriting text-lg text-[#8C2318] font-black">
+                          2. Maaf
+                        </h4>
+                      </div>
+                      <p className="font-sans-ui text-xs sm:text-[12.5px] text-[#2D2319] leading-relaxed font-medium pl-3.5">
+                        Maafin awa dib atas segala sifattt kekanak kanakn nyaaa😔, maafin awa kalo kerjaannya mengeluh ke kamu dan ngeluarin sifat² clingy yg mungkin menyebalkan bagi kamuu🤕 dan maafin Tatwaaa yg terkadang tiba tiba serius membahas hubungann padahal waktunya ga tepattt.
+                      </p>
+                      <p className="font-handwriting text-sm text-[#7A5524] font-bold italic pt-1 pl-3.5">
+                        Oiyaaa satu kata lagi nih ya tambahan hehe... 🙃
+                      </p>
+                    </div>
+
+                    {/* BUTIR 3: TOLONG */}
+                    <div className="bg-[#FAF5ED] rounded-xl p-3 border border-[#EADBBD] shadow-2xs space-y-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-[#8C2318]" />
+                        <h4 className="font-handwriting text-lg text-[#8C2318] font-black">
+                          3. Tolong
+                        </h4>
+                      </div>
+                      <p className="font-sans-ui text-xs sm:text-[12.5px] text-[#2D2319] leading-relaxed font-medium pl-3.5">
+                        Tolonggg jangan lupain aku ya adibaa, aku tauu temen kamu banyakkk... irpan, dipdut, bpkb, naju, ara, key, musang², bestie telkom dll, tapi please sisain sedikit ruang dihati kamuuu untuk akuu entah apapun itu statusnyaaa... aku masih sanggup dengerin omelan kamu tentang dunia kemakom dan perkuliahan aku masih sanggup dimintain anter jemput dimanapun itu dan aku masih sanggup nemenin makan kamuu...
+                      </p>
+                      <div className="border-t border-[#EADBBD]/80 pt-1.5 pl-3.5 space-y-1">
+                        <p className="font-sans-ui text-[11.5px] text-[#7A5524] italic font-medium">
+                          Dah ah panjang² kaya bikin puisi ajee...
+                        </p>
+                        <p className="font-sans-ui text-xs sm:text-[12.5px] text-[#140E0A] font-semibold leading-relaxed">
+                          Akuuu selalu berharap kamu dikelilingi orang² baik orang² tulus, orang² yg membahagiakan kamuuu... meskipun sekarang aku udah gada di dalamnya... 🫶🏼
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* KUTIPAN SPESIAL BAHASA INGGRIS DUKUNPOLBAN */}
+                    <div className="bg-[#FAF6EE] rounded-xl p-3 border border-[#D8C7B0] border-l-4 border-l-[#8C2318] shadow-2xs text-left my-2 relative">
+                      <p className="font-serif italic text-xs sm:text-[12px] text-[#2D2118] leading-relaxed">
+                        "I'll love you forever, with all my heart. i still remember the feeling i got when i first started talking to you, i was so excited, i don't even know how to tell you how much you mean to me, I'm so glad youre mine, i love you more than anything in this world, i can't believe i was able to find my love and best friend at the same, i love you so deeply, and I'l love you forever With all my heart.."
+                      </p>
+                      <span className="font-handwriting text-[15px] sm:text-[16px] font-black text-[#8C2318] block text-right mt-1.5">
+                        -DukunPolban
+                      </span>
+                    </div>
+
+                    {/* Doa Kelancaran Kuliah di Pilkom 25 */}
+                    <div className="border-t border-[#F0E6CE] pt-2">
+                      <p className="font-handwriting text-[14.5px] sm:text-[15.5px] text-[#1E3A8A] font-bold leading-relaxed">
+                        "{closing.prayer}"
+                      </p>
+                    </div>
+
+                    {/* Tanda Tangan Penutup */}
+                    <div className="text-right pt-1 pb-1">
+                      <span className="font-handwriting text-xl sm:text-2xl text-[#140E0A] font-black block">
+                        {closing.finalSignoff}
+                      </span>
+                    </div>
                   </div>
 
                   {/* ======================================================== */}
                   {/* RITUAL TUTUP LEMBARAN: DOCK STEMPEL LILIN VINTAGE REALISTIS */}
                   {/* ======================================================== */}
-                  <div className="border-t-2 border-dashed border-[#E0D3C1] pt-2.5 mt-1">
-                    <div className="w-full h-18 bg-[#F4EDE2] rounded-xl border border-[#D8C7B0] px-3 py-1 relative flex items-center justify-between overflow-hidden shadow-inner">
+                  <div className="border-t-2 border-dashed border-[#E0D3C1] pt-2 pb-2 px-3 bg-[#FAF6EE] z-10">
+                    <div className="w-full h-17 bg-[#F4EDE2] rounded-xl border border-[#D8C7B0] px-3 py-1 relative flex items-center justify-between overflow-hidden shadow-inner">
                       
-                      {/* GAGANG STEMPEL LILIN KUNINGAN ANTIK (DRAGGABLE X) */}
+                      {/* GAGANG STEMPEL LILIN KUNINGAN ANTIK (DRAGGABLE X & TAP FRIENDLY) */}
                       <motion.div
                         drag={!isSealed ? "x" : false}
                         dragConstraints={{ left: 0, right: 180 }}
@@ -288,6 +365,7 @@ export function Segment8Closing({ onFinalLock }) {
                             handleSealComplete();
                           }
                         }}
+                        onClick={handleSealComplete}
                         animate={isSealed ? { x: 180, opacity: 0, transition: { delay: 0.35, duration: 0.3 } } : undefined}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -430,19 +508,19 @@ export function Segment8Closing({ onFinalLock }) {
         </div>
 
         {/* 3. PANDUAN SENTUH TUNGGAL (DYNAMIC & RINGKAS) */}
-        <div className="w-full max-w-[340px] flex items-center justify-center z-20 pointer-events-none mt-1">
+        <div className="w-full max-w-[350px] flex items-center justify-center z-20 pointer-events-none mt-1">
           {currentStage === "ticket" ? (
-            <div className="bg-[#1C1612]/85 border border-[#8C6D4F]/35 rounded-full px-3.5 py-1.5 shadow-xs flex items-center justify-center gap-1.5 text-amber-100 font-sans-ui text-[11px] font-medium text-center backdrop-blur-xs">
+            <div className="bg-[#1C1612]/85 border border-[#8C6D4F]/35 rounded-full px-3.5 py-1.5 shadow-xs flex items-center justify-center gap-1.5 text-amber-100 font-sans-ui text-[10.5px] sm:text-[11px] font-medium text-center backdrop-blur-xs">
               <span>💌</span>
-              <span>Tarik lembaran surat di balik tiket ke bawah</span>
+              <span>Tarik atau ketuk surat di balik tiket untuk membaca</span>
             </div>
           ) : !isSealed ? (
-            <div className="bg-[#1C1612]/85 border border-[#8C6D4F]/35 rounded-full px-3.5 py-1.5 shadow-xs flex items-center justify-center gap-1.5 text-amber-100 font-sans-ui text-[11px] font-medium text-center backdrop-blur-xs">
+            <div className="bg-[#1C1612]/85 border border-[#8C6D4F]/35 rounded-full px-3.5 py-1.5 shadow-xs flex items-center justify-center gap-1.5 text-amber-100 font-sans-ui text-[10.5px] sm:text-[11px] font-medium text-center backdrop-blur-xs">
               <span>🕯️</span>
-              <span>Geser stempel kuningan ke atas lilin merah untuk menyegel ➔</span>
+              <span>Geser atau ketuk stempel kuningan untuk menyegel ➔</span>
             </div>
           ) : (
-            <div className="bg-[#1C1612]/90 border border-amber-400/40 rounded-full px-3.5 py-1.5 shadow-xs flex items-center justify-center gap-1.5 text-amber-200 font-sans-ui text-[11px] font-bold text-center backdrop-blur-xs animate-pulse">
+            <div className="bg-[#1C1612]/90 border border-amber-400/40 rounded-full px-3.5 py-1.5 shadow-xs flex items-center justify-center gap-1.5 text-amber-200 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs animate-pulse">
               <span>✨</span>
               <span>Lembaran tersegel abadi... Menutup kenangan.</span>
             </div>

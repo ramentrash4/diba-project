@@ -61,10 +61,10 @@ export function Segment7Wishlist({ onComplete }) {
           animate={
             isTransitioning
               ? {
-                  y: -180,
-                  opacity: 0.1,
-                  transition: { duration: 0.5, ease: "easeInOut" },
-                }
+                y: -180,
+                opacity: 0.1,
+                transition: { duration: 0.5, ease: "easeInOut" },
+              }
               : { y: 0, opacity: 1 }
           }
           className="w-full relative flex flex-col items-center"
@@ -74,7 +74,7 @@ export function Segment7Wishlist({ onComplete }) {
 
           {/* BADAN LEMBARAN LEGAL PAD KUNING */}
           <div className="w-full bg-[#FEFCE8] rounded-t-2xl border-x-2 border-t-2 border-[#EADBBD] shadow-[0_14px_40px_rgba(0,0,0,0.16)] relative flex flex-col overflow-hidden text-left paper-shadow">
-            
+
             {/* Tepian Robekan Kertas Kasar di Paling Atas */}
             <div className="w-full h-3.5 bg-[#EDE3C8] relative overflow-hidden flex items-end">
               <svg viewBox="0 0 400 20" preserveAspectRatio="none" className="w-full h-3 text-[#FEFCE8] fill-current">
@@ -172,11 +172,10 @@ export function Segment7Wishlist({ onComplete }) {
               {[...Array(18)].map((_, dotIdx) => (
                 <span
                   key={`perf-dot-${dotIdx}`}
-                  className={`w-1 h-1 rounded-full transition-colors duration-150 ${
-                    tearProgress > (dotIdx / 18) * 100
+                  className={`w-1 h-1 rounded-full transition-colors duration-150 ${tearProgress > (dotIdx / 18) * 100
                       ? "bg-transparent"
                       : "bg-[#7A5524]/40"
-                  }`}
+                    }`}
                 />
               ))}
             </div>
@@ -224,14 +223,14 @@ export function Segment7Wishlist({ onComplete }) {
             animate={
               isTransitioning
                 ? {
-                    y: -140,
-                    scale: 1.05,
-                    transition: { duration: 0.48, ease: [0.22, 1, 0.36, 1] },
-                  }
+                  y: -140,
+                  scale: 1.05,
+                  transition: { duration: 0.48, ease: [0.22, 1, 0.36, 1] },
+                }
                 : {
-                    rotate: tearProgress * 0.04,
-                    y: tearProgress * 0.03,
-                  }
+                  rotate: tearProgress * 0.04,
+                  y: tearProgress * 0.03,
+                }
             }
             className="w-full bg-[#FFFDF8] rounded-b-2xl border-x-2 border-b-2 border-[#D8C7B0] shadow-md overflow-hidden relative"
           >
@@ -255,7 +254,7 @@ export function Segment7Wishlist({ onComplete }) {
                   PASSENGER
                 </span>
                 <span className="font-sans-ui text-xs sm:text-[12.5px] font-black text-[#140E0A] leading-tight">
-                  Askiyaa Adiba
+                  Adiba Askiyaa
                 </span>
               </div>
               <div className="flex flex-col text-right">

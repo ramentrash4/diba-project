@@ -263,16 +263,45 @@ export const scrapbookData = {
 
   // 9. Segmen 8: Penutup & Tiket Doa
   closing: {
-    letter: `Terima kasih untuk setiap tawa, obrolan larut malam, dan semua hal baik yang pernah kita bagi bersama. Tidak ada penyesalan, hanya rasa syukur pernah mengenalmu dan berjalan bersamamu di satu potongan waktu.`,
+    letter: {
+      greeting: "Haiii lagiii... Cantikkkk",
+      intro:
+        "Lucu yaaa perjalananyaaa...\nOkeeee dari semuaaa itu ada 2 kata terakhir dari akuuu dibb",
+      points: [
+        {
+          num: "1",
+          title: "Makasih",
+          body: "makasihhh atas semuaa kesempatan yg kamu kasih buat akuu, makasih atas waktu kamu pada saat kita masih barenggg, makasih atas hati kamuuu yg pada saat itu tulus di dekat akuuu dan aku rasakan ituuu🤍",
+        },
+        {
+          num: "2",
+          title: "Maaf",
+          body: "Maafin awa dib atas segala sifattt kekanak kanakn nyaaa😔, maafin awa kalo kerjaannya mengeluh ke kamu dan ngeluarin sifat² clingy yg mungkin menyebalkan bagi kamuu🤕 dan maafin Tatwaaa yg terkadang tiba tiba serius membahas hubungann padahal waktunya ga tepattt.",
+          subnote: "Oiyaaa satu kata lagi nih ya tambahan hehe... 🙃",
+        },
+        {
+          num: "3",
+          title: "Tolong",
+          body: "Tolonggg jangan lupain aku ya adibaa, aku tauu temen kamu banyakkk... irpan, dipdut, bpkb, naju, ara, key, musang², bestie telkom dll, tapi please sisain sedikit ruang dihati kamuuu untuk akuu entah apapun itu statusnyaaa... aku masih sanggup dengerin omelan kamu tentang dunia kemakom dan perkuliahan aku masih sanggup dimintain anter jemput dimanapun itu dan aku masih sanggup nemenin makan kamuu...",
+          outro:
+            "Dah ah panjang² kaya bikin puisi ajee...\nAkuuu selalu berharap kamu dikelilingi orang² baik orang² tulus, orang² yg membahagiakan kamuuu... meskipun sekarang aku udah gada di dalamnya... 🫶🏼",
+        },
+      ],
+      englishQuote:
+        "I'll love you forever, with all my heart. i still remember the feeling i got when i first started talking to you, i was so excited, i don't even know how to tell you how much you mean to me, I'm so glad youre mine, i love you more than anything in this world, i can't believe i was able to find my love and best friend at the same, i love you so deeply, and I'l love you forever With all my heart..",
+      signature: "-DukunPolban",
+      previewText: "Haiii lagiii... Cantikkkk. Lucu yaaa perjalananyaaa...",
+    },
     ticket: {
-      passenger: "Adiba (Askiyaa)",
+      passenger: "Adiba Askiyaa",
       classType: "First Class — Kehidupan Baru",
       flightNo: "PILKOM-2025",
       destination: "Masa Depan yang Cerah & Bahagia",
       seat: "No. 1 di Ceritamu Sendiri",
       validity: "Valid Selamanya",
     },
-    prayer: "Semoga kuliahmu selalu lancar di Pilkom 25, langkahmu dipermudah, dan kamu selalu dikelilingi orang-orang yang tulus menyayangimu.",
+    prayer:
+      "Semoga kuliahmu selalu lancar di Pilkom 25, langkahmu dipermudah, dan kamu selalu dikelilingi orang-orang yang tulus menyayangimu.",
     finalSignoff: "Berbahagialah. — Tatwa",
   },
 };
