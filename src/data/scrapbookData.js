@@ -14,6 +14,13 @@ export const scrapbookData = {
     greeting: "Untuk Askiyaa, Pilkom 25.",
     boxSubtitle: "Sebuah bingkisan kecil dari lembaran yang pernah kita tulis bersama.",
     ribbonInstruction: "Tarik pitanya perlahan...",
+    letterGreeting: "Haiii manusia favorit Tatwa Sukma!",
+    letterParagraphs: [
+      "Selamat datang di kenangan indah Tatwa bersama Adiba...",
+      "5 bulan bersama banyak cerita suka duka yang tidak pernah terlupa...",
+      "Tolong di simak pake hati meskipun kamu telah memilih pergi 🫶🏼",
+    ],
+    sender: "Tatwa Sukma",
   },
 
   // 2. Musik Latar (BGM)

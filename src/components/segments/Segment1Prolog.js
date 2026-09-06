@@ -6,6 +6,7 @@ import confetti from "canvas-confetti";
 import { ArrowUp, Disc, Sparkles } from "lucide-react";
 import { useAudio } from "@/components/audio/AudioProvider";
 import { WashiTape } from "@/components/common/WashiTape";
+import { scrapbookData } from "@/data/scrapbookData";
 
 export function Segment1Prolog({ onComplete }) {
   // isUnsealed: segel lilin terbuka & tutup amplop melipat ke atas 180 derajat
@@ -160,7 +161,7 @@ export function Segment1Prolog({ onComplete }) {
                     Ilmu Komputer — Angkatan 2025
                   </span>
                   <span className="text-sm text-[#8C2318] font-black block mt-1">
-                    Dari: Tatwa
+                    Dari: {scrapbookData.recipient.sender}
                   </span>
                 </div>
 
@@ -259,22 +260,23 @@ export function Segment1Prolog({ onComplete }) {
                   </span>
                 </div>
 
-                {/* Sapaan Tangan Adiba */}
-                <h2 className="font-handwriting text-3xl sm:text-4xl font-black text-[#120C08] mb-2 leading-tight">
-                  Untuk Adiba (Askiyaa),
+                {/* Sapaan Tangan Tatwa */}
+                <h2 className="font-handwriting text-2xl sm:text-3xl font-black text-[#120C08] mb-2 leading-tight">
+                  {scrapbookData.recipient.letterGreeting}
                 </h2>
 
                 {/* Isi Surat Terbaca Sangat Jelas & Menyentuh */}
-                <div className="space-y-2.5 font-sans-ui text-xs sm:text-sm text-[#2D2319] leading-relaxed mb-3.5 font-semibold">
-                  <p>Selamat datang di buku kenangan kecil kita.</p>
-                  <p>
-                    Setiap lembar di sini menyimpan lagu-lagu, tawa, obrolan, dan cerita yang pernah ada di antara kita. Buka perlahan dan nikmati perjalanannya ya.
+                <div className="space-y-2 font-sans-ui text-xs sm:text-[13px] text-[#2D2319] leading-relaxed mb-3.5 font-medium">
+                  <p>{scrapbookData.recipient.letterParagraphs[0]}</p>
+                  <p>{scrapbookData.recipient.letterParagraphs[1]}</p>
+                  <p className="font-handwriting text-base sm:text-lg text-[#8C2318] font-bold mt-1 leading-snug">
+                    {scrapbookData.recipient.letterParagraphs[2]}
                   </p>
                 </div>
 
                 {/* Tanda Tangan Tatwa */}
-                <div className="font-handwriting text-2xl font-black text-[#8C2318] text-right mb-3">
-                  — Tatwa
+                <div className="font-handwriting text-xl sm:text-2xl font-black text-[#8C2318] text-right mb-3">
+                  — {scrapbookData.recipient.sender}
                 </div>
 
                 {/* ========================================================= */}
