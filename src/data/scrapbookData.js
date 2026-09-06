@@ -102,25 +102,37 @@ export const scrapbookData = {
   // 5. Segmen 4: Kamus Bahasa Kita (Inside Jokes)
   dictionary: [
     {
-      word: "Ngambek 'Y'",
-      phonetic: "/ngam·bek way/",
-      type: "kata sifat / ungkapan",
-      definition: "Kondisi saat Adiba mendadak membalas chat hanya dengan satu huruf kapital 'Y' tanpa titik.",
-      example: "Tatwa: 'Mau pesen es krim rasa apa?' — Adiba: 'Y'",
+      word: "Mukjekkk",
+      phonetic: "/muk·jekkk/",
+      type: "ungkapan / kode rahasia",
+      definition:
+        "Bahasa rahasia yang biasa kita ucapin kalau lagi asyik ngegibahin hal random di sekitar kita hehe.",
+      example:
+        "Tatwa: 'Liat deh orang di meja seberang...' — Diba: 'Mukjekkk! Jangan keras-keras ih!' *sambil nahan ketawa* 🤫",
+      secretFootnote:
+        "Setiap kata ini keluar, auto saling lirik terus langsung ketawa kecil berdua tanpa ada orang lain yang paham kodenya. 😂🤫",
     },
     {
-      word: "Pilkom Pace",
-      phonetic: "/pil·kom peys/",
-      type: "nomina",
-      definition: "Ritme kehidupan anak ilmu komputer: antara begadang ngoding, mengeluh pusing, tapi tugas tetap selesai.",
-      example: "'Tetap semangat di Pilkom 25 ya, kamu jauh lebih tangguh dari yang kamu kira.'",
+      word: "Mam",
+      phonetic: "/ma·aam/",
+      type: "verba / sinyal manja",
+      definition:
+        "Kata sakti yang mendadak keluar kalau Adiba lagi laper parah dan kangen, biasanya diiringi nada manja.",
+      example:
+        "Diba: 'Tatwaaa... mam 🥺' — Tatwa: 'Mau mam apa hari ini? Bakso apa seblak favorit kamu?' 🍜",
+      secretFootnote:
+        "Kalau kata 'mam' udah keluar dengan nada gemasnya, artinya Tatwa harus sigap nyiapin makanan sebelum cemberutnya makin bertambah. 😋🍽️",
     },
     {
-      word: "Dih!",
-      phonetic: "/dih!/",
-      type: "interjeksi",
-      definition: "Kata seru andalan Adiba ketika Tatwa mulai melontarkan lelucon garing atau ejekan kecil.",
-      example: "'Dih, apaan sih gak jelas banget!' *tapi sambil nahan ketawa*",
+      word: "Achuuu",
+      phonetic: "/a·chuuu/",
+      type: "partikel afeksi / imbuhan eksklusif",
+      definition:
+        "Imbuhan penutup kalimat paling istimewa yang cuma boleh dan cuma pernah dipakai kalau lagi sama kamu.",
+      example:
+        "Diba: 'Makasih banyak yaaa Tatwa achuuu...' — Tatwa: 'Sama-sama manusia favorit Tatwa 🫶🏼'",
+      secretFootnote:
+        "Imbuhan yang paling bikin meleleh dan cuma milik kita berdua. Gak akan pernah ada yang bisa gantiin panggilan ini. 🥺❤️",
     },
   ],
 

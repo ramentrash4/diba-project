@@ -41,9 +41,9 @@ export function Segment4Kamus({ onComplete }) {
 
   // Catatan rahasia tambahan dari Tatwa untuk setiap entri saat distabilo
   const secretFootnotes = [
-    "Catatan Tatwa: Tapi anehnya, kalau ditanya lagi 5 menit kemudian langsung ngaku kalau sebenarnya lagi pengen jajan es krim atau seblak pedas. 🍨",
-    "Catatan Tatwa: Jangan pernah ragu sama kemampuanmu di Pilkom 25 ya Diba. Kamu jauh lebih cerdas dan gigih dari yang kamu kira. Laptopnya jangan dipeluk tidur! 💻",
-    "Catatan Tatwa: Nada bicaramu pas bilang 'Dih!' itu khas banget. Salah satu ekspresi yang paling sering bikin kangen suasana waktu itu. ✨",
+    "Setiap kata ini keluar, auto saling lirik terus langsung ketawa kecil berdua tanpa ada orang lain yang paham kodenya. 😂🤫",
+    "Kalau kata 'mam' udah keluar dengan nada gemasnya, artinya Tatwa harus sigap nyiapin makanan sebelum cemberutnya makin bertambah. 😋🍽️",
+    "Imbuhan yang paling bikin meleleh dan cuma milik kita berdua. Gak akan pernah ada yang bisa gantiin panggilan ini. 🥺❤️",
   ];
 
   // Efek coretan stabilo saat kartu diketuk (hanya jika tidak sedang dragging)
@@ -120,11 +120,11 @@ export function Segment4Kamus({ onComplete }) {
   const getDoodleIcon = (idx) => {
     switch (idx) {
       case 0:
-        return <Coffee className="w-4 h-4 text-[#8C3E2D]" />;
+        return <Sparkles className="w-4 h-4 text-[#8C3E2D]" />;
       case 1:
-        return <Code className="w-4 h-4 text-[#2E5B88]" />;
+        return <Smile className="w-4 h-4 text-[#D97706]" />;
       case 2:
-        return <Smile className="w-4 h-4 text-[#9E6528]" />;
+        return <Heart className="w-4 h-4 text-[#DC2626]" />;
       default:
         return <Heart className="w-4 h-4 text-[#8C3E2D]" />;
     }
