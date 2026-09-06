@@ -83,8 +83,21 @@ export function AudioProvider({ children }) {
     }
   };
 
+  // Menggeser posisi putar audio (Seek Forward / Backward)
+  const seekTrack = (timeInSeconds) => {
+    if (foregroundAudioRef.current) {
+      foregroundAudioRef.current.currentTime = timeInSeconds;
+    }
+  };
+
   // Memutar audio foreground (Lagu Segmen 2 atau VN Segmen 6)
-  const playTrack = (trackId, src, onEndedCallback, playbackRate = 1) => {
+  const playTrack = (
+    trackId,
+    src,
+    onEndedCallback,
+    playbackRate = 1,
+    onTimeUpdateCallback
+  ) => {
     if (activeTrackId === trackId && isForegroundPlaying) {
       pauseTrack();
       return;
@@ -97,6 +110,16 @@ export function AudioProvider({ children }) {
     if (foregroundAudioRef.current) {
       foregroundAudioRef.current.src = src;
       foregroundAudioRef.current.playbackRate = playbackRate;
+
+      foregroundAudioRef.current.ontimeupdate = () => {
+        if (onTimeUpdateCallback && foregroundAudioRef.current) {
+          onTimeUpdateCallback(
+            foregroundAudioRef.current.currentTime || 0,
+            foregroundAudioRef.current.duration || 0
+          );
+        }
+      };
+
       foregroundAudioRef.current.onended = () => {
         setIsForegroundPlaying(false);
         setActiveTrackId(null);
@@ -172,6 +195,7 @@ export function AudioProvider({ children }) {
         startBgm,
         playTrack,
         pauseTrack,
+        seekTrack,
         setPlaybackRate,
         duckBgm,
         restoreBgm,
