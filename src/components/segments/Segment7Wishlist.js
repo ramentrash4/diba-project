@@ -19,8 +19,8 @@ export function Segment7Wishlist({ onComplete }) {
   const { playSfx } = useAudio();
   const wishlist = scrapbookData.wishlist;
 
-  // Catatan refleksi yang sedang aktif dibuka (default: item 0 terbuka sebagai petunjuk visual)
-  const [activeNoteIdx, setActiveNoteIdx] = useState(0);
+  // Status catatan refleksi yang sedang terbuka (default: item 0 terbuka sebagai petunjuk visual interaksi)
+  const [revealedNotes, setRevealedNotes] = useState({ 0: true });
 
   // Status persentase sobekan garis perforasi (0 - 100)
   const [tearProgress, setTearProgress] = useState(0);
@@ -29,7 +29,10 @@ export function Segment7Wishlist({ onComplete }) {
 
   const handleToggleItem = (idx) => {
     playSfx("pencil-scratch");
-    setActiveNoteIdx((prev) => (prev === idx ? null : idx));
+    setRevealedNotes((prev) => ({
+      ...prev,
+      [idx]: !prev[idx],
+    }));
   };
 
   // Interaksi Robek Tiket Boarding Pass Selesai (Zero Buttons)
@@ -51,7 +54,7 @@ export function Segment7Wishlist({ onComplete }) {
   return (
     <section className="w-full flex-1 flex flex-col items-center justify-center px-3 sm:px-4 py-3 select-none relative overflow-hidden my-auto text-[#1E1712]">
       {/* WRAPPER TERFOKUS TEPAT DI TENGAH OPTIKAL LAYAR DENGAN PROPORSI SEIMBANG */}
-      <div className="w-full max-w-[345px] sm:max-w-[355px] flex flex-col items-center justify-center gap-2.5 my-auto z-10">
+      <div className="w-full max-w-[345px] sm:max-w-[360px] flex flex-col items-center justify-center gap-2.5 my-auto z-10">
 
         {/* SATU ARTEFAK UTUH: KERTAS LEGAL PAD KUNING DENGAN STUB TIKET DI PERFORASI BAWAH */}
         <motion.div
@@ -86,7 +89,7 @@ export function Segment7Wishlist({ onComplete }) {
             <div className="absolute left-7 top-3.5 bottom-0 w-px bg-rose-300/80 pointer-events-none" />
 
             {/* HEADER KERTAS TERINTEGRASI */}
-            <div className="pt-2 pb-1.5 px-3 pl-9 flex items-center justify-between border-b border-[#EADBBD]/80">
+            <div className="pt-2.5 pb-2 px-3 pl-9 flex items-center justify-between border-b border-[#EADBBD]/80">
               <div>
                 <h2 className="font-handwriting text-xl sm:text-2xl text-[#140E0A] font-black tracking-wide leading-tight">
                   Rencana Tertunda 📝
@@ -101,29 +104,29 @@ export function Segment7Wishlist({ onComplete }) {
             </div>
 
             {/* KONTEN DAFTAR WISHLIST */}
-            <div className="py-2 px-3 pl-9 space-y-1.5 relative z-10">
+            <div className="py-2.5 px-3 pl-9 space-y-2 relative z-10">
               {wishlist.map((item, idx) => {
-                const isRevealed = activeNoteIdx === idx;
+                const isRevealed = !!revealedNotes[idx];
 
                 return (
                   <div
                     key={`wish-${idx}`}
                     onClick={() => handleToggleItem(idx)}
-                    className="cursor-pointer group select-none py-1 border-b border-[#F0E6CE]/70 last:border-0"
+                    className="cursor-pointer group select-none py-1.5 border-b border-[#F0E6CE]/70 last:border-0"
                   >
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-2.5">
                       {/* Kotak Centang Sentuh Ramah Jari */}
-                      <div className="mt-0.5 w-4 h-4 rounded-xs border-2 border-[#8C6D4F] flex items-center justify-center shrink-0 bg-white shadow-2xs group-hover:border-[#8C3E2D] transition-colors">
+                      <div className="mt-0.5 w-4.5 h-4.5 rounded-xs border-2 border-[#8C6D4F] flex items-center justify-center shrink-0 bg-white shadow-2xs group-hover:border-[#8C3E2D] transition-colors">
                         {isRevealed ? (
-                          <span className="text-[#8C3E2D] font-black text-[11px] leading-none">✓</span>
+                          <span className="text-[#8C3E2D] font-black text-xs leading-none">✓</span>
                         ) : (
                           <div className="w-1.5 h-1.5 rounded-2xs bg-[#D8C2A7] opacity-45" />
                         )}
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        {/* Judul Wishlist (Teks Penuh, Tidak Terpotong Truncate) */}
-                        <span className="font-sans-ui text-xs sm:text-[12.5px] font-bold text-[#261B12] leading-snug block group-hover:text-[#8C3E2D] transition-colors">
+                        {/* Judul Wishlist (Teks Penuh, Tidak Terpotong) */}
+                        <span className="font-sans-ui text-xs sm:text-[13px] font-bold text-[#261B12] leading-snug block group-hover:text-[#8C3E2D] transition-colors">
                           {item.text}
                         </span>
 
@@ -135,9 +138,9 @@ export function Segment7Wishlist({ onComplete }) {
                               animate={{ opacity: 1, height: "auto" }}
                               exit={{ opacity: 0, height: 0 }}
                               transition={{ duration: 0.22, ease: "easeOut" }}
-                              className="mt-1 pl-1 border-l-2 border-[#1D3557]/30"
+                              className="mt-1 pl-2 border-l-2 border-[#1D3557]/40"
                             >
-                              <p className="font-handwriting text-[14px] sm:text-[15px] text-[#1D3557] font-bold leading-snug">
+                              <p className="font-handwriting text-[15px] sm:text-[16px] text-[#1D3557] font-bold leading-snug">
                                 "{item.note}"
                               </p>
                             </motion.div>
@@ -151,7 +154,7 @@ export function Segment7Wishlist({ onComplete }) {
             </div>
 
             {/* Petunjuk Halus di Kaki Legal Pad */}
-            <div className="px-3 pb-1.5 pl-9 text-left">
+            <div className="px-3 pb-2 pl-9 text-left">
               <span className="font-sans-ui text-[9.5px] text-[#8C755E] font-medium">
                 💡 Ketuk rencana untuk membuka catatan refleksi
               </span>
@@ -159,7 +162,7 @@ export function Segment7Wishlist({ onComplete }) {
           </div>
 
           {/* 2. JALUR PERFORASI SOBEK TIKET LANGSUNG DI BAWAH KERTAS LEGAL PAD */}
-          <div className="w-full h-8 relative flex items-center justify-between px-2 bg-[#FEFCE8] border-x-2 border-[#EADBBD] overflow-hidden">
+          <div className="w-full h-8.5 relative flex items-center justify-between px-2 bg-[#FEFCE8] border-x-2 border-[#EADBBD] overflow-hidden">
             {/* Lekukan Tiket Berlubang di Sisi Kiri & Kanan (Perforation Notches) */}
             <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-[#FAF6EE] border border-[#D8C7B0] z-20 pointer-events-none" />
             <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-[#FAF6EE] border border-[#D8C7B0] z-20 pointer-events-none" />
@@ -178,29 +181,30 @@ export function Segment7Wishlist({ onComplete }) {
               ))}
             </div>
 
-            {/* TAB SLIDER ROBEK BERGERIGI (DRAGGABLE X - TOUCH FRIENDLY) */}
+            {/* TAB SLIDER ROBEK BERGERIGI (DRAGGABLE X - TOUCH FRIENDLY & TAP FRIENDLY) */}
             <motion.div
               drag={!isTorn ? "x" : false}
-              dragConstraints={{ left: 0, right: 230 }}
+              dragConstraints={{ left: 0, right: 235 }}
               dragElastic={0.06}
               dragSnapToOrigin={!isTorn}
               onDrag={(e, info) => {
-                const progress = Math.min(100, Math.max(0, (info.offset.x / 230) * 100));
+                const progress = Math.min(100, Math.max(0, (info.offset.x / 235) * 100));
                 setTearProgress(progress);
               }}
               onDragEnd={(e, info) => {
-                const progress = (info.offset.x / 230) * 100;
-                if (progress >= 60 || info.velocity.x > 120) {
+                const progress = (info.offset.x / 235) * 100;
+                if (progress >= 55 || info.velocity.x > 100) {
                   handleTearComplete();
                 } else {
                   setTearProgress(0);
                 }
               }}
-              animate={isTorn ? { x: 230 } : undefined}
+              onClick={handleTearComplete}
+              animate={isTorn ? { x: 235 } : undefined}
               whileTap={{ scale: 0.95 }}
               className="absolute left-2 top-1/2 -translate-y-1/2 z-30 cursor-grab active:cursor-grabbing touch-none select-none"
             >
-              <div className="flex items-center gap-1.5 bg-[#8C3E2D] text-white px-2.5 py-1 rounded-full border border-amber-300 shadow-md">
+              <div className="flex items-center gap-1.5 bg-[#8C3E2D] hover:bg-[#783426] text-white px-2.5 py-1 rounded-full border border-amber-300 shadow-md">
                 <span className="text-xs">✂️</span>
                 <span className="font-mono text-[9px] font-black uppercase tracking-wider">
                   Sobek
@@ -269,12 +273,12 @@ export function Segment7Wishlist({ onComplete }) {
         {/* 4. PETUNJUK TUNGGAL (RINGKAS, DINAMIS & ANTI-REDUNDAN) */}
         <div className="w-full max-w-[340px] flex items-center justify-center z-20 pointer-events-none mt-1">
           {!isTorn ? (
-            <div className="bg-[#1C1612]/85 border border-[#8C6D4F]/35 rounded-full px-3.5 py-1.5 shadow-xs flex items-center justify-center gap-1.5 text-amber-100 font-sans-ui text-[11px] font-medium text-center backdrop-blur-xs">
+            <div className="bg-[#1C1612]/85 border border-[#8C6D4F]/35 rounded-full px-3.5 py-1.5 shadow-xs flex items-center justify-center gap-1.5 text-amber-100 font-sans-ui text-[10.5px] sm:text-[11px] font-medium text-center backdrop-blur-xs">
               <span>✂️</span>
-              <span>Geser tab gunting ke kanan untuk merobek tiket penerbangan</span>
+              <span>Geser atau ketuk gunting untuk merobek tiket penerbangan</span>
             </div>
           ) : (
-            <div className="bg-[#1C1612]/90 border border-emerald-400/40 rounded-full px-3.5 py-1.5 shadow-xs flex items-center justify-center gap-1.5 text-emerald-200 font-sans-ui text-[11px] font-bold text-center backdrop-blur-xs animate-pulse">
+            <div className="bg-[#1C1612]/90 border border-emerald-400/40 rounded-full px-3.5 py-1.5 shadow-xs flex items-center justify-center gap-1.5 text-emerald-200 font-sans-ui text-[10.5px] sm:text-[11px] font-bold text-center backdrop-blur-xs animate-pulse">
               <span>✈️</span>
               <span>Tiket terobek! Menuju doa masa depan...</span>
             </div>

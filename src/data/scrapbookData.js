@@ -248,20 +248,16 @@ export const scrapbookData = {
   // 8. Segmen 7: Rencana Tertunda (Wishlist Kertas Robek)
   wishlist: [
     {
-      text: "Nonton konser bareng yang sempat kita rencanakan",
-      note: "Mungkin di kesempatan lain, dengan ceritamu yang baru.",
+      text: "Nonton festivalist Bareng",
+      note: "Mungkin nanti kita bisa nyanyi GAS barengg huhu",
     },
     {
-      text: "Keliling kota naik motor pas sore hari waktu langit ungu",
-      note: "Semoga kamu selalu menikmati angin sore di kotamu.",
+      text: "Photobooth Berdua",
+      note: "Biar seluruh bandung tau kalo moment lucu kita perlu diabadikan",
     },
     {
-      text: "Makan ramen pedas di tempat langganan",
-      note: "Jangan lupa pesan minum yang manis ya, biar gak kepedesan.",
-    },
-    {
-      text: "Selesai kuliah dan wisuda bareng",
-      note: "Aku yakin kamu bakal jadi sarjana Pilkom yang hebat.",
+      text: "Naik gunung Bareng",
+      note: "Menikmati alam bersama kamu, soalnya alam sama kamu sama sama indah ",
     },
   ],
 

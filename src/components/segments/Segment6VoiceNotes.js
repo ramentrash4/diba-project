@@ -180,7 +180,7 @@ export function Segment6VoiceNotes({ onComplete }) {
     <section className="w-full flex-1 flex flex-col items-center justify-center px-3 py-2 select-none relative overflow-hidden my-auto bg-gradient-to-b from-[#101722] via-[#0A1017] to-[#05080E] text-white">
       {/* WRAPPER TENGAH LAYAR TERFOKUS (ROOM CHAT CONTAINER) */}
       <div className="w-full max-w-[365px] sm:max-w-[380px] flex flex-col items-center justify-center gap-2 my-auto">
-        
+
         {/* INDIKATOR KONEKSI AUDIO DARI SEGMEN 5 */}
         <div className="flex items-center gap-1.5 text-emerald-300 font-mono text-[9px] font-bold uppercase tracking-wider bg-[#101F20]/90 px-2.5 py-0.5 rounded-full border border-emerald-500/30 shadow-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
@@ -190,7 +190,7 @@ export function Segment6VoiceNotes({ onComplete }) {
 
         {/* BINGKAI ROOMCHAT WHATSAPP REALISTIS */}
         <div className="w-full h-[470px] sm:h-[490px] bg-[#0B141A] rounded-2xl border border-[#202C33] shadow-[0_16px_45px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden relative">
-          
+
           {/* 1. HEADER ROOMCHAT WA */}
           <div className="h-13 bg-[#1F2C34] border-b border-[#2A3942] px-3 flex items-center justify-between z-20 shrink-0 shadow-sm">
             <div className="flex items-center gap-2">
@@ -229,13 +229,6 @@ export function Segment6VoiceNotes({ onComplete }) {
             {/* Latar Belakang Subtle Pattern Wallpaper Chat */}
             <div className="absolute inset-0 bg-[radial-gradient(#1F2C34_1px,transparent_1px)] [background-size:16px_16px] opacity-35 pointer-events-none" />
 
-            {/* Badge Tanggal Obrolan */}
-            <div className="flex justify-center my-1 relative z-10">
-              <span className="bg-[#182229] text-[#8696A0] text-[9.5px] font-sans-ui font-semibold px-2.5 py-0.5 rounded-md shadow-xs border border-white/5 uppercase tracking-wider">
-                14 Oktober 2024
-              </span>
-            </div>
-
             {/* DAFTAR BUBBLE CHAT TERUNGKAP SATU PER SATU */}
             {vns.map((vn, idx) => {
               const isUnlocked = idx === 0 || revealedReplies[vns[idx - 1].id];
@@ -255,18 +248,17 @@ export function Segment6VoiceNotes({ onComplete }) {
                   {/* BUBBLE VN ADIBA (SISI KIRI - WHATSAPP STYLE, BEBAS TRANSLATE, SCRUBBABLE) */}
                   <div className="flex justify-start w-full">
                     <div className="w-[95%] sm:w-[92%] bg-[#202C33] rounded-2xl rounded-tl-xs px-3 py-2.5 border border-[#2A3942] shadow-md flex flex-col gap-1.5 text-left relative">
-                      
+
                       {/* Bar Pemutar VN: Play Button, Waveform Scrubber & Speed Badge */}
                       <div className="flex items-center gap-2.5 w-full">
                         {/* Tombol Play / Pause */}
                         <button
                           onClick={() => handleToggleVn(vn)}
                           aria-label={isPlaying ? "Pause voice note" : "Play voice note"}
-                          className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all cursor-pointer shrink-0 ${
-                            isPlaying
-                              ? "bg-emerald-400 text-slate-950 scale-105 shadow-emerald-500/20"
-                              : "bg-[#00A884] hover:bg-[#02906f] text-white"
-                          }`}
+                          className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all cursor-pointer shrink-0 ${isPlaying
+                            ? "bg-emerald-400 text-slate-950 scale-105 shadow-emerald-500/20"
+                            : "bg-[#00A884] hover:bg-[#02906f] text-white"
+                            }`}
                         >
                           {isPlaying ? (
                             <Pause className="w-4 h-4 fill-current" />
@@ -286,9 +278,8 @@ export function Segment6VoiceNotes({ onComplete }) {
                               return (
                                 <div
                                   key={bIdx}
-                                  className={`flex-1 rounded-full transition-colors duration-150 ${
-                                    isPassed ? "bg-[#00A884]" : "bg-[#8696A0]/45"
-                                  }`}
+                                  className={`flex-1 rounded-full transition-colors duration-150 ${isPassed ? "bg-[#00A884]" : "bg-[#8696A0]/45"
+                                    }`}
                                   style={{ height: `${Math.max(20, h)}%` }}
                                 />
                               );
@@ -343,11 +334,10 @@ export function Segment6VoiceNotes({ onComplete }) {
                         <button
                           onClick={(e) => handleToggleSpeed(vn.id, e)}
                           title="Ubah kecepatan putar"
-                          className={`h-6.5 px-2 rounded-full font-mono text-[10px] font-bold border transition-all cursor-pointer shrink-0 flex items-center justify-center ${
-                            currentSpeed === 2
-                              ? "bg-amber-400 text-slate-950 border-amber-300 font-extrabold shadow-xs"
-                              : "bg-[#111B21] text-slate-300 border-white/15 hover:text-white hover:border-white/30"
-                          }`}
+                          className={`h-6.5 px-2 rounded-full font-mono text-[10px] font-bold border transition-all cursor-pointer shrink-0 flex items-center justify-center ${currentSpeed === 2
+                            ? "bg-amber-400 text-slate-950 border-amber-300 font-extrabold shadow-xs"
+                            : "bg-[#111B21] text-slate-300 border-white/15 hover:text-white hover:border-white/30"
+                            }`}
                         >
                           {currentSpeed}x
                         </button>
@@ -445,10 +435,10 @@ export function Segment6VoiceNotes({ onComplete }) {
               animate={
                 isTransitioning
                   ? {
-                      y: -330,
-                      scale: 1,
-                      transition: { duration: 0.48, ease: [0.22, 1, 0.36, 1] },
-                    }
+                    y: -330,
+                    scale: 1,
+                    transition: { duration: 0.48, ease: [0.22, 1, 0.36, 1] },
+                  }
                   : { y: 0 }
               }
               className="absolute top-0 w-full max-w-[360px] sm:max-w-[375px] cursor-grab active:cursor-grabbing touch-none select-none z-30 flex flex-col items-center"
