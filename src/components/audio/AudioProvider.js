@@ -1,7 +1,15 @@
 "use client";
 
-import React, { createContext, useContext, useState, useRef, useEffect } from "react";
-import { lofiEngine, playSfx as triggerSynthSfx, playSyntheticNote } from "@/utils/audioSynth";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
+import { lofiEngine, playSfx as triggerSynthSfx } from "@/utils/audioSynth";
 import { scrapbookData } from "@/data/scrapbookData";
 
 const AudioContext = createContext(null);
@@ -13,6 +21,18 @@ export function AudioProvider({ children }) {
 
   const bgmAudioRef = useRef(null);
   const foregroundAudioRef = useRef(null);
+  const isBgmActiveRef = useRef(false);
+
+  useEffect(() => {
+    isBgmActiveRef.current = isBgmActive;
+  }, [isBgmActive]);
+
+  // Mengembalikan volume BGM ke tingkat normal
+  const restoreBgm = useCallback(() => {
+    if (bgmAudioRef.current && isBgmActiveRef.current) {
+      bgmAudioRef.current.volume = scrapbookData.bgm.defaultVolume;
+    }
+  }, []);
 
   // Inisialisasi Audio Element di browser
   useEffect(() => {
@@ -21,7 +41,6 @@ export function AudioProvider({ children }) {
       bgm.loop = true;
       bgm.volume = scrapbookData.bgm.defaultVolume;
 
-      // Handle error jika file MP3 belum ada, gunakan synthesizer lofi sebagai fallback
       bgm.onerror = () => {
         // Fallback procedural engine aktif
       };
@@ -45,46 +64,38 @@ export function AudioProvider({ children }) {
       }
       lofiEngine.stop();
     };
-  }, []);
+  }, [restoreBgm]);
 
   // Mulai memutar BGM lembut
-  const startBgm = () => {
+  const startBgm = useCallback(() => {
     setIsBgmActive(true);
     if (bgmAudioRef.current) {
       bgmAudioRef.current
         .play()
         .catch(() => {
-          // Jika file lokal tidak ditemukan, aktifkan procedural lofi ambient
           lofiEngine.start();
         });
     } else {
       lofiEngine.start();
     }
-  };
+  }, []);
 
   // Auto-ducking: meredakan volume BGM saat lagu / VN berbunyi
-  const duckBgm = () => {
+  const duckBgm = useCallback(() => {
     if (bgmAudioRef.current) {
       bgmAudioRef.current.volume = 0.08;
     }
-  };
-
-  // Mengembalikan volume BGM ke tingkat normal
-  const restoreBgm = () => {
-    if (bgmAudioRef.current && isBgmActive) {
-      bgmAudioRef.current.volume = scrapbookData.bgm.defaultVolume;
-    }
-  };
+  }, []);
 
   // Mengatur kecepatan putar audio foreground (1x / 2x)
-  const setPlaybackRate = (rate = 1) => {
+  const setPlaybackRate = useCallback((rate = 1) => {
     if (foregroundAudioRef.current) {
       foregroundAudioRef.current.playbackRate = rate;
     }
-  };
+  }, []);
 
   // Menggeser posisi putar audio (Seek Forward / Backward)
-  const seekTrack = (timeInSeconds) => {
+  const seekTrack = useCallback((timeInSeconds) => {
     if (foregroundAudioRef.current) {
       try {
         foregroundAudioRef.current.currentTime = timeInSeconds;
@@ -92,90 +103,17 @@ export function AudioProvider({ children }) {
         console.log("Seek error:", e);
       }
     }
-  };
+  }, []);
 
-  // Memutar audio foreground (Lagu Segmen 2 atau VN Segmen 6)
-  const playTrack = (
-    trackId,
-    src,
-    onEndedCallback,
-    playbackRate = 1,
-    onTimeUpdateCallback,
-    startTime = 0
-  ) => {
-    if (activeTrackId === trackId && isForegroundPlaying) {
-      pauseTrack();
-      return;
-    }
-
-    setActiveTrackId(trackId);
-    setIsForegroundPlaying(true);
-    duckBgm();
-
-    if (foregroundAudioRef.current) {
-      const audio = foregroundAudioRef.current;
-      const isSameSrc =
-        audio.src && (audio.src.endsWith(src) || audio.src === src);
-
-      if (!isSameSrc) {
-        audio.src = src;
-      }
-      audio.playbackRate = playbackRate;
-
-      if (startTime > 0) {
-        try {
-          audio.currentTime = startTime;
-        } catch (e) {
-          audio.onloadedmetadata = () => {
-            audio.currentTime = startTime;
-          };
-        }
-      }
-
-      audio.ontimeupdate = () => {
-        if (onTimeUpdateCallback && foregroundAudioRef.current) {
-          onTimeUpdateCallback(
-            foregroundAudioRef.current.currentTime || 0,
-            foregroundAudioRef.current.duration || 0
-          );
-        }
-      };
-
-      audio.onended = () => {
-        setIsForegroundPlaying(false);
-        setActiveTrackId(null);
-        restoreBgm();
-        if (onEndedCallback) onEndedCallback();
-      };
-
-      audio
-        .play()
-        .catch(() => {
-          // Fallback jika file audio demo belum dimasukkan: simulasikan durasi bunyi 5 detik
-          console.log(`Audio fallback for track ${trackId}`);
-          playSyntheticNote(330, 2.0, "triangle", 0.15);
-          setTimeout(() => {
-            playSyntheticNote(392, 2.0, "triangle", 0.15);
-          }, 1200);
-          setTimeout(() => {
-            setIsForegroundPlaying(false);
-            setActiveTrackId(null);
-            restoreBgm();
-            if (onEndedCallback) onEndedCallback();
-          }, 4000);
-        });
-    }
-  };
-
-  const pauseTrack = () => {
+  const pauseTrack = useCallback(() => {
     if (foregroundAudioRef.current) {
       foregroundAudioRef.current.pause();
     }
     setIsForegroundPlaying(false);
     restoreBgm();
-  };
+  }, [restoreBgm]);
 
-  const stopTrack = () => {
+  const stopTrack = useCallback(() => {
     if (foregroundAudioRef.current) {
       foregroundAudioRef.current.pause();
       try {
@@ -185,15 +123,79 @@ export function AudioProvider({ children }) {
     setIsForegroundPlaying(false);
     setActiveTrackId(null);
     restoreBgm();
-  };
+  }, [restoreBgm]);
+
+  // Memutar audio foreground (Lagu Segmen 2 atau VN Segmen 6)
+  const playTrack = useCallback(
+    (
+      trackId,
+      src,
+      onEndedCallback,
+      playbackRate = 1,
+      onTimeUpdateCallback,
+      startTime = 0
+    ) => {
+      if (activeTrackId === trackId && isForegroundPlaying) {
+        pauseTrack();
+        return;
+      }
+
+      setActiveTrackId(trackId);
+      setIsForegroundPlaying(true);
+      duckBgm();
+
+      if (foregroundAudioRef.current) {
+        const audio = foregroundAudioRef.current;
+        const isSameSrc =
+          audio.src && (audio.src.endsWith(src) || audio.src === src);
+
+        if (!isSameSrc) {
+          audio.src = src;
+        }
+        audio.playbackRate = playbackRate;
+
+        if (startTime > 0) {
+          try {
+            audio.currentTime = startTime;
+          } catch (e) {
+            audio.onloadedmetadata = () => {
+              audio.currentTime = startTime;
+            };
+          }
+        }
+
+        audio.ontimeupdate = () => {
+          if (onTimeUpdateCallback && foregroundAudioRef.current) {
+            onTimeUpdateCallback(
+              foregroundAudioRef.current.currentTime || 0,
+              foregroundAudioRef.current.duration || 0
+            );
+          }
+        };
+
+        audio.onended = () => {
+          setIsForegroundPlaying(false);
+          setActiveTrackId(null);
+          restoreBgm();
+          if (onEndedCallback) onEndedCallback();
+        };
+
+        audio.play().catch((err) => {
+          if (err && err.name === "AbortError") return;
+          console.warn(`Audio play error for track ${trackId}:`, err);
+        });
+      }
+    },
+    [activeTrackId, isForegroundPlaying, duckBgm, restoreBgm, pauseTrack]
+  );
 
   // Memainkan SFX haptik
-  const playSfx = (name) => {
+  const playSfx = useCallback((name) => {
     triggerSynthSfx(name);
-  };
+  }, []);
 
   // Mereda ke hening mutlak (untuk Segmen 8 Penutup)
-  const fadeOutAll = (durationMs = 2500) => {
+  const fadeOutAll = useCallback((durationMs = 2500) => {
     lofiEngine.stop();
     if (foregroundAudioRef.current) {
       foregroundAudioRef.current.pause();
@@ -216,28 +218,43 @@ export function AudioProvider({ children }) {
       }, stepTime);
     }
     setIsBgmActive(false);
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      isBgmActive,
+      activeTrackId,
+      isForegroundPlaying,
+      startBgm,
+      playTrack,
+      pauseTrack,
+      stopTrack,
+      seekTrack,
+      setPlaybackRate,
+      duckBgm,
+      restoreBgm,
+      playSfx,
+      fadeOutAll,
+    }),
+    [
+      isBgmActive,
+      activeTrackId,
+      isForegroundPlaying,
+      startBgm,
+      playTrack,
+      pauseTrack,
+      stopTrack,
+      seekTrack,
+      setPlaybackRate,
+      duckBgm,
+      restoreBgm,
+      playSfx,
+      fadeOutAll,
+    ]
+  );
 
   return (
-    <AudioContext.Provider
-      value={{
-        isBgmActive,
-        activeTrackId,
-        isForegroundPlaying,
-        startBgm,
-        playTrack,
-        pauseTrack,
-        stopTrack,
-        seekTrack,
-        setPlaybackRate,
-        duckBgm,
-        restoreBgm,
-        playSfx,
-        fadeOutAll,
-      }}
-    >
-      {children}
-    </AudioContext.Provider>
+    <AudioContext.Provider value={value}>{children}</AudioContext.Provider>
   );
 }
 
@@ -248,3 +265,4 @@ export function useAudio() {
   }
   return context;
 }
+

@@ -45,12 +45,18 @@ export function Segment2Soundtrack({ onComplete }) {
     }, 450);
   };
 
-  // Pastikan lagu kaset otomatis terhenti saat pengguna meninggalkan Segmen 2
+  const pauseTrackRef = useRef(pauseTrack);
+  useEffect(() => {
+    pauseTrackRef.current = pauseTrack;
+  });
+
+  // Pastikan lagu kaset otomatis terhenti HANYA saat komponen Segmen 2 benar-benar di-unmount (pindah ke Segmen 3)
+  // Dependency array kosong [] memastikan lagu TIDAK berhenti saat teks selesai diketik atau saat re-render
   useEffect(() => {
     return () => {
-      pauseTrack();
+      pauseTrackRef.current?.();
     };
-  }, [pauseTrack]);
+  }, []);
 
   // Counter analog 3-digit retro (misal 042 -> 043 -> 044...)
   const [tapeCounter, setTapeCounter] = useState(42);
@@ -73,7 +79,10 @@ export function Segment2Soundtrack({ onComplete }) {
     setHasPlayedAny(true);
     setIsDropTargetActive(false);
     setIsRackExpanded(false); // otomatis minimalkan rak agar layar lega dan padat
-    playTrack(tape.id, tape.src);
+    playTrack(tape.id, tape.src, () => {
+      // Hanya berhenti jika durasi lagu habis secara alami
+      setIsPlaying(false);
+    });
   };
 
   // Keluarkan kaset (Eject) -> kembali ke rak
@@ -94,7 +103,10 @@ export function Segment2Soundtrack({ onComplete }) {
       setIsPlaying(false);
     } else {
       if (insertedTape) {
-        playTrack(insertedTape.id, insertedTape.src);
+        playTrack(insertedTape.id, insertedTape.src, () => {
+          // Hanya berhenti jika durasi lagu habis secara alami
+          setIsPlaying(false);
+        });
         setIsPlaying(true);
       }
     }

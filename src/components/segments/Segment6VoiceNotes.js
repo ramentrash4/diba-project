@@ -151,12 +151,17 @@ export function Segment6VoiceNotes({ onComplete }) {
     }, 500);
   };
 
+  const pauseTrackRef = useRef(pauseTrack);
+  useEffect(() => {
+    pauseTrackRef.current = pauseTrack;
+  });
+
   useEffect(() => {
     return () => {
       if (progressTimer.current) clearInterval(progressTimer.current);
-      pauseTrack();
+      pauseTrackRef.current?.();
     };
-  }, [pauseTrack]);
+  }, []);
 
   // Format detik menjadi 0:00
   const formatTime = (sec) => {
