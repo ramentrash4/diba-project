@@ -249,13 +249,8 @@ export function Segment3Polaroid({ onComplete }) {
                     isDraggingRef.current = true;
                   }}
                   onDrag={(e, info) => {
-                    if (info.offset.x < -30) {
-                      setDragCue("next");
-                    } else if (info.offset.x > 30) {
-                      setDragCue("prev");
-                    } else {
-                      setDragCue(null);
-                    }
+                    const nextCue = info.offset.x < -30 ? "next" : info.offset.x > 30 ? "prev" : null;
+                    setDragCue((prev) => (prev !== nextCue ? nextCue : prev));
                   }}
                   onDragEnd={(e, info) => {
                     setDragCue(null);

@@ -148,13 +148,13 @@ export function Segment2Soundtrack({ onComplete }) {
 
     const timer = setInterval(() => {
       if (index < fullText.length) {
-        setTypedText(fullText.slice(0, index + 1));
-        index++;
+        index = Math.min(fullText.length, index + 2);
+        setTypedText(fullText.slice(0, index));
       } else {
         setIsTyping(false);
         clearInterval(timer);
       }
-    }, 20);
+    }, 40);
 
     return () => clearInterval(timer);
   }, [insertedTape]);

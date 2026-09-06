@@ -24,7 +24,7 @@ export function AtmosphereBackdrop({ currentSegment }) {
             ? "radial-gradient(circle at 80% 20%, #FFFBF2 0%, #F5ECDD 45%, #ECDDC8 100%)"
             : "radial-gradient(circle at 85% 15%, #FFFDF5 0%, #FAF2E6 45%, #F2E4D2 100%)",
         }}
-        transition={{ duration: 1.2, ease: "easeInOut" }}
+        transition={{ duration: 0.8, ease: "easeInOut" }}
       />
 
       {/* 2. Tekstur Serat Kertas Linen Lembut Organik */}
@@ -44,7 +44,7 @@ export function AtmosphereBackdrop({ currentSegment }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
             className="absolute inset-0 pointer-events-none"
           >
             {/* Berkas Cahaya Matahari Sore Hangat (Radial Gradient Hardware Accelerated) */}
@@ -61,22 +61,9 @@ export function AtmosphereBackdrop({ currentSegment }) {
               }}
             />
 
-            {/* Bayangan Dahan Dedaunan Jendela Kafe (Segmen 1 - 3) */}
+            {/* Bayangan Dahan Dedaunan Jendela Kafe (Segmen 1 - 3) - Murni CSS Compositor */}
             {currentSegment <= 3 && (
-              <motion.div
-                className="absolute -top-4 -left-6 w-80 h-80 opacity-20 pointer-events-none"
-                animate={{
-                  rotate: [0, 2, 0, -1.5, 0],
-                  x: [0, 4, 0, -3, 0],
-                  y: [0, 2, 0, -2, 0],
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 8,
-                  ease: "easeInOut",
-                }}
-                style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}
-              >
+              <div className="absolute -top-4 -left-6 w-80 h-80 opacity-20 pointer-events-none anim-leaf-sway">
                 <svg viewBox="0 0 240 240" fill="#423120" className="w-full h-full opacity-85">
                   <path d="M10,20 Q60,70 110,110 Q160,150 220,180 Q160,165 110,125 Q60,85 10,20 Z" />
                   <path d="M50,55 Q95,45 140,25 Q125,60 80,75 Z" />
@@ -92,7 +79,7 @@ export function AtmosphereBackdrop({ currentSegment }) {
                   <circle cx="25" cy="160" r="15" />
                   <circle cx="45" cy="130" r="17" />
                 </svg>
-              </motion.div>
+              </div>
             )}
 
             {/* Sorot Lampu Baca Meja Kayu (Segmen 4 Kamus) */}
@@ -105,33 +92,23 @@ export function AtmosphereBackdrop({ currentSegment }) {
               />
             )}
 
-            {/* Partikel Debu Cahaya Matahari Berputar Lembut (Golden Dust Motes) - Hardware Accelerated */}
-            {[...Array(4)].map((_, i) => (
-              <motion.div
-                key={`day-mote-${i}`}
-                className="absolute rounded-full bg-[#D4963B]"
-                style={{
-                  width: `${3.5 + (i % 2) * 1.5}px`,
-                  height: `${3.5 + (i % 2) * 1.5}px`,
-                  top: `${15 + i * 18}%`,
-                  left: `${15 + (i * 24) % 65}%`,
-                  opacity: 0.28,
-                  willChange: "transform, opacity",
-                  transform: "translate3d(0,0,0)",
-                }}
-                animate={{
-                  y: [0, -20, 0],
-                  x: [0, i % 2 === 0 ? 8 : -8, 0],
-                  opacity: [0.15, 0.42, 0.15],
-                  scale: [0.9, 1.12, 0.9],
-                }}
-                transition={{
-                  duration: 5 + i * 1.2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            ))}
+            {/* Partikel Debu Cahaya Matahari (Golden Dust Motes) - Murni CSS Keyframes (0% JS CPU) */}
+            <div
+              className="absolute rounded-full bg-[#D4963B] anim-mote-1 pointer-events-none"
+              style={{ width: "4px", height: "4px", top: "18%", left: "20%" }}
+            />
+            <div
+              className="absolute rounded-full bg-[#D4963B] anim-mote-2 pointer-events-none"
+              style={{ width: "3px", height: "3px", top: "38%", left: "65%" }}
+            />
+            <div
+              className="absolute rounded-full bg-[#D4963B] anim-mote-3 pointer-events-none"
+              style={{ width: "5px", height: "5px", top: "58%", left: "28%" }}
+            />
+            <div
+              className="absolute rounded-full bg-[#D4963B] anim-mote-4 pointer-events-none"
+              style={{ width: "3.5px", height: "3.5px", top: "75%", left: "70%" }}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -144,7 +121,7 @@ export function AtmosphereBackdrop({ currentSegment }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 0.6 }}
             className="absolute inset-0 pointer-events-none"
           >
             {/* Sorotan Lampu Hangat Meja Kafe Bebas Lag Blur */}
@@ -161,60 +138,45 @@ export function AtmosphereBackdrop({ currentSegment }) {
               }}
             />
 
-            {/* Titik-titik Rintik Hujan Halus di Latar Belakang (Segmen 5) */}
+            {/* Titik-titik Rintik Hujan Halus di Latar Belakang (Segmen 5) - Murni CSS Keyframes */}
             {currentSegment === 5 && (
               <div className="absolute inset-0 opacity-25 pointer-events-none">
-                {[...Array(6)].map((_, i) => (
-                  <motion.div
-                    key={`rain-${i}`}
-                    className="absolute w-[1.5px] bg-gradient-to-b from-transparent via-cyan-200 to-transparent rounded-full"
-                    style={{
-                      height: `${14 + (i % 3) * 8}px`,
-                      top: `${-20 + i * 14}%`,
-                      left: `${8 + i * 15}%`,
-                      willChange: "transform, opacity",
-                      transform: "translate3d(0,0,0)",
-                    }}
-                    animate={{
-                      y: [0, 750],
-                      opacity: [0, 0.55, 0],
-                    }}
-                    transition={{
-                      duration: 1.3 + (i % 3) * 0.4,
-                      repeat: Infinity,
-                      ease: "linear",
-                      delay: i * 0.2,
-                    }}
-                  />
-                ))}
+                <div
+                  className="absolute w-[1.5px] h-4 bg-gradient-to-b from-transparent via-cyan-200 to-transparent rounded-full anim-rain-1"
+                  style={{ top: "-10%", left: "15%" }}
+                />
+                <div
+                  className="absolute w-[1.5px] h-5 bg-gradient-to-b from-transparent via-cyan-200 to-transparent rounded-full anim-rain-2"
+                  style={{ top: "-15%", left: "45%" }}
+                />
+                <div
+                  className="absolute w-[1.5px] h-3.5 bg-gradient-to-b from-transparent via-cyan-200 to-transparent rounded-full anim-rain-3"
+                  style={{ top: "-5%", left: "75%" }}
+                />
               </div>
             )}
 
-            {/* Pendaran Bokeh Malam Hari Menggunakan Radial Gradient Halus */}
-            {[...Array(4)].map((_, i) => (
-              <motion.div
-                key={`night-bokeh-${i}`}
-                className="absolute rounded-full pointer-events-none"
-                style={{
-                  width: `${24 + (i % 2) * 16}px`,
-                  height: `${24 + (i % 2) * 16}px`,
-                  top: `${20 + i * 16}%`,
-                  left: `${15 + (i * 23) % 65}%`,
-                  background: "radial-gradient(circle, rgba(255,226,189,0.35) 0%, rgba(255,226,189,0.08) 50%, transparent 75%)",
-                  willChange: "transform, opacity",
-                  transform: "translate3d(0,0,0)",
-                }}
-                animate={{
-                  opacity: [0.15, 0.35, 0.15],
-                  scale: [0.95, 1.15, 0.95],
-                }}
-                transition={{
-                  duration: 4 + i * 0.8,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            ))}
+            {/* Pendaran Bokeh Malam Hari Menggunakan Radial Gradient Halus - Murni CSS */}
+            <div
+              className="absolute rounded-full pointer-events-none anim-bokeh-1"
+              style={{
+                width: "36px",
+                height: "36px",
+                top: "22%",
+                left: "18%",
+                background: "radial-gradient(circle, rgba(255,226,189,0.35) 0%, rgba(255,226,189,0.08) 50%, transparent 75%)",
+              }}
+            />
+            <div
+              className="absolute rounded-full pointer-events-none anim-bokeh-2"
+              style={{
+                width: "48px",
+                height: "48px",
+                top: "55%",
+                left: "62%",
+                background: "radial-gradient(circle, rgba(255,226,189,0.35) 0%, rgba(255,226,189,0.08) 50%, transparent 75%)",
+              }}
+            />
           </motion.div>
         )}
       </AnimatePresence>

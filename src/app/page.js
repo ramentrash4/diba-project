@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { AudioProvider, useAudio } from "@/components/audio/AudioProvider";
 import { AtmosphereBackdrop } from "@/components/common/AtmosphereBackdrop";
 import { DevNavigator } from "@/components/common/DevNavigator";
@@ -83,59 +83,30 @@ function ScrapbookApp() {
         {/* Background Atmosfer Dinamis di dalam Frame Mobile (Bayangan Daun & Cahaya Sore) */}
         <AtmosphereBackdrop currentSegment={currentSegment} />
 
-        {/* KONTEN SEGMEN AKTIF DENGAN DUKUNGAN SHARED ELEMENT MORPHING */}
-        <LayoutGroup id="scrapbook-morph-group">
-          <AnimatePresence mode={isMorphTransition ? "popLayout" : "wait"}>
-            <motion.div
-              key={`segment-${currentSegment}`}
-              initial={
-                isDirectSeamlessTransition
-                  ? { opacity: 1, scale: 1, rotateY: 0 }
-                  : isMorphTransition
-                  ? { opacity: 0, scale: 0.98 }
-                  : {
-                      opacity: 0,
-                      rotateY: 25,
-                      scale: 0.97,
-                      filter: "brightness(0.96)",
-                    }
-              }
-              animate={{
-                opacity: 1,
-                rotateY: 0,
-                scale: 1,
-                filter: "brightness(1)",
-                transition: {
-                  duration: isDirectSeamlessTransition ? 0.05 : isMorphTransition ? 0.45 : 0.65,
-                  ease: [0.22, 1, 0.36, 1],
-                },
-              }}
-              exit={
-                isDirectSeamlessTransition
-                  ? {
-                      opacity: 0,
-                      transition: { duration: 0.05 },
-                    }
-                  : isMorphTransition
-                  ? {
-                      opacity: 0,
-                      scale: 0.95,
-                      transition: { duration: 0.35 },
-                    }
-                  : {
-                      opacity: 0,
-                      rotateY: -25,
-                      scale: 0.97,
-                      filter: "brightness(0.92)",
-                      transition: {
-                        duration: 0.45,
-                        ease: "easeInOut",
-                      },
-                    }
-              }
-              className="w-full h-full flex-1 flex flex-col justify-center items-center relative z-10 origin-center overflow-hidden"
-              style={{ willChange: "transform, opacity", transform: "translateZ(0)" }}
-            >
+        {/* KONTEN SEGMEN AKTIF DENGAN TRANSISI ELEGAN TERAKSELERASI HARDWARE */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`segment-${currentSegment}`}
+            initial={{ opacity: 0, scale: 0.985 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              transition: {
+                duration: 0.28,
+                ease: [0.22, 1, 0.36, 1],
+              },
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.985,
+              transition: {
+                duration: 0.18,
+                ease: "easeOut",
+              },
+            }}
+            className="w-full h-full flex-1 flex flex-col justify-center items-center relative z-10 origin-center overflow-hidden"
+            style={{ willChange: "transform, opacity", transform: "translateZ(0)" }}
+          >
             {currentSegment === 1 && (
               <Segment1Prolog onComplete={handlePrologComplete} />
             )}
@@ -162,7 +133,6 @@ function ScrapbookApp() {
             )}
           </motion.div>
         </AnimatePresence>
-        </LayoutGroup>
 
         {/* Overlay Putih Mutlak Penutup Lembaran (Whiteout Closure) */}
         <AnimatePresence>

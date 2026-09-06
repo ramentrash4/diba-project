@@ -180,11 +180,11 @@ export function Segment5KacaEmbun({ onComplete }) {
     }
   }, [activeTab, clearedTabs, playSfx]);
 
+  const canvasRectRef = useRef(null);
+
   // Logika mengusap kaca (Scratch / Wiper)
   const getCanvasCoordinates = (e) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
-    const rect = canvas.getBoundingClientRect();
+    const rect = canvasRectRef.current || (canvasRef.current && canvasRef.current.getBoundingClientRect()) || { left: 0, top: 0 };
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     return {
@@ -195,6 +195,10 @@ export function Segment5KacaEmbun({ onComplete }) {
 
   const startWiping = (e) => {
     if (isCurrentCleared || isReFrosting || isFinishing) return;
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvasRectRef.current = canvas.getBoundingClientRect();
+    }
     isDrawing.current = true;
     lastPoint.current = getCanvasCoordinates(e);
     wipe(e);

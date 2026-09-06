@@ -100,24 +100,6 @@ export function Segment6VoiceNotes({ onComplete }) {
         },
         startAt
       );
-
-      if (progressTimer.current) clearInterval(progressTimer.current);
-
-      const targetDuration = vn.durationSeconds || 7;
-
-      // Timer pendamping untuk kelancaran animasi waveform
-      progressTimer.current = setInterval(() => {
-        if (isScrubbingRef.current) return;
-        setVnProgress((prev) => {
-          const current = (prev[vn.id] || 0) + 0.1 * speed;
-          if (current >= targetDuration) {
-            clearInterval(progressTimer.current);
-            handleVnFinished(vn);
-            return { ...prev, [vn.id]: targetDuration };
-          }
-          return { ...prev, [vn.id]: current };
-        });
-      }, 100);
     }
   };
 

@@ -239,32 +239,15 @@ class LofiAmbientEngine {
 
     this.isPlaying = true;
 
-    const playChordStep = () => {
-      if (!this.isPlaying) return;
-      const currentChord = this.chords[this.chordIndex % this.chords.length];
-
-      // Petikan arpeggio lembut berfrekuensi hangat
-      currentChord.forEach((freq, i) => {
-        setTimeout(() => {
-          if (this.isPlaying) {
-            playSyntheticNote(freq, 2.6, "sine", 0.038);
-            // Tambahkan harmonik atas lonceng lembut pada nada tertinggi
-            if (i === currentChord.length - 1) {
-              setTimeout(() => {
-                if (this.isPlaying) {
-                  playSyntheticNote(freq * 1.5, 1.8, "triangle", 0.015);
-                }
-              }, 120);
-            }
-          }
-        }, i * 360);
-      });
-
-      this.chordIndex = (this.chordIndex + 1) % this.chords.length;
-    };
-
-    playChordStep();
-    this.intervalId = setInterval(playChordStep, 3400);
+    // Mainkan arpeggio akord hangat satu putaran yang elegan tanpa interval looping berat
+    const currentChord = this.chords[0];
+    currentChord.forEach((freq, i) => {
+      setTimeout(() => {
+        if (this.isPlaying) {
+          playSyntheticNote(freq, 2.8, "sine", 0.035);
+        }
+      }, i * 320);
+    });
   }
 
   stop() {
