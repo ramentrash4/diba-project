@@ -49,10 +49,15 @@ export function Segment4Kamus({ onComplete }) {
   // Efek coretan stabilo saat kartu diketuk (hanya jika tidak sedang dragging)
   const handleToggleHighlight = (idx) => {
     if (isDraggingRef.current || isClosingBook) return;
-    playSfx("pencil-scratch");
+    const willHighlight = !highlightedWords[idx];
+    if (willHighlight) {
+      playSfx("highlighter-glide");
+    } else {
+      playSfx("pencil-scratch");
+    }
     setHighlightedWords((prev) => ({
       ...prev,
-      [idx]: !prev[idx],
+      [idx]: willHighlight,
     }));
   };
 
@@ -295,11 +300,11 @@ export function Segment4Kamus({ onComplete }) {
                       <motion.div
                         animate={
                           isHighlighted
-                            ? { width: "100%", opacity: 0.55 }
+                            ? { width: "102%", opacity: 0.65 }
                             : { width: "0%", opacity: 0 }
                         }
                         transition={{ duration: 0.35, ease: "easeOut" }}
-                        className="absolute inset-y-0.5 -left-1 bg-amber-300 rounded-sm -rotate-1 pointer-events-none"
+                        className="absolute inset-y-0.5 -left-1 bg-gradient-to-r from-amber-300 via-amber-200 to-amber-300 rounded-sm -rotate-0.5 pointer-events-none shadow-[0_0_8px_rgba(252,211,77,0.45)]"
                       />
                       <h3 className="relative font-sans-ui text-lg sm:text-xl font-black text-[#140E0A] tracking-tight">
                         {currentEntry.word}

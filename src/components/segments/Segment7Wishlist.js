@@ -28,7 +28,7 @@ export function Segment7Wishlist({ onComplete }) {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleToggleItem = (idx) => {
-    playSfx("pencil-scratch");
+    playSfx("pencil-check");
     setRevealedNotes((prev) => ({
       ...prev,
       [idx]: !prev[idx],
@@ -98,15 +98,12 @@ export function Segment7Wishlist({ onComplete }) {
                   Hal-hal yang belum sempat kita lakukan bersama.
                 </p>
               </div>
-              <span className="font-mono text-[9px] text-[#7A5524] font-bold bg-[#8C5D1E]/10 px-2 py-0.5 rounded-full border border-[#8C5D1E]/20 shrink-0">
-                Wishlist
-              </span>
             </div>
 
-            {/* KONTEN DAFTAR WISHLIST */}
-            <div className="py-2.5 px-3 pl-9 space-y-2 relative z-10">
+            {/* DAFTAR WISHLIST ITEM */}
+            <div className="p-3 pl-9 space-y-1">
               {wishlist.map((item, idx) => {
-                const isRevealed = !!revealedNotes[idx];
+                const isRevealed = revealedNotes[idx];
 
                 return (
                   <div
@@ -118,7 +115,13 @@ export function Segment7Wishlist({ onComplete }) {
                       {/* Kotak Centang Sentuh Ramah Jari */}
                       <div className="mt-0.5 w-4.5 h-4.5 rounded-xs border-2 border-[#8C6D4F] flex items-center justify-center shrink-0 bg-white shadow-2xs group-hover:border-[#8C3E2D] transition-colors">
                         {isRevealed ? (
-                          <span className="text-[#8C3E2D] font-black text-xs leading-none">✓</span>
+                          <motion.span
+                            initial={{ scale: 0.5, rotate: -15 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            className="text-[#8C3E2D] font-black text-xs leading-none"
+                          >
+                            ✓
+                          </motion.span>
                         ) : (
                           <div className="w-1.5 h-1.5 rounded-2xs bg-[#D8C2A7] opacity-45" />
                         )}

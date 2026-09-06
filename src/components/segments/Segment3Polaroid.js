@@ -59,6 +59,7 @@ export function Segment3Polaroid({ onComplete }) {
       setExitX(0);
       if (currentIndex + 1 < polaroids.length) {
         setCurrentIndex((prev) => prev + 1);
+        playSfx("camera-shutter");
       } else {
         // Selesai melihat seluruh foto polaroid, transisi mulus ke Segmen 4 (Kamus Bahasa Kita)
         onComplete();
@@ -74,6 +75,7 @@ export function Segment3Polaroid({ onComplete }) {
     setIsFlipped(false);
     setExitX(0);
     setCurrentIndex((prev) => prev - 1);
+    playSfx("camera-shutter");
   };
 
   const currentPhoto = polaroids[currentIndex];
@@ -361,6 +363,13 @@ export function Segment3Polaroid({ onComplete }) {
                         />
 
                         {/* Kilau Permukaan Foto Glossy */}
+                        <motion.div
+                          key={`polaroid-sheen-${currentIndex}`}
+                          initial={{ x: "-100%", opacity: 0.35 }}
+                          animate={{ x: "200%", opacity: 0 }}
+                          transition={{ duration: 1.1, ease: "easeOut" }}
+                          className="absolute inset-0 pointer-events-none bg-gradient-to-r from-transparent via-white/25 to-transparent -rotate-12 z-10"
+                        />
                         <div
                           className="absolute inset-0 pointer-events-none opacity-20"
                           style={{

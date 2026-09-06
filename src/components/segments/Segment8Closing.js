@@ -41,15 +41,19 @@ export function Segment8Closing({ onFinalLock }) {
     if (isSealed || isLocking) return;
     setIsSealed(true);
     setIsLocking(true);
-    playSfx("clasp-open");
+    playSfx("stamp-thud");
+
+    setTimeout(() => {
+      playSfx("wax-crack");
+    }, 120);
 
     setTimeout(() => {
       playSfx("tape-click");
-    }, 160);
+    }, 280);
 
     setTimeout(() => {
       onFinalLock();
-    }, 900);
+    }, 950);
   };
 
   return (

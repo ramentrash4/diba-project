@@ -71,12 +71,12 @@ export function Segment5KacaEmbun({ onComplete }) {
   const handlePlugIn = useCallback(() => {
     if (isPluggedIn || isFinishing) return;
     setIsPluggedIn(true);
-    playSfx("clasp-open");
+    playSfx("aux-snap");
 
     // Efek audio desis statis radio lembut
     setTimeout(() => {
       playSfx("mist-wipe");
-    }, 200);
+    }, 180);
 
     // Buka jendela ke Segmen 6
     setTimeout(() => {

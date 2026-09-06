@@ -233,7 +233,7 @@ export function Segment2Soundtrack({ onComplete }) {
               <span className="font-typewriter text-[9px] text-[#BAA794] font-black uppercase mr-0.5">
                 TAPE
               </span>
-              <div className="flex gap-0.5 font-mono text-[11px] font-black text-amber-300 tracking-wider">
+              <div className={`flex gap-0.5 font-mono text-[11px] font-black text-amber-300 tracking-wider transition-all duration-300 ${isCurrentActive ? "drop-shadow-[0_0_5px_rgba(251,191,36,0.85)]" : ""}`}>
                 <span className="bg-[#221B15] px-1 py-0.2 rounded-xs border border-black/80">{counterFormatted[0]}</span>
                 <span className="bg-[#221B15] px-1 py-0.2 rounded-xs border border-black/80">{counterFormatted[1]}</span>
                 <span className="bg-[#221B15] px-1 py-0.2 rounded-xs border border-black/80">{counterFormatted[2]}</span>

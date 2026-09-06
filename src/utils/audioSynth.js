@@ -155,6 +155,47 @@ export function playSfx(name) {
       });
       break;
 
+    case "wax-crack":
+      // Suara retakan segel lilin tradisional yang pecah
+      playSyntheticNote(620, 0.05, "triangle", 0.22);
+      setTimeout(() => playSyntheticNote(840, 0.04, "sine", 0.18), 18);
+      setTimeout(() => playSyntheticNote(320, 0.08, "triangle", 0.12), 40);
+      break;
+
+    case "camera-shutter":
+      // Suara klik mekanis rana kamera polaroid
+      playSyntheticNote(480, 0.04, "triangle", 0.25);
+      setTimeout(() => playSyntheticNote(180, 0.06, "sine", 0.2), 25);
+      setTimeout(() => playSyntheticNote(720, 0.05, "triangle", 0.12), 70);
+      break;
+
+    case "highlighter-glide":
+      // Suara gesekan spidol stabilo pastel di atas kertas
+      playSyntheticNote(520, 0.09, "sine", 0.08);
+      setTimeout(() => playSyntheticNote(640, 0.07, "triangle", 0.06), 35);
+      setTimeout(() => playSyntheticNote(480, 0.06, "sine", 0.05), 80);
+      break;
+
+    case "aux-snap":
+      // Suara colokan jack earphone 3.5mm kuningan mengunci ke dalam port
+      playSyntheticNote(240, 0.06, "triangle", 0.3);
+      setTimeout(() => playSyntheticNote(680, 0.05, "sine", 0.22), 20);
+      setTimeout(() => playSyntheticNote(940, 0.04, "triangle", 0.15), 45);
+      break;
+
+    case "pencil-check":
+      // Suara goresan pensil centang pada kertas wishlist
+      playSyntheticNote(380, 0.05, "triangle", 0.15);
+      setTimeout(() => playSyntheticNote(540, 0.07, "sine", 0.12), 30);
+      break;
+
+    case "stamp-thud":
+      // Suara debum stempel kuningan berat menekan segel lilin hangat
+      playSyntheticNote(95, 0.16, "triangle", 0.4);
+      setTimeout(() => playSyntheticNote(160, 0.12, "sine", 0.25), 25);
+      setTimeout(() => playSyntheticNote(280, 0.08, "triangle", 0.15), 60);
+      break;
+
     case "tape-peel":
       // Suara gesekan adesif selotip terkelupas dari kertas bertekstur
       [240, 380, 520, 680].forEach((freq, idx) => {
@@ -169,20 +210,20 @@ export function playSfx(name) {
 }
 
 /**
- * Generator Melodi Lo-Fi Ambient sederhana untuk BGM
+ * Generator Melodi Lo-Fi Ambient yang Hangat & Puitis untuk BGM
  */
 class LofiAmbientEngine {
   constructor() {
     this.isPlaying = false;
     this.intervalId = null;
+    // Progresi akord lo-fi jazz romantis hangat: Cmaj9 -> Am9 -> Fmaj7(9) -> G13sus
     this.chords = [
-      [261.63, 329.63, 392.0, 493.88], // Cmaj7
-      [220.0, 261.63, 329.63, 392.0],  // Am7
-      [174.61, 220.0, 261.63, 329.63], // Fmaj7
-      [196.0, 246.94, 293.66, 392.0],  // G7
+      [261.63, 329.63, 392.0, 493.88, 587.33], // Cmaj9
+      [220.0, 261.63, 329.63, 392.0, 493.88],  // Am9
+      [174.61, 220.0, 261.63, 329.63, 392.0],  // Fmaj7(9)
+      [196.0, 246.94, 293.66, 392.0, 440.0],   // G13sus
     ];
     this.chordIndex = 0;
-    this.masterGain = null;
   }
 
   start() {
@@ -190,26 +231,33 @@ class LofiAmbientEngine {
     if (!ctx || this.isPlaying) return;
 
     this.isPlaying = true;
-    let step = 0;
 
     const playChordStep = () => {
       if (!this.isPlaying) return;
       const currentChord = this.chords[this.chordIndex % this.chords.length];
 
-      // Arpeggiate chord gently
+      // Petikan arpeggio lembut berfrekuensi hangat
       currentChord.forEach((freq, i) => {
         setTimeout(() => {
           if (this.isPlaying) {
-            playSyntheticNote(freq, 2.2, "sine", 0.04);
+            playSyntheticNote(freq, 2.6, "sine", 0.038);
+            // Tambahkan harmonik atas lonceng lembut pada nada tertinggi
+            if (i === currentChord.length - 1) {
+              setTimeout(() => {
+                if (this.isPlaying) {
+                  playSyntheticNote(freq * 1.5, 1.8, "triangle", 0.015);
+                }
+              }, 120);
+            }
           }
-        }, i * 380);
+        }, i * 360);
       });
 
       this.chordIndex = (this.chordIndex + 1) % this.chords.length;
     };
 
     playChordStep();
-    this.intervalId = setInterval(playChordStep, 3200);
+    this.intervalId = setInterval(playChordStep, 3400);
   }
 
   stop() {

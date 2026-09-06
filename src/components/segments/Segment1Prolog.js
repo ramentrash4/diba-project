@@ -23,7 +23,10 @@ export function Segment1Prolog({ onComplete }) {
     if (isUnsealed) return;
     setIsUnsealed(true);
 
-    playSfx("unboxing-chime");
+    playSfx("wax-crack");
+    setTimeout(() => {
+      playSfx("unboxing-chime");
+    }, 110);
     startBgm();
 
     try {
@@ -201,8 +204,14 @@ export function Segment1Prolog({ onComplete }) {
                         whileTap={{ scale: 0.95 }}
                         exit={{ scale: 0, opacity: 0, transition: { duration: 0.2 } }}
                       >
-                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#A83226] via-[#8C2318] to-[#63140C] shadow-xl border-2 border-[#C94A3C]/60 flex items-center justify-center select-none active:scale-95 transition-transform">
-                          <div className="w-11 h-11 rounded-full border border-amber-200/50 flex items-center justify-center shadow-inner">
+                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#A83226] via-[#8C2318] to-[#63140C] shadow-xl border-2 border-[#C94A3C]/60 flex items-center justify-center select-none active:scale-95 transition-transform relative overflow-hidden">
+                          {/* Kilau Halus Lilin Segel */}
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none -rotate-45"
+                            animate={{ x: ["-100%", "200%"] }}
+                            transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut", repeatDelay: 1.5 }}
+                          />
+                          <div className="w-11 h-11 rounded-full border border-amber-200/50 flex items-center justify-center shadow-inner relative z-10">
                             <span className="font-handwriting text-2xl font-bold text-amber-100 drop-shadow">
                               A
                             </span>

@@ -285,8 +285,13 @@ export function Segment6VoiceNotes({ onComplete }) {
                               return (
                                 <div
                                   key={bIdx}
-                                  className={`flex-1 rounded-full transition-colors duration-150 ${isPassed ? "bg-[#00A884]" : "bg-[#8696A0]/45"
-                                    }`}
+                                  className={`flex-1 rounded-full transition-all duration-150 ${
+                                    isPassed
+                                      ? isPlaying
+                                        ? "bg-emerald-400 shadow-[0_0_5px_#34D399]"
+                                        : "bg-[#00A884]"
+                                      : "bg-[#8696A0]/45"
+                                  }`}
                                   style={{ height: `${Math.max(20, h)}%` }}
                                 />
                               );
