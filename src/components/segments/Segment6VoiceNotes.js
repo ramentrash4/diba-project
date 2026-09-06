@@ -44,6 +44,7 @@ export function Segment6VoiceNotes({ onComplete }) {
 
   const progressTimer = useRef(null);
   const chatBottomRef = useRef(null);
+  const isScrubbingRef = useRef(false);
 
   // Auto-scroll ke bawah saat ada pesan baru atau animasi mengetik
   useEffect(() => {
@@ -67,9 +68,10 @@ export function Segment6VoiceNotes({ onComplete }) {
 
   // Geser posisi audio maju/mundur (Scrubbing seperti WhatsApp asli)
   const handleSeek = (vn, newTime) => {
-    setVnProgress((prev) => ({ ...prev, [vn.id]: newTime }));
-    if (playingVnId === vn.id && seekTrack) {
-      seekTrack(newTime);
+    const clampedTime = Math.max(0, Math.min(newTime, vn.durationSeconds || 7));
+    setVnProgress((prev) => ({ ...prev, [vn.id]: clampedTime }));
+    if (seekTrack) {
+      seekTrack(clampedTime);
     }
   };
 
@@ -92,24 +94,22 @@ export function Segment6VoiceNotes({ onComplete }) {
         () => handleVnFinished(vn),
         speed,
         (currTime) => {
-          setVnProgress((prev) => ({ ...prev, [vn.id]: currTime }));
-        }
+          if (!isScrubbingRef.current) {
+            setVnProgress((prev) => ({ ...prev, [vn.id]: currTime }));
+          }
+        },
+        startAt
       );
-
-      if (startAt > 0 && seekTrack) {
-        setTimeout(() => {
-          seekTrack(startAt);
-        }, 60);
-      }
 
       if (progressTimer.current) clearInterval(progressTimer.current);
 
       const targetDuration = vn.durationSeconds || 7;
-      const intervalMs = Math.round(100 / speed);
 
+      // Timer pendamping untuk kelancaran animasi waveform
       progressTimer.current = setInterval(() => {
+        if (isScrubbingRef.current) return;
         setVnProgress((prev) => {
-          const current = (prev[vn.id] || 0) + 0.1;
+          const current = (prev[vn.id] || 0) + 0.1 * speed;
           if (current >= targetDuration) {
             clearInterval(progressTimer.current);
             handleVnFinished(vn);
@@ -117,7 +117,7 @@ export function Segment6VoiceNotes({ onComplete }) {
           }
           return { ...prev, [vn.id]: current };
         });
-      }, intervalMs);
+      }, 100);
     }
   };
 
@@ -179,7 +179,7 @@ export function Segment6VoiceNotes({ onComplete }) {
   return (
     <section className="w-full flex-1 flex flex-col items-center justify-center px-3 py-2 select-none relative overflow-hidden my-auto bg-gradient-to-b from-[#101722] via-[#0A1017] to-[#05080E] text-white">
       {/* WRAPPER TENGAH LAYAR TERFOKUS (ROOM CHAT CONTAINER) */}
-      <div className="w-full max-w-[340px] sm:max-w-[355px] flex flex-col items-center justify-center gap-2 my-auto">
+      <div className="w-full max-w-[365px] sm:max-w-[380px] flex flex-col items-center justify-center gap-2 my-auto">
         
         {/* INDIKATOR KONEKSI AUDIO DARI SEGMEN 5 */}
         <div className="flex items-center gap-1.5 text-emerald-300 font-mono text-[9px] font-bold uppercase tracking-wider bg-[#101F20]/90 px-2.5 py-0.5 rounded-full border border-emerald-500/30 shadow-xs">
@@ -202,8 +202,8 @@ export function Segment6VoiceNotes({ onComplete }) {
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#1F2C34] rounded-full" />
               </div>
               <div className="text-left">
-                <span className="font-sans-ui text-xs font-black text-[#E9EDEF] block leading-tight">
-                  Adiba (Askiyaa) 🤍
+                <span className="font-sans-ui text-xs sm:text-[13px] font-bold text-[#E9EDEF] block leading-tight">
+                  askiyaaachuuu
                 </span>
                 <span className="font-sans-ui text-[10px] block leading-none pt-0.5">
                   {isTypingFor ? (
@@ -253,18 +253,18 @@ export function Segment6VoiceNotes({ onComplete }) {
               return (
                 <div key={vn.id} className="space-y-2 relative z-10">
                   {/* BUBBLE VN ADIBA (SISI KIRI - WHATSAPP STYLE, BEBAS TRANSLATE, SCRUBBABLE) */}
-                  <div className="flex justify-start">
-                    <div className="max-w-[88%] bg-[#202C33] rounded-2xl rounded-tl-xs p-2.5 border border-[#2A3942] shadow-md flex flex-col gap-1.5 text-left relative">
+                  <div className="flex justify-start w-full">
+                    <div className="w-[95%] sm:w-[92%] bg-[#202C33] rounded-2xl rounded-tl-xs px-3 py-2.5 border border-[#2A3942] shadow-md flex flex-col gap-1.5 text-left relative">
                       
                       {/* Bar Pemutar VN: Play Button, Waveform Scrubber & Speed Badge */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2.5 w-full">
                         {/* Tombol Play / Pause */}
                         <button
                           onClick={() => handleToggleVn(vn)}
                           aria-label={isPlaying ? "Pause voice note" : "Play voice note"}
                           className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all cursor-pointer shrink-0 ${
                             isPlaying
-                              ? "bg-emerald-500 text-slate-950 scale-105"
+                              ? "bg-emerald-400 text-slate-950 scale-105 shadow-emerald-500/20"
                               : "bg-[#00A884] hover:bg-[#02906f] text-white"
                           }`}
                         >
@@ -275,35 +275,67 @@ export function Segment6VoiceNotes({ onComplete }) {
                           )}
                         </button>
 
-                        {/* WAVEFORM SCRUBBER (DAPAT DI-SLIDE / DIKLIK MAJU-MUNDUR) */}
-                        <div className="relative flex-1 flex items-center h-7 cursor-pointer group">
+                        {/* WAVEFORM SCRUBBER (DAPAT DI-SLIDE / DIKLIK MAJU-MUNDUR SEPERTI WA ASLI) */}
+                        <div className="relative flex-1 flex items-center h-8 cursor-pointer select-none group touch-none">
                           {/* Visual Waveform Bars */}
-                          <div className="flex items-center gap-0.5 w-full h-full pointer-events-none">
+                          <div className="flex items-center gap-[2px] w-full h-full pointer-events-none px-0.5">
                             {waveBars.map((h, bIdx) => {
-                              const barThreshold = (bIdx / waveBars.length) * targetDuration;
-                              const isPassed = currentProgress >= barThreshold;
+                              const barProgress =
+                                (bIdx / (waveBars.length - 1)) * targetDuration;
+                              const isPassed = currentProgress >= barProgress;
                               return (
                                 <div
                                   key={bIdx}
-                                  className={`flex-1 rounded-full transition-colors ${
-                                    isPassed ? "bg-[#00A884]" : "bg-[#8696A0]/50"
+                                  className={`flex-1 rounded-full transition-colors duration-150 ${
+                                    isPassed ? "bg-[#00A884]" : "bg-[#8696A0]/45"
                                   }`}
-                                  style={{ height: `${h}%` }}
+                                  style={{ height: `${Math.max(20, h)}%` }}
                                 />
                               );
                             })}
                           </div>
 
-                          {/* Native Range Slider Transparan di Atas Waveform untuk Scrubbing Sentuh Mulus */}
+                          {/* Scrubber Knob / Dot seperti WhatsApp asli */}
+                          <div
+                            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-[#00A884] border-2 border-[#202C33] shadow-md pointer-events-none transition-[left] duration-75 z-10"
+                            style={{
+                              left: `${Math.min(
+                                99,
+                                Math.max(
+                                  1,
+                                  (currentProgress / targetDuration) * 100
+                                )
+                              )}%`,
+                            }}
+                          />
+
+                          {/* Native Range Slider Transparan di Atas Waveform untuk Scrubbing Sentuh Mulus Maju-Mundur */}
                           <input
                             type="range"
                             min={0}
                             max={targetDuration}
-                            step={0.1}
+                            step={0.05}
                             value={currentProgress}
-                            onChange={(e) => handleSeek(vn, parseFloat(e.target.value))}
-                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20"
-                            aria-label="Geser posisi audio maju mundur"
+                            onPointerDown={() => {
+                              isScrubbingRef.current = true;
+                            }}
+                            onTouchStart={() => {
+                              isScrubbingRef.current = true;
+                            }}
+                            onPointerUp={() => {
+                              isScrubbingRef.current = false;
+                            }}
+                            onTouchEnd={() => {
+                              isScrubbingRef.current = false;
+                            }}
+                            onChange={(e) =>
+                              handleSeek(vn, parseFloat(e.target.value))
+                            }
+                            onInput={(e) =>
+                              handleSeek(vn, parseFloat(e.target.value))
+                            }
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20 touch-none"
+                            aria-label="Maju mundurkan voice note"
                           />
                         </div>
 
@@ -311,26 +343,26 @@ export function Segment6VoiceNotes({ onComplete }) {
                         <button
                           onClick={(e) => handleToggleSpeed(vn.id, e)}
                           title="Ubah kecepatan putar"
-                          className={`h-6 px-1.5 rounded-full font-mono text-[9px] font-black border transition-all cursor-pointer shrink-0 flex items-center justify-center ${
+                          className={`h-6.5 px-2 rounded-full font-mono text-[10px] font-bold border transition-all cursor-pointer shrink-0 flex items-center justify-center ${
                             currentSpeed === 2
-                              ? "bg-amber-400 text-slate-950 border-amber-300 font-extrabold"
-                              : "bg-[#111B21] text-slate-300 border-white/10 hover:text-white"
+                              ? "bg-amber-400 text-slate-950 border-amber-300 font-extrabold shadow-xs"
+                              : "bg-[#111B21] text-slate-300 border-white/15 hover:text-white hover:border-white/30"
                           }`}
                         >
                           {currentSpeed}x
                         </button>
                       </div>
 
-                      {/* Baris Informasi Bawah: Durasi & Timestamp */}
-                      <div className="flex items-center justify-between pl-11 text-[9.5px] font-mono text-[#8696A0]">
-                        <span>
+                      {/* Baris Informasi Bawah: Durasi & Timestamp (Jelas, Berjarak Aman, & Tidak Bertabrakan) */}
+                      <div className="flex items-center justify-between pl-11.5 pr-1 pt-0.5 text-[10px] font-mono text-[#8696A0]">
+                        <span className="font-semibold text-slate-300 tracking-tight">
                           {isPlaying || currentProgress > 0
                             ? formatTime(currentProgress)
                             : vn.duration}
                         </span>
-                        <div className="flex items-center gap-1">
-                          <span>20:4{idx + 1}</span>
-                          <CheckCheck className="w-3 h-3 text-[#53BDEB]" />
+                        <div className="flex items-center gap-1 shrink-0">
+                          <span className="text-[#8696A0]">20:4{idx + 1}</span>
+                          <CheckCheck className="w-3.5 h-3.5 text-[#53BDEB]" />
                         </div>
                       </div>
                     </div>
@@ -343,7 +375,7 @@ export function Segment6VoiceNotes({ onComplete }) {
                         initial={{ opacity: 0, scale: 0.9, y: 4 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9 }}
-                        className="flex justify-end"
+                        className="flex justify-end w-full"
                       >
                         <div className="bg-[#005C4B]/80 text-emerald-100 rounded-2xl rounded-tr-xs px-3 py-1.5 border border-emerald-500/20 shadow-sm flex items-center gap-1.5">
                           <span className="font-sans-ui text-[10.5px] font-semibold">
@@ -366,9 +398,9 @@ export function Segment6VoiceNotes({ onComplete }) {
                         initial={{ opacity: 0, scale: 0.92, y: 5 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{ type: "spring", stiffness: 280, damping: 22 }}
-                        className="flex justify-end"
+                        className="flex justify-end w-full"
                       >
-                        <div className="max-w-[85%] bg-[#005C4B] rounded-2xl rounded-tr-xs p-2.5 border border-[#02735E] shadow-md text-left relative">
+                        <div className="max-w-[86%] sm:max-w-[82%] bg-[#005C4B] rounded-2xl rounded-tr-xs px-3 py-2 border border-[#02735E] shadow-md text-left relative">
                           <p className="font-sans-ui text-[12.5px] sm:text-[13px] text-[#E9EDEF] font-medium leading-relaxed">
                             "{vn.tatwaReply}"
                           </p>
@@ -419,7 +451,7 @@ export function Segment6VoiceNotes({ onComplete }) {
                     }
                   : { y: 0 }
               }
-              className="absolute top-0 w-full max-w-[335px] sm:max-w-[340px] cursor-grab active:cursor-grabbing touch-none select-none z-30 flex flex-col items-center"
+              className="absolute top-0 w-full max-w-[360px] sm:max-w-[375px] cursor-grab active:cursor-grabbing touch-none select-none z-30 flex flex-col items-center"
             >
               {/* Selotip Washi Tape Kuning */}
               <div className="w-20 h-3.5 bg-amber-200/70 -rotate-1 shadow-xs border border-amber-300/40 rounded-xs z-30 mb-[-6px] pointer-events-none" />
@@ -498,7 +530,7 @@ export function Segment6VoiceNotes({ onComplete }) {
         )}
 
         {/* 4. PANDUAN INTERAKSI RINGKAS */}
-        <div className="w-full max-w-[325px] flex items-center justify-center z-20 pointer-events-none">
+        <div className="w-full max-w-[350px] flex items-center justify-center z-20 pointer-events-none">
           {!allVnsRevealed ? (
             <div className="bg-[#182333]/90 border border-emerald-400/30 rounded-full px-3.5 py-1 shadow-md flex items-center justify-center gap-2 text-emerald-200 font-sans-ui text-[10px] sm:text-[10.5px] font-bold text-center backdrop-blur-xs">
               <Sparkles className="w-3 h-3 text-emerald-400" />

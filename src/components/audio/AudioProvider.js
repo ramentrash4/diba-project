@@ -86,7 +86,11 @@ export function AudioProvider({ children }) {
   // Menggeser posisi putar audio (Seek Forward / Backward)
   const seekTrack = (timeInSeconds) => {
     if (foregroundAudioRef.current) {
-      foregroundAudioRef.current.currentTime = timeInSeconds;
+      try {
+        foregroundAudioRef.current.currentTime = timeInSeconds;
+      } catch (e) {
+        console.log("Seek error:", e);
+      }
     }
   };
 
@@ -96,7 +100,8 @@ export function AudioProvider({ children }) {
     src,
     onEndedCallback,
     playbackRate = 1,
-    onTimeUpdateCallback
+    onTimeUpdateCallback,
+    startTime = 0
   ) => {
     if (activeTrackId === trackId && isForegroundPlaying) {
       pauseTrack();
@@ -108,10 +113,26 @@ export function AudioProvider({ children }) {
     duckBgm();
 
     if (foregroundAudioRef.current) {
-      foregroundAudioRef.current.src = src;
-      foregroundAudioRef.current.playbackRate = playbackRate;
+      const audio = foregroundAudioRef.current;
+      const isSameSrc =
+        audio.src && (audio.src.endsWith(src) || audio.src === src);
 
-      foregroundAudioRef.current.ontimeupdate = () => {
+      if (!isSameSrc) {
+        audio.src = src;
+      }
+      audio.playbackRate = playbackRate;
+
+      if (startTime > 0) {
+        try {
+          audio.currentTime = startTime;
+        } catch (e) {
+          audio.onloadedmetadata = () => {
+            audio.currentTime = startTime;
+          };
+        }
+      }
+
+      audio.ontimeupdate = () => {
         if (onTimeUpdateCallback && foregroundAudioRef.current) {
           onTimeUpdateCallback(
             foregroundAudioRef.current.currentTime || 0,
@@ -120,14 +141,14 @@ export function AudioProvider({ children }) {
         }
       };
 
-      foregroundAudioRef.current.onended = () => {
+      audio.onended = () => {
         setIsForegroundPlaying(false);
         setActiveTrackId(null);
         restoreBgm();
         if (onEndedCallback) onEndedCallback();
       };
 
-      foregroundAudioRef.current
+      audio
         .play()
         .catch(() => {
           // Fallback jika file audio demo belum dimasukkan: simulasikan durasi bunyi 5 detik
@@ -151,7 +172,6 @@ export function AudioProvider({ children }) {
       foregroundAudioRef.current.pause();
     }
     setIsForegroundPlaying(false);
-    setActiveTrackId(null);
     restoreBgm();
   };
 
