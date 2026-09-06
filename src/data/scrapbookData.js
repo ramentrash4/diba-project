@@ -38,7 +38,7 @@ export const scrapbookData = {
       title: "Merry Christmas, I Miss You",
       artist: "Alex Crichton",
       duration: "3:15",
-      src: "/audio/songs/song1.mp3",
+      src: "/audio/song/MerryChristmast.mp3",
       coverImage: "/albums/merry.webp",
       tag: "Side A • Indie",
       memoryText:
@@ -49,7 +49,7 @@ export const scrapbookData = {
       title: "Orang-Orang di Kerumunan",
       artist: "FSTVLST",
       duration: "4:20",
-      src: "/audio/songs/song2.mp3",
+      src: "/audio/song/OODK.mp3",
       coverImage: "/albums/OODK.webp",
       tag: "Side B • Rock",
       memoryText:
@@ -60,11 +60,11 @@ export const scrapbookData = {
       title: "Remaja",
       artist: "HIVI!",
       duration: "3:40",
-      src: "/audio/songs/song3.mp3",
+      src: "/audio/song/Remaja.mp3",
       coverImage: "/albums/remaja.webp",
       tag: "Side A • Pop",
       memoryText:
-        "Makasih udah Makasih udah mau dengerin HIVI sama aku keliling bandung malam itu after rain meskipun tws sebelah²😭 aku sama festivalist terkhusus OODK, Jadinya setiap aku lagi cape ada lagu membara yg bisa aku repeat... HONG!!! 👊🏽",
+        "Makasih udah mau dengerin HIVI sama aku keliling bandung malam itu after rain meskipun tws sebelah²😭",
     },
   ],
 
