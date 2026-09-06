@@ -24,6 +24,7 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: "cover",
 };
 
 export const metadata = {
@@ -34,7 +35,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="id" className={`${handwriting.variable} ${typewriter.variable} ${sans.variable}`}>
-      <body className="antialiased bg-[#FAF7F2] text-[#2C2621] selection:bg-[#E8B4B8] selection:text-white font-sans min-h-screen overflow-x-hidden">
+      <body className="antialiased bg-[#FAF7F2] text-[#2C2621] selection:bg-[#E8B4B8] selection:text-white font-sans w-full h-[100dvh] max-h-[100dvh] overflow-hidden fixed inset-0">
         {children}
       </body>
     </html>

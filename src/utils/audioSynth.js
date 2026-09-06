@@ -42,6 +42,13 @@ export function playSyntheticNote(freq = 440, duration = 0.8, type = "sine", gai
     osc.connect(gain);
     gain.connect(ctx.destination);
 
+    osc.onended = () => {
+      try {
+        osc.disconnect();
+        gain.disconnect();
+      } catch (e) {}
+    };
+
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + duration);
   } catch (err) {

@@ -206,7 +206,7 @@ export function Segment4Kamus({ onComplete }) {
 
         {/* 2. BUKU SAKU FISIK REALISTIS (3D PERSPECTIVE CONTAINER) */}
         <div
-          className="w-full max-w-[320px] sm:max-w-[335px] h-[375px] sm:h-[390px] relative z-10"
+          className="w-full max-w-[320px] sm:max-w-[335px] h-[min(375px,calc(100dvh-140px))] sm:h-[390px] relative z-10"
           style={{ perspective: "1200px" }}
         >
           {/* Tepi Cover Kiri Terbuka / Tarik ke Kanan untuk Menutup Buku (Khusus Halaman Terakhir) */}

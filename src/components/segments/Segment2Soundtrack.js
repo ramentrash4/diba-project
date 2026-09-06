@@ -165,23 +165,23 @@ export function Segment2Soundtrack({ onComplete }) {
   const counterFormatted = String(tapeCounter).padStart(3, "0");
 
   return (
-    <section className="w-full h-full flex-1 flex flex-col items-center justify-center p-3 sm:p-4 select-none relative overflow-y-auto scrollbar-none my-auto">
+    <section className="w-full h-full flex-1 flex flex-col items-center justify-center p-2 sm:p-4 select-none relative overflow-y-auto scrollbar-none my-auto">
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={isPullingOut ? { opacity: 0.2, y: 70, scale: 0.95 } : { opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.45, ease: "easeInOut" }}
-        className="w-full max-w-[345px] flex flex-col items-center my-auto py-1"
+        className="w-full max-w-[345px] flex flex-col items-center my-auto py-0.5 sm:py-1"
       >
         {/* Header Segmen 2 Standout & Jelas */}
-        <div className="text-center mb-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#FFF9EE] border border-[#CDB9A0] text-[#423222] font-black text-[10.5px] font-sans-ui tracking-wide uppercase shadow-xs mb-1">
+        <div className="text-center mb-1.5 sm:mb-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#FFF9EE] border border-[#CDB9A0] text-[#423222] font-black text-[10.5px] font-sans-ui tracking-wide uppercase shadow-xs mb-0.5 sm:mb-1">
             <Disc className="w-3.5 h-3.5 text-[#A83226] animate-spin-slow" />
             <span>Side A: Mixtape Kenangan</span>
           </span>
-          <h2 className="font-handwriting text-3xl sm:text-4xl font-black text-[#120C08] tracking-wide leading-tight">
+          <h2 className="font-handwriting text-2xl sm:text-4xl font-black text-[#120C08] tracking-wide leading-tight">
             Soundtrack Perjalanan
           </h2>
-          <p className="font-sans-ui text-[11px] sm:text-xs text-[#3D2E1F] font-bold mt-0.5">
+          <p className="font-sans-ui text-[10.5px] sm:text-xs text-[#3D2E1F] font-bold mt-0.5">
             {insertedTape
               ? "Kaset sedang berputar di dalam player 🎵"
               : "Tarik kaset ke pemutar di atas atau ketuk untuk memutar 👇"}
@@ -242,7 +242,7 @@ export function Segment2Soundtrack({ onComplete }) {
           </div>
 
           {/* 2. JENDELA MIKA KASET (CASSETTE BAY) */}
-          <div className="relative w-full h-[142px] my-2 rounded-xl border-2 border-[#382E25] bg-[#0F0C09] p-2 flex items-center justify-center overflow-hidden">
+          <div className="relative w-full h-[132px] sm:h-[142px] my-1.5 sm:my-2 rounded-xl border-2 border-[#382E25] bg-[#0F0C09] p-2 flex items-center justify-center overflow-hidden">
             {/* Partikel Notasi Musik Melayang Saat Lagu Berputar */}
             <AnimatePresence>
               {isCurrentActive && (

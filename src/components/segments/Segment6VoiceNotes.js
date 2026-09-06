@@ -184,9 +184,9 @@ export function Segment6VoiceNotes({ onComplete }) {
     (revealedReplies["vn-7"] && Object.keys(revealedReplies).length >= 4);
 
   return (
-    <section className="w-full flex-1 flex flex-col items-center justify-center px-3 py-2 select-none relative overflow-hidden my-auto bg-gradient-to-b from-[#101722] via-[#0A1017] to-[#05080E] text-white">
+    <section className="w-full h-full flex-1 flex flex-col items-center justify-center px-3 py-1.5 sm:py-2 select-none relative overflow-hidden my-auto bg-gradient-to-b from-[#101722] via-[#0A1017] to-[#05080E] text-white">
       {/* WRAPPER TENGAH LAYAR TERFOKUS (ROOM CHAT CONTAINER) */}
-      <div className="w-full max-w-[365px] sm:max-w-[380px] flex flex-col items-center justify-center gap-2 my-auto">
+      <div className="w-full max-w-[365px] sm:max-w-[380px] flex flex-col items-center justify-center gap-1.5 sm:gap-2 my-auto">
 
         {/* INDIKATOR KONEKSI AUDIO DARI SEGMEN 5 */}
         <div className="flex items-center gap-1.5 text-emerald-300 font-mono text-[9px] font-bold uppercase tracking-wider bg-[#101F20]/90 px-2.5 py-0.5 rounded-full border border-emerald-500/30 shadow-xs">
@@ -195,8 +195,8 @@ export function Segment6VoiceNotes({ onComplete }) {
           <Headphones className="w-3 h-3 text-emerald-400 ml-0.5" />
         </div>
 
-        {/* BINGKAI ROOMCHAT WHATSAPP REALISTIS */}
-        <div className="w-full h-[470px] sm:h-[490px] bg-[#0B141A] rounded-2xl border border-[#202C33] shadow-[0_16px_45px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden relative">
+        {/* BINGKAI ROOMCHAT WHATSAPP REALISTIS DENGAN TINGGI RESPONSIF BEBAS OVERFLOW */}
+        <div className="w-full h-[min(440px,calc(100dvh-125px))] sm:h-[490px] bg-[#0B141A] rounded-2xl border border-[#202C33] shadow-[0_16px_45px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden relative">
 
           {/* 1. HEADER ROOMCHAT WA */}
           <div className="h-13 bg-[#1F2C34] border-b border-[#2A3942] px-3 flex items-center justify-between z-20 shrink-0 shadow-sm">

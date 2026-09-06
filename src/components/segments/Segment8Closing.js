@@ -259,7 +259,7 @@ export function Segment8Closing({ onFinalLock }) {
                   </div>
 
                   {/* Area Isi Surat yang Dapat Di-scroll Halus (Preserving Intimacy & No Overflow) */}
-                  <div className="max-h-[320px] sm:max-h-[350px] overflow-y-auto px-4 py-3 space-y-3 relative text-left scrollbar-thin scrollbar-thumb-[#D8C2A7]/60">
+                  <div className="max-h-[min(310px,calc(100dvh-270px))] sm:max-h-[350px] overflow-y-auto px-4 py-3 space-y-3 relative text-left scrollbar-thin scrollbar-thumb-[#D8C2A7]/60">
                     
                     {/* Pembuka / Sapaan Hangat */}
                     <div className="space-y-0.5 pb-1">

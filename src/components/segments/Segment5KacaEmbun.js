@@ -303,7 +303,7 @@ export function Segment5KacaEmbun({ onComplete }) {
         {/* 2. BINGKAI JENDELA KACA BEREMBUN (KOKOH DI TENGAH, BEBAS GESER KARTU, RE-FROSTING TACTILE) */}
         <div
           onClick={handleTapGlass}
-          className={`w-full max-w-[320px] sm:max-w-[335px] h-[375px] sm:h-[390px] relative z-10 flex flex-col items-center justify-center bg-[#1F1711] rounded-2xl p-2.5 sm:p-3 border-4 border-[#3D2E24] shadow-[0_22px_55px_rgba(0,0,0,0.85)] select-none transition-all duration-300 ${
+          className={`w-full max-w-[320px] sm:max-w-[335px] h-[min(375px,calc(100dvh-140px))] sm:h-[390px] relative z-10 flex flex-col items-center justify-center bg-[#1F1711] rounded-2xl p-2.5 sm:p-3 border-4 border-[#3D2E24] shadow-[0_22px_55px_rgba(0,0,0,0.85)] select-none transition-all duration-300 ${
             isCurrentCleared && activeTab < memories.length - 1
               ? "cursor-pointer ring-2 ring-amber-400/40"
               : "cursor-default"
@@ -435,7 +435,7 @@ export function Segment5KacaEmbun({ onComplete }) {
             onTouchStart={startWiping}
             onTouchMove={wipe}
             onTouchEnd={stopWiping}
-            className={`absolute inset-2.5 sm:inset-3 w-[calc(100%-20px)] sm:w-[calc(100%-24px)] h-[calc(100%-20px)] sm:h-[calc(100%-24px)] rounded-xl z-20 transition-opacity duration-500 ${
+            className={`absolute inset-2.5 sm:inset-3 w-[calc(100%-20px)] sm:w-[calc(100%-24px)] h-[calc(100%-20px)] sm:h-[calc(100%-24px)] rounded-xl z-20 transition-opacity duration-500 touch-none ${
               isCurrentCleared ? "pointer-events-none opacity-0" : "opacity-100 cursor-pointer"
             }`}
           />
