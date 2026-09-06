@@ -204,7 +204,7 @@ export const scrapbookData = {
       transcript:
         "awaaaaaaaaaa......tolong (mau cerita sesuatu)",
       tatwaReply:
-        "panik bgt manggilnya ada apa siii bocil... pasti ada gosip kampus atau drama baru kan? 🤣",
+        "panik bgt manggilnya ada apa siii... pasti ada ceritaaa yaaa? 🤣",
     },
     {
       id: "vn-3",
@@ -237,7 +237,7 @@ export const scrapbookData = {
       transcript:
         "awaa masa naju gamau pulangin aku lagi besok karena dia gaada kelas nanti dipulangin hari minggu ihhhh",
       tatwaReply:
-        "wkwkwk kasian bgt dioper-oper naju 😂 yauda sabar yaa, nanti aku yang nemenin ngobrol terus kok.",
+        "wkwkwk kasian bgt dioper-oper naju 😂 yauda sabar yaa, nanti aku yang jemput dehh.",
     },
     {
       id: "vn-6",
@@ -259,7 +259,7 @@ export const scrapbookData = {
       transcript:
         "yaudaaa dehh, aku mau nonton ajaa (sebel dikit)",
       tatwaReply:
-        "ngambek tipis nih ceritanyaa... nonton apa tuh? jangan lupa istirahat ya kesayangan Tatwa 🫶🏼",
+        "ngambek tipis nih yeee ceritanyaa... nonton apa tuh? jangan lupa istirahat yaaa 🫶🏼",
     },
   ],
 
