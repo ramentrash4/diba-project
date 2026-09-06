@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AudioProvider, useAudio } from "@/components/audio/AudioProvider";
 import { AtmosphereBackdrop } from "@/components/common/AtmosphereBackdrop";
-import { DevNavigator } from "@/components/common/DevNavigator";
 
 import { Segment1Prolog } from "@/components/segments/Segment1Prolog";
 import { Segment2Soundtrack } from "@/components/segments/Segment2Soundtrack";
@@ -19,7 +18,6 @@ function ScrapbookApp() {
   const [currentSegment, setCurrentSegment] = useState(1);
   const [prevSegment, setPrevSegment] = useState(1);
   const [unlockedSegment, setUnlockedSegment] = useState(1);
-  const [isStrictLock, setIsStrictLock] = useState(false);
   const [isWhiteoutLocked, setIsWhiteoutLocked] = useState(false);
 
   const { startBgm, fadeOutAll, playSfx, pauseTrack } = useAudio();
@@ -140,8 +138,8 @@ function ScrapbookApp() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 2.2, ease: "easeInOut" }}
-              className="absolute inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 text-center select-none cursor-default pointer-events-auto"
+              transition={{ duration: 1.2, ease: "easeOut" }}
+              className="absolute inset-0 bg-[#FFFDF9] flex items-center justify-center z-50 text-center px-6"
             >
               <motion.p
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -155,22 +153,6 @@ function ScrapbookApp() {
           )}
         </AnimatePresence>
       </div>
-
-      {/* Dev Segment Navigator (Mengambang di Luar Frame Mobile) */}
-      {!isWhiteoutLocked && (
-        <DevNavigator
-          currentSegment={currentSegment}
-          onSelectSegment={(num) => {
-            if (isStrictLock && num > unlockedSegment) {
-              alert(`Segmen ${num} masih terkunci. Selesaikan segmen sebelumnya.`);
-              return;
-            }
-            setCurrentSegment(num);
-          }}
-          isStrictLock={isStrictLock}
-          onToggleStrictLock={() => setIsStrictLock(!isStrictLock)}
-        />
-      )}
     </div>
   );
 }
