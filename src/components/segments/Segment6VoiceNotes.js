@@ -141,6 +141,7 @@ export function Segment6VoiceNotes({ onComplete }) {
   const handlePullWishlist = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
+    pauseTrack();
     playSfx("ticket-tear");
     setTimeout(() => {
       playSfx("paper-swoosh");
@@ -153,8 +154,9 @@ export function Segment6VoiceNotes({ onComplete }) {
   useEffect(() => {
     return () => {
       if (progressTimer.current) clearInterval(progressTimer.current);
+      pauseTrack();
     };
-  }, []);
+  }, [pauseTrack]);
 
   // Format detik menjadi 0:00
   const formatTime = (sec) => {

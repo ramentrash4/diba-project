@@ -37,10 +37,20 @@ export function Segment2Soundtrack({ onComplete }) {
     if (isPullingOut) return;
     setIsPullingOut(true);
     playSfx("tape-peel");
+    // Hentikan pemutaran lagu kaset saat berpindah ke Segmen 3
+    pauseTrack();
+    setIsPlaying(false);
     setTimeout(() => {
       onComplete();
     }, 450);
   };
+
+  // Pastikan lagu kaset otomatis terhenti saat pengguna meninggalkan Segmen 2
+  useEffect(() => {
+    return () => {
+      pauseTrack();
+    };
+  }, [pauseTrack]);
 
   // Counter analog 3-digit retro (misal 042 -> 043 -> 044...)
   const [tapeCounter, setTapeCounter] = useState(42);

@@ -22,12 +22,16 @@ function ScrapbookApp() {
   const [isStrictLock, setIsStrictLock] = useState(false);
   const [isWhiteoutLocked, setIsWhiteoutLocked] = useState(false);
 
-  const { startBgm, fadeOutAll, playSfx } = useAudio();
+  const { startBgm, fadeOutAll, playSfx, pauseTrack } = useAudio();
 
   // Transisi maju ke segmen berikutnya
   const goToNextSegment = (nextNum, isMorph = false) => {
     if (!isMorph) {
       playSfx("page-turn");
+    }
+    // Hentikan foreground audio (lagu mixtape / VN) saat berpindah segmen
+    if (currentSegment !== nextNum) {
+      pauseTrack();
     }
     setPrevSegment(currentSegment);
     if (nextNum > unlockedSegment) {

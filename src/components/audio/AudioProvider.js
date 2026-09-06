@@ -175,6 +175,18 @@ export function AudioProvider({ children }) {
     restoreBgm();
   };
 
+  const stopTrack = () => {
+    if (foregroundAudioRef.current) {
+      foregroundAudioRef.current.pause();
+      try {
+        foregroundAudioRef.current.currentTime = 0;
+      } catch (e) {}
+    }
+    setIsForegroundPlaying(false);
+    setActiveTrackId(null);
+    restoreBgm();
+  };
+
   // Memainkan SFX haptik
   const playSfx = (name) => {
     triggerSynthSfx(name);
@@ -215,6 +227,7 @@ export function AudioProvider({ children }) {
         startBgm,
         playTrack,
         pauseTrack,
+        stopTrack,
         seekTrack,
         setPlaybackRate,
         duckBgm,
