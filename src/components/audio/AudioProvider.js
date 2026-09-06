@@ -76,8 +76,15 @@ export function AudioProvider({ children }) {
     }
   };
 
+  // Mengatur kecepatan putar audio foreground (1x / 2x)
+  const setPlaybackRate = (rate = 1) => {
+    if (foregroundAudioRef.current) {
+      foregroundAudioRef.current.playbackRate = rate;
+    }
+  };
+
   // Memutar audio foreground (Lagu Segmen 2 atau VN Segmen 6)
-  const playTrack = (trackId, src, onEndedCallback) => {
+  const playTrack = (trackId, src, onEndedCallback, playbackRate = 1) => {
     if (activeTrackId === trackId && isForegroundPlaying) {
       pauseTrack();
       return;
@@ -89,6 +96,7 @@ export function AudioProvider({ children }) {
 
     if (foregroundAudioRef.current) {
       foregroundAudioRef.current.src = src;
+      foregroundAudioRef.current.playbackRate = playbackRate;
       foregroundAudioRef.current.onended = () => {
         setIsForegroundPlaying(false);
         setActiveTrackId(null);
@@ -164,6 +172,7 @@ export function AudioProvider({ children }) {
         startBgm,
         playTrack,
         pauseTrack,
+        setPlaybackRate,
         duckBgm,
         restoreBgm,
         playSfx,

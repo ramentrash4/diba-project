@@ -169,28 +169,79 @@ export const scrapbookData = {
     {
       id: "vn-1",
       sender: "Adiba",
-      // Masukkan rekaman suara asli Adiba ke public/audio/vn/vn1.mp3
-      src: "/audio/vn/vn1.mp3",
-      duration: "0:14",
-      audioPreviewLabel: "VN: 'Tatwaaa...'",
-      // Balasan imajiner Tatwa (lucu, personal, khas mereka berdua)
-      tatwaReply: "kenapa sii panggil panggil... padahal mau nanya tugas doang kan aslinya :P",
+      src: "/audio/vn/1.ogg",
+      duration: "0:09",
+      durationSeconds: 9,
+      transcript:
+        "iyaaaa gapapaaa siapa yang mayah si sakdakdalwkdad (salting)",
+      tatwaReply:
+        "hahaha saltingnya kedengeran banget sampe ngelantur gitu ngomongnya 😆 gemes bgt sih...",
     },
     {
       id: "vn-2",
       sender: "Adiba",
-      src: "/audio/vn/vn2.mp3",
-      duration: "0:22",
-      audioPreviewLabel: "VN: 'Lagi di mana?'",
-      tatwaReply: "lagi mikir, kok bisa ya ada orang se-random kamu wkwk.",
+      src: "/audio/vn/2.ogg",
+      duration: "0:03",
+      durationSeconds: 3,
+      transcript:
+        "awaaaaaaaaaa......tolong (mau cerita sesuatu)",
+      tatwaReply:
+        "panik bgt manggilnya ada apa siii bocil... pasti ada gosip kampus atau drama baru kan? 🤣",
     },
     {
       id: "vn-3",
       sender: "Adiba",
-      src: "/audio/vn/vn3.mp3",
-      duration: "0:18",
-      audioPreviewLabel: "VN: Tawa lepas",
-      tatwaReply: "suara tawamu ini yang paling sering bikin kangen suasana waktu itu.",
+      src: "/audio/vn/3.ogg",
+      duration: "0:09",
+      durationSeconds: 9,
+      transcript:
+        "masa aku pas pulang kan lapar banget trus pusing trus aduh kepala aku kaya di bekep AAAAAAA.....",
+      tatwaReply:
+        "kebiasaan deh telat makan! kan udah dibilang perutnya jangan dibiarin kosong, langsung lemes kan jadinya 🥺🍲",
+    },
+    {
+      id: "vn-4",
+      sender: "Adiba",
+      src: "/audio/vn/4.ogg",
+      duration: "0:07",
+      durationSeconds: 7,
+      transcript:
+        "ihiihahaaahadi oiya kah ahiiahha (cekikikan)",
+      tatwaReply:
+        "ketawanya nular bgt tolong wkwkwk... tawa lepas kamu ini yang paling mahal tauu ✨",
+    },
+    {
+      id: "vn-5",
+      sender: "Adiba",
+      src: "/audio/vn/5.ogg",
+      duration: "0:07",
+      durationSeconds: 7,
+      transcript:
+        "awaa masa naju gamau pulangin aku lagi besok karena dia gaada kelas nanti dipulangin hari minggu ihhhh",
+      tatwaReply:
+        "wkwkwk kasian bgt dioper-oper naju 😂 yauda sabar yaa, nanti aku yang nemenin ngobrol terus kok.",
+    },
+    {
+      id: "vn-6",
+      sender: "Adiba",
+      src: "/audio/vn/6.ogg",
+      duration: "0:07",
+      durationSeconds: 7,
+      transcript:
+        "gantyiiii ga gantyiii nim guaaah (suara kesel imut)",
+      tatwaReply:
+        "gamauuu wleee 😜 lagian nim kamu udah terlanjur nempel di sec acc aku, biar inget terus wkwk",
+    },
+    {
+      id: "vn-7",
+      sender: "Adiba",
+      src: "/audio/vn/7.ogg",
+      duration: "0:04",
+      durationSeconds: 4,
+      transcript:
+        "yaudaaa dehh, aku mau nonton ajaa (sebel dikit)",
+      tatwaReply:
+        "ngambek tipis nih ceritanyaa... nonton apa tuh? jangan lupa istirahat ya kesayangan Tatwa 🫶🏼",
     },
   ],
 
