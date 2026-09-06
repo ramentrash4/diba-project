@@ -34,9 +34,10 @@ export function Segment3Polaroid({ onComplete }) {
   // Indikator visual real-time saat kartu sedang di-drag ('next' | 'prev' | null)
   const [dragCue, setDragCue] = useState(null);
 
-  // Fallback map untuk gambar lokal jika file JPG belum dimasukkan Tatwa
+  // Mengambil sumber gambar polaroid nyata
   const getPhotoSrc = (photo, idx) => {
-    return `/images/polaroids/photo${idx + 1}.svg`;
+    if (photo && photo.src) return photo.src;
+    return `/polaroids/${idx + 1}.webp`;
   };
 
   // Toggle 3D flip card (eksklusif ketukan foto, bukan saat drag)
@@ -197,6 +198,7 @@ export function Segment3Polaroid({ onComplete }) {
               {/* Foto-foto di Bawah Stack Kanan (Cascade Entrance & Shadow Stack) */}
               {polaroids.slice(currentIndex + 1, currentIndex + 3).map((subPhoto, subIdx) => {
                 const depth = subIdx + 1;
+                const subOrigIdx = currentIndex + depth;
                 return (
                   <motion.div
                     key={`sub-${subPhoto.id}`}
@@ -213,9 +215,22 @@ export function Segment3Polaroid({ onComplete }) {
                       ease: [0.16, 1, 0.3, 1],
                     }}
                     style={{ zIndex: 10 - depth }}
-                    className="absolute w-[275px] sm:w-[290px] h-[345px] sm:h-[360px] bg-[#FFFDF8] rounded-sm p-3 border border-[#D5C7B5] shadow-lg pointer-events-none"
+                    className="absolute w-[275px] sm:w-[290px] h-[345px] sm:h-[360px] bg-[#FFFDF8] rounded-sm p-3 border border-[#D5C7B5] shadow-lg pointer-events-none flex flex-col justify-between"
                   >
-                    <div className="w-full h-[215px] sm:h-[225px] bg-[#EBE0D2] rounded-xs relative overflow-hidden opacity-50" />
+                    <div className="w-full h-[215px] sm:h-[225px] bg-[#1E1712]/15 rounded-xs relative overflow-hidden border border-black/10">
+                      <Image
+                        src={getPhotoSrc(subPhoto, subOrigIdx)}
+                        alt={subPhoto.frontCaption || "Polaroid"}
+                        fill
+                        className="object-cover opacity-45 filter blur-[0.5px]"
+                        sizes="290px"
+                      />
+                    </div>
+                    <div className="flex-1 flex items-center justify-center text-center px-1 pt-1 opacity-50">
+                      <span className="font-handwriting text-base text-[#140E0A] font-bold truncate">
+                        "{subPhoto.frontCaption || subPhoto.title}"
+                      </span>
+                    </div>
                   </motion.div>
                 );
               })}
@@ -292,7 +307,11 @@ export function Segment3Polaroid({ onComplete }) {
                         className="absolute top-5 right-5 z-40 bg-[#8C3E2D]/95 text-[#FFF7ED] font-mono text-[10.5px] font-black px-3 py-1 rounded-md shadow-xl border border-white/40 pointer-events-none tracking-wider flex items-center gap-1.5"
                       >
                         <span>👈</span>
-                        <span>FOTO BERIKUTNYA</span>
+                        <span>
+                          {currentIndex === polaroids.length - 1
+                            ? "BUKA KAMUS 📖"
+                            : "FOTO BERIKUTNYA"}
+                        </span>
                       </motion.div>
                     )}
                     {dragCue === "prev" && (
@@ -303,7 +322,7 @@ export function Segment3Polaroid({ onComplete }) {
                         className="absolute top-5 left-5 z-40 bg-[#2A180B]/95 text-[#F3E5AB] font-mono text-[10.5px] font-black px-3 py-1 rounded-md shadow-xl border border-[#D4AF37]/50 pointer-events-none tracking-wider flex items-center gap-1.5"
                       >
                         <span>👉</span>
-                        <span>{currentIndex > 0 ? "FOTO SEBELUMNYA" : "FOTO PERTAMA"}</span>
+                        <span>{currentIndex > 0 ? `FOTO 0${currentIndex}` : "FOTO PERTAMA"}</span>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -331,13 +350,13 @@ export function Segment3Polaroid({ onComplete }) {
                       />
 
                       {/* Area Foto Polaroid Glossy */}
-                      <div className="w-full h-[215px] sm:h-[225px] bg-[#1E1712] rounded-xs relative overflow-hidden border border-black/20 shadow-inner">
+                      <div className="w-full h-[220px] sm:h-[230px] bg-[#1E1712] rounded-xs relative overflow-hidden border border-black/20 shadow-inner">
                         <Image
                           src={getPhotoSrc(currentPhoto, currentIndex)}
-                          alt={currentPhoto.frontCaption}
+                          alt={currentPhoto.frontCaption || currentPhoto.title}
                           fill
                           className="object-cover"
-                          sizes="(max-width: 412px) 270px, 300px"
+                          sizes="(max-width: 412px) 280px, 300px"
                           priority={currentIndex === 0}
                         />
 
@@ -350,16 +369,18 @@ export function Segment3Polaroid({ onComplete }) {
                           }}
                         />
 
-                        {/* Stempel Tanggal Vintage di Sudut Foto */}
-                        <span className="absolute bottom-1.5 right-1.5 font-typewriter text-[9.5px] font-bold text-[#FAF5EC] bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded shadow">
-                          {currentPhoto.date}
-                        </span>
+                        {/* Stempel Tanggal Vintage di Sudut Foto (jika ada) */}
+                        {currentPhoto.date && (
+                          <span className="absolute bottom-1.5 right-1.5 font-typewriter text-[9.5px] font-bold text-[#FAF5EC] bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded shadow">
+                            {currentPhoto.date}
+                          </span>
+                        )}
                       </div>
 
                       {/* Bagian Bawah Kertas Polaroid: Tulisan Tangan Caption Bersih & Otentik */}
                       <div className="flex-1 flex items-center justify-center text-center px-1 pt-1.5 pb-0.5">
-                        <p className="font-handwriting text-base sm:text-[18px] text-[#140E0A] font-black leading-tight">
-                          "{currentPhoto.frontCaption}"
+                        <p className="font-handwriting text-lg sm:text-[21px] text-[#140E0A] font-black leading-tight tracking-wide">
+                          "{currentPhoto.frontCaption || currentPhoto.title}"
                         </p>
                       </div>
                     </div>
@@ -373,35 +394,41 @@ export function Segment3Polaroid({ onComplete }) {
                         backfaceVisibility: "hidden",
                         transform: "rotateY(180deg)",
                       }}
-                      className="absolute inset-0 bg-[#FDF7EB] rounded-sm p-4 sm:p-4.5 border-2 border-[#D8C7B0] shadow-2xl flex flex-col justify-between select-none"
+                      className="absolute inset-0 bg-[#FDF7EB] rounded-sm p-3.5 sm:p-4 border-2 border-[#D8C7B0] shadow-2xl flex flex-col justify-between select-none"
                     >
-                      {/* Header Sisi Belakang: Hangat & Personal (Bukan 'Archive Memo' Kaku) */}
-                      <div className="flex items-center justify-between border-b border-[#E0D2C0] pb-2">
+                      {/* Header Sisi Belakang: Hangat & Personal */}
+                      <div className="flex items-center justify-between border-b border-[#E0D2C0] pb-1.5">
                         <div className="flex items-center gap-1.5 text-[#8C3E2D]">
-                          <Paperclip className="w-3.5 h-3.5" />
+                          <Paperclip className="w-3.5 h-3.5 text-amber-700" />
                           <span className="font-mono text-[9.5px] font-black uppercase tracking-wider">
                             Catatan Tatwa ✨
                           </span>
                         </div>
-                        <span className="font-typewriter text-[9.5px] text-[#5A4839] font-bold">
-                          {currentPhoto.date}
-                        </span>
+                        {currentPhoto.date ? (
+                          <span className="font-typewriter text-[9.5px] text-[#5A4839] font-bold">
+                            {currentPhoto.date}
+                          </span>
+                        ) : (
+                          <span className="font-mono text-[9px] bg-[#EAE0D2] text-[#5A4839] font-bold px-1.5 py-0.5 rounded">
+                            Foto 0{currentIndex + 1}
+                          </span>
+                        )}
                       </div>
 
                       {/* Pesan Tulisan Tangan Tinta Biru Pulpen Tatwa */}
-                      <div className="flex-1 flex flex-col justify-center py-2 text-left">
-                        <p className="font-handwriting text-[17px] sm:text-[19px] text-[#1E3A8A] font-black leading-relaxed">
+                      <div className="flex-1 flex flex-col justify-center py-2 text-left overflow-y-auto">
+                        <p className="font-handwriting text-base sm:text-[17.5px] text-[#1E3A8A] font-black leading-relaxed">
                           "{currentPhoto.backNote}"
                         </p>
                       </div>
 
                       {/* Tanda Tangan Tatwa Rapi & Bersih */}
-                      <div className="border-t border-[#E0D2C0] pt-2 flex items-center justify-between">
+                      <div className="border-t border-[#E0D2C0] pt-1.5 flex items-center justify-between">
                         <span className="font-handwriting text-sm text-[#1E3A8A] font-bold">
                           — Tatwa ✨
                         </span>
                         <span className="font-mono text-[9px] text-[#8C6D53] font-semibold">
-                          0{currentIndex + 1}
+                          0{currentIndex + 1} / 0{polaroids.length}
                         </span>
                       </div>
                     </div>
@@ -431,12 +458,16 @@ export function Segment3Polaroid({ onComplete }) {
                 <>
                   <span className="text-[#8C3E2D] font-black flex items-center gap-1">
                     <span>👉</span>
-                    <span>Geser kanan: Sebelumnya</span>
+                    <span>Geser kanan: Foto 0{currentIndex}</span>
                   </span>
                   <span className="text-[#B5A38E]">•</span>
                   <span className="text-[#1E3A8A] font-black flex items-center gap-1">
                     <span>👈</span>
-                    <span>Geser kiri: Lanjut</span>
+                    <span>
+                      {currentIndex === polaroids.length - 1
+                        ? "Geser kiri: Buka Kamus 📖"
+                        : "Geser kiri: Lanjut"}
+                    </span>
                   </span>
                 </>
               ) : (

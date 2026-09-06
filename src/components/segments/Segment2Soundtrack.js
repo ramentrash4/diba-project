@@ -814,20 +814,20 @@ export function Segment2Soundtrack({ onComplete }) {
                     {/* Area Gambar Polaroid dengan Foto Kenangan */}
                     <div className="w-full h-[50px] shrink-0 bg-[#2E241E] rounded-xs relative overflow-hidden flex items-center justify-center border border-black/15 shadow-inner">
                       <Image
-                        src="/images/polaroids/photo1.svg"
+                        src="/polaroids/1.webp"
                         alt="Polaroid Preview"
                         fill
                         className="object-cover"
                         sizes="90px"
                       />
                       <span className="absolute bottom-0.5 right-1 text-[7.5px] font-mono text-amber-100 font-bold bg-black/60 px-1 rounded-xs">
-                        14 Okt
+                        Foto 01
                       </span>
                     </div>
 
                     {/* Teks Tulisan Tangan di Dagu Polaroid */}
                     <span className="font-handwriting text-[11px] font-bold text-[#1F1711] leading-none text-center truncate pt-0.5">
-                      Kita di Kafe ✨
+                      My favorite photo ✨
                     </span>
                   </motion.div>
                 </div>

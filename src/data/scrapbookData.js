@@ -64,7 +64,7 @@ export const scrapbookData = {
       coverImage: "/albums/remaja.webp",
       tag: "Side A • Pop",
       memoryText:
-        "Makasih udah ngenalin aku sama festivalist terkhusus OODK, Jadinya setiap aku lagi cape ada lagu membara yg bisa aku repeat... HONG!!! 👊🏽",
+        "Makasih udah Makasih udah mau dengerin HIVI sama aku keliling bandung malam itu after rain meskipun tws sebelah²😭 aku sama festivalist terkhusus OODK, Jadinya setiap aku lagi cape ada lagu membara yg bisa aku repeat... HONG!!! 👊🏽",
     },
   ],
 
@@ -72,36 +72,30 @@ export const scrapbookData = {
   polaroids: [
     {
       id: "photo-1",
-      // Masukkan foto ke public/images/polaroids/photo1.jpg
-      src: "/images/polaroids/photo1.jpg",
-      date: "14 Oktober 2024",
-      frontCaption: "Aku suka baju yang kamu pakai di foto itu.",
-      backNote: "Di tempat ini kamu ketawa kencang banget sampai hampir menumpahkan minuman. Jangan pernah hilang tawa lepasmu itu ya.",
+      src: "/polaroids/1.webp",
+      title: "My favorite photo",
+      frontCaption: "My favorite photo",
+      backNote:
+        "Sumpaahhh kamu disini shining bgtt dan cantik bgt, dan untuk mendapatkan fotonyaa aku harus membujuk kamu berkali² 🙄🙄wkwkwkw",
       rotation: -3,
     },
     {
       id: "photo-2",
-      src: "/images/polaroids/photo2.jpg",
-      date: "28 November 2024",
-      frontCaption: "Muka cemberut andalan kalau lagi lapar.",
-      backNote: "Padahal 5 menit setelah makanan datang langsung senyum lagi seperti anak kecil.",
+      src: "/polaroids/2.webp",
+      title: "simple but cute",
+      frontCaption: "simple but cute",
+      backNote:
+        "Kalooo ini aku asal cekrek sebenernyaa😋, pas kamu lagi rapihin kalung kamu di aku...tapi  tingkat kelucuan fotonya 100%😉",
       rotation: 2,
     },
     {
       id: "photo-3",
-      src: "/images/polaroids/photo3.jpg",
-      date: "12 Januari 2025",
-      frontCaption: "Sudut kampus yang paling sering kita lewati.",
-      backNote: "Banyak obrolan random dari masa depan sampai tugas kuliah yang gak selesai-selesai.",
+      src: "/polaroids/3.webp",
+      title: "Beautiful eyes",
+      frontCaption: "Beautiful eyes",
+      backNote:
+        "Di fotoo ini yang keliatann cuma mataa kamuu, tapi justru ituu mewakili pesona kecantikan kamuu eakkk... lampu merah kala itu 😋",
       rotation: -1,
-    },
-    {
-      id: "photo-4",
-      src: "/images/polaroids/photo4.jpg",
-      date: "14 Februari 2025",
-      frontCaption: "Hari itu, terima kasih sudah tersenyum.",
-      backNote: "Semoga langkahmu ke depan selalu dipenuhi orang-orang yang tulus menjagamu.",
-      rotation: 3,
     },
   ],
 
