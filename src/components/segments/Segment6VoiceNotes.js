@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play,
@@ -17,6 +17,303 @@ import { scrapbookData } from "@/data/scrapbookData";
 import { useAudio } from "@/components/audio/AudioProvider";
 import { WashiTape } from "@/components/common/WashiTape";
 
+// Format detik menjadi format menit:detik (0:00)
+function formatTime(sec) {
+  const s = Math.floor(sec || 0);
+  const m = Math.floor(s / 60);
+  const remainder = s % 60;
+  return `${m}:${remainder < 10 ? "0" : ""}${remainder}`;
+}
+
+// 16 Bar waveform unik per VN
+function getWaveBars(id) {
+  const seed = id.charCodeAt(id.length - 1) || 5;
+  return [32, 65, 45, 90, 55, 95, 75, 45, 85, 60, 95, 55, 40, 75, 50, 65].map(
+    (base, i) => Math.min(100, Math.max(25, base + ((seed * (i + 1)) % 25) - 10))
+  );
+}
+
+/**
+ * Komponen Terisolasi untuk 1 Bubble VN Diba (WhatsApp Style)
+ * -------------------------------------------------------------
+ * Menggunakan direct DOM updates pada slider waveform (clipPath & left)
+ * sehingga saat audio diputar, animasi progress berjalan 60fps/120fps
+ * tanpa memicu re-render beruntun pada komponen parent atau komponen lain.
+ */
+const VoiceNoteItem = React.memo(function VoiceNoteItem({
+  vn,
+  idx,
+  isPlaying,
+  isCompleted,
+  isTyping,
+  isReplied,
+  currentSpeed,
+  activeUpdaterRef,
+  onTogglePlay,
+  onToggleSpeed,
+  onSeek,
+}) {
+  const targetDuration = vn.durationSeconds || 7;
+  const waveBars = useMemo(() => getWaveBars(vn.id), [vn.id]);
+
+  const activeClipRef = useRef(null);
+  const knobRef = useRef(null);
+  const rangeRef = useRef(null);
+  const timeLabelRef = useRef(null);
+  const lastSecRef = useRef(-1);
+  const currentTimeRef = useRef(0);
+  const isScrubbingRef = useRef(false);
+
+  // Subscribe ke update frame audio saat sedang berputar
+  useEffect(() => {
+    if (isPlaying) {
+      activeUpdaterRef.current = (currTime, duration) => {
+        if (isScrubbingRef.current) return;
+        const dur = vn.durationSeconds || duration || 7;
+        const pct = Math.min(100, Math.max(0, (currTime / dur) * 100));
+
+        if (activeClipRef.current) {
+          activeClipRef.current.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+        }
+        if (knobRef.current) {
+          knobRef.current.style.left = `${pct}%`;
+        }
+        if (rangeRef.current) {
+          rangeRef.current.value = currTime;
+        }
+        if (timeLabelRef.current) {
+          const currentSec = Math.floor(currTime);
+          if (lastSecRef.current !== currentSec) {
+            lastSecRef.current = currentSec;
+            timeLabelRef.current.textContent = formatTime(currTime);
+          }
+        }
+        currentTimeRef.current = currTime;
+      };
+    } else {
+      // Saat tidak lagi berputar dan audio telah selesai
+      if (currentTimeRef.current >= targetDuration - 0.2) {
+        currentTimeRef.current = 0;
+        if (activeClipRef.current) {
+          activeClipRef.current.style.clipPath = `inset(0 100% 0 0)`;
+        }
+        if (knobRef.current) {
+          knobRef.current.style.left = `0%`;
+        }
+        if (rangeRef.current) {
+          rangeRef.current.value = 0;
+        }
+        if (timeLabelRef.current) {
+          timeLabelRef.current.textContent = vn.duration;
+        }
+        lastSecRef.current = -1;
+      }
+    }
+  }, [isPlaying, vn.duration, vn.durationSeconds, targetDuration, activeUpdaterRef]);
+
+  // Handle sentuhan slider maju / mundur
+  const handleRangeInput = (e) => {
+    const val = parseFloat(e.target.value);
+    const dur = vn.durationSeconds || 7;
+    const pct = Math.min(100, Math.max(0, (val / dur) * 100));
+
+    if (activeClipRef.current) {
+      activeClipRef.current.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+    }
+    if (knobRef.current) {
+      knobRef.current.style.left = `${pct}%`;
+    }
+    if (timeLabelRef.current) {
+      timeLabelRef.current.textContent = formatTime(val);
+    }
+    currentTimeRef.current = val;
+    onSeek(vn, val);
+  };
+
+  const initialPct = Math.min(
+    100,
+    Math.max(0, (currentTimeRef.current / targetDuration) * 100)
+  );
+
+  return (
+    <div className="space-y-2 relative z-10">
+      {/* BUBBLE VN ADIBA (SISI KIRI - WHATSAPP STYLE DENGAN ENTRANCE HALUS) */}
+      <motion.div
+        initial={{ opacity: 0, y: 14, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+        className="flex justify-start w-full"
+      >
+        <div className="w-[96%] sm:w-[93%] bg-[#202C33] rounded-2xl rounded-tl-xs px-3 py-2.5 border border-[#2A3942] shadow-md flex flex-col gap-1.5 text-left relative">
+          {/* Bar Pemutar VN: Play Button, Waveform Scrubber & Speed Badge */}
+          <div className="flex items-center gap-2.5 w-full">
+            {/* Tombol Play / Pause */}
+            <button
+              onClick={() => onTogglePlay(vn, currentTimeRef.current)}
+              aria-label={isPlaying ? "Pause voice note" : "Play voice note"}
+              className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-transform cursor-pointer shrink-0 active:scale-95 ${
+                isPlaying
+                  ? "bg-emerald-400 text-slate-950 scale-105 shadow-emerald-500/30"
+                  : "bg-[#00A884] hover:bg-[#02906f] text-white"
+              }`}
+            >
+              {isPlaying ? (
+                <Pause className="w-4 h-4 fill-current" />
+              ) : (
+                <Play className="w-4 h-4 fill-current ml-0.5" />
+              )}
+            </button>
+
+            {/* WAVEFORM SCRUBBER (DUAL-LAYER GPU-CLIPPED DENGAN SMOOTH GLIDE) */}
+            <div className="relative flex-1 flex items-center h-8 cursor-pointer select-none group touch-none">
+              {/* 1. Base Layer: Unplayed Waveform (Gray Bars) */}
+              <div className="flex items-center gap-[2.5px] w-full h-full pointer-events-none px-0.5">
+                {waveBars.map((h, bIdx) => (
+                  <div
+                    key={bIdx}
+                    className="flex-1 rounded-full bg-[#8696A0]/35"
+                    style={{ height: `${Math.max(22, h)}%` }}
+                  />
+                ))}
+              </div>
+
+              {/* 2. Active Layer: Played Waveform (Green/Emerald Bars clipped by clipPath) */}
+              <div
+                ref={activeClipRef}
+                className="absolute inset-0 flex items-center gap-[2.5px] w-full h-full pointer-events-none px-0.5 will-change-[clip-path]"
+                style={{ clipPath: `inset(0 ${100 - initialPct}% 0 0)` }}
+              >
+                {waveBars.map((h, bIdx) => (
+                  <div
+                    key={bIdx}
+                    className="flex-1 rounded-full bg-emerald-400 shadow-[0_0_3px_#34D399]"
+                    style={{ height: `${Math.max(22, h)}%` }}
+                  />
+                ))}
+              </div>
+
+              {/* 3. Scrubber Knob (WhatsApp Dot) */}
+              <div
+                ref={knobRef}
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-[#00A884] border-2 border-[#202C33] shadow-[0_1px_4px_rgba(0,0,0,0.6)] pointer-events-none z-10 will-change-[left]"
+                style={{ left: `${initialPct}%` }}
+              />
+
+              {/* 4. Native Range Slider untuk Sentuhan Touch & Mouse Scrubbing */}
+              <input
+                ref={rangeRef}
+                type="range"
+                min={0}
+                max={targetDuration}
+                step={0.02}
+                defaultValue={currentTimeRef.current}
+                onPointerDown={() => {
+                  isScrubbingRef.current = true;
+                }}
+                onTouchStart={() => {
+                  isScrubbingRef.current = true;
+                }}
+                onPointerUp={() => {
+                  isScrubbingRef.current = false;
+                }}
+                onTouchEnd={() => {
+                  isScrubbingRef.current = false;
+                }}
+                onChange={handleRangeInput}
+                onInput={handleRangeInput}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20 touch-none"
+                aria-label="Maju mundurkan voice note"
+              />
+            </div>
+
+            {/* Tombol Speed 1x / 2x di Dalam Bubble VN */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSpeed(vn.id);
+              }}
+              title="Ubah kecepatan putar"
+              className={`h-6 px-2 rounded-full font-mono text-[9.5px] font-bold border transition-colors cursor-pointer shrink-0 flex items-center justify-center ${
+                currentSpeed === 2
+                  ? "bg-amber-400 text-slate-950 border-amber-300 font-extrabold shadow-xs"
+                  : "bg-[#111B21] text-slate-300 border-white/15 hover:text-white hover:border-white/30"
+              }`}
+            >
+              {currentSpeed}x
+            </button>
+          </div>
+
+          {/* Baris Informasi Bawah: Durasi & Timestamp */}
+          <div className="flex items-center justify-between pl-11.5 pr-1 pt-0.5 text-[10px] font-mono text-[#8696A0]">
+            <span
+              ref={timeLabelRef}
+              className="font-semibold text-slate-300 tracking-tight"
+            >
+              {isPlaying || currentTimeRef.current > 0
+                ? formatTime(currentTimeRef.current)
+                : vn.duration}
+            </span>
+            <div className="flex items-center gap-1 shrink-0">
+              <span className="text-[#8696A0]">20:4{idx + 1}</span>
+              <CheckCheck
+                className={`w-3.5 h-3.5 ${
+                  isCompleted ? "text-[#53BDEB]" : "text-[#8696A0]"
+                }`}
+              />
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* INDIKATOR TYPING TATWA */}
+      <AnimatePresence>
+        {isTyping && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.18 } }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="flex justify-end w-full"
+          >
+            <div className="bg-[#005C4B]/80 text-emerald-100 rounded-2xl rounded-tr-xs px-3 py-1.5 border border-emerald-500/20 shadow-sm flex items-center gap-1.5">
+              <span className="font-sans-ui text-[10.5px] font-semibold">
+                Tatwa sedang mengetik
+              </span>
+              <div className="flex items-center gap-0.5 pt-1">
+                <span className="w-1 h-1 rounded-full bg-white animate-bounce" />
+                <span className="w-1 h-1 rounded-full bg-white animate-bounce [animation-delay:0.2s]" />
+                <span className="w-1 h-1 rounded-full bg-white animate-bounce [animation-delay:0.4s]" />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* BUBBLE BALASAN TATWA (SISI KANAN - WHATSAPP OUTGOING BUBBLE) */}
+      <AnimatePresence>
+        {isReplied && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.93, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+            className="flex justify-end w-full"
+          >
+            <div className="max-w-[86%] sm:max-w-[82%] bg-[#005C4B] rounded-2xl rounded-tr-xs px-3 py-2 border border-[#02735E] shadow-md text-left relative">
+              <p className="font-sans-ui text-[12.5px] sm:text-[13px] text-[#E9EDEF] font-medium leading-relaxed">
+                "{vn.tatwaReply}"
+              </p>
+              <div className="flex items-center justify-end gap-1 mt-0.5 text-[9px] font-mono text-emerald-200/70">
+                <span>20:4{idx + 1}</span>
+                <CheckCheck className="w-3 h-3 text-[#53BDEB]" />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+});
+
 export function Segment6VoiceNotes({ onComplete }) {
   const { playTrack, pauseTrack, seekTrack, setPlaybackRate, playSfx } = useAudio();
   const vns = scrapbookData.voiceNotes;
@@ -24,14 +321,14 @@ export function Segment6VoiceNotes({ onComplete }) {
   // ID VN yang sedang aktif berputar
   const [playingVnId, setPlayingVnId] = useState(null);
 
-  // Progres waktu putar per-VN dalam detik: { "vn-1": 3.2, ... }
-  const [vnProgress, setVnProgress] = useState({});
-
   // Kecepatan putar per-VN (1x atau 2x): { "vn-1": 1, ... }
   const [vnSpeed, setVnSpeed] = useState({});
 
   // Status VN mana saja yang sudah pernah selesai didengar
   const [completedVns, setCompletedVns] = useState({});
+
+  // Status VN mana saja yang sudah terbuka di chat feed (mulai dari vn-1)
+  const [unlockedVns, setUnlockedVns] = useState({ [vns[0].id]: true });
 
   // Status animasi "Tatwa sedang mengetik..." untuk VN tertentu
   const [isTypingFor, setIsTypingFor] = useState(null);
@@ -42,82 +339,126 @@ export function Segment6VoiceNotes({ onComplete }) {
   // Status transisi menuju Segmen 7 (Wishlist)
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const progressTimer = useRef(null);
-  const chatBottomRef = useRef(null);
-  const isScrubbingRef = useRef(false);
+  const activeUpdaterRef = useRef(null);
+  const chatContainerRef = useRef(null);
+  const pauseTrackRef = useRef(pauseTrack);
 
-  // Auto-scroll ke bawah saat ada pesan baru atau animasi mengetik
   useEffect(() => {
-    if (chatBottomRef.current) {
-      chatBottomRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [isTypingFor, revealedReplies]);
+    pauseTrackRef.current = pauseTrack;
+  });
+
+  useEffect(() => {
+    return () => {
+      pauseTrackRef.current?.();
+    };
+  }, []);
+
+  // Smooth scroll terisolasi hanya pada chat container tanpa window jump
+  const scrollToBottom = useCallback((instant = false) => {
+    if (!chatContainerRef.current) return;
+    const container = chatContainerRef.current;
+    requestAnimationFrame(() => {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: instant ? "auto" : "smooth",
+      });
+    });
+  }, []);
+
+  // Auto-scroll ke bawah saat ada pesan baru atau status mengetik
+  useEffect(() => {
+    scrollToBottom(false);
+  }, [isTypingFor, revealedReplies, unlockedVns, scrollToBottom]);
+
+  // Initial scroll saat mount
+  useEffect(() => {
+    scrollToBottom(true);
+  }, [scrollToBottom]);
 
   // Mengatur kecepatan putar (1x ↔ 2x)
-  const handleToggleSpeed = (vnId, e) => {
-    if (e) e.stopPropagation();
-    playSfx("btn-toggle");
-    const currentSpeed = vnSpeed[vnId] || 1;
-    const nextSpeed = currentSpeed === 1 ? 2 : 1;
-    setVnSpeed((prev) => ({ ...prev, [vnId]: nextSpeed }));
+  const handleToggleSpeed = useCallback(
+    (vnId) => {
+      playSfx("btn-toggle");
+      const currentSpeed = vnSpeed[vnId] || 1;
+      const nextSpeed = currentSpeed === 1 ? 2 : 1;
+      setVnSpeed((prev) => ({ ...prev, [vnId]: nextSpeed }));
 
-    if (playingVnId === vnId && setPlaybackRate) {
-      setPlaybackRate(nextSpeed);
-    }
-  };
+      if (playingVnId === vnId && setPlaybackRate) {
+        setPlaybackRate(nextSpeed);
+      }
+    },
+    [vnSpeed, playingVnId, playSfx, setPlaybackRate]
+  );
 
-  // Geser posisi audio maju/mundur (Scrubbing seperti WhatsApp asli)
-  const handleSeek = (vn, newTime) => {
-    const clampedTime = Math.max(0, Math.min(newTime, vn.durationSeconds || 7));
-    setVnProgress((prev) => ({ ...prev, [vn.id]: clampedTime }));
-    if (seekTrack) {
-      seekTrack(clampedTime);
-    }
-  };
+  // Geser posisi audio maju/mundur (Scrubbing)
+  const handleSeek = useCallback(
+    (vn, newTime) => {
+      const clampedTime = Math.max(0, Math.min(newTime, vn.durationSeconds || 7));
+      if (seekTrack) {
+        seekTrack(clampedTime);
+      }
+    },
+    [seekTrack]
+  );
 
   // Putar atau Jeda Voice Note
-  const handleToggleVn = (vn) => {
-    const speed = vnSpeed[vn.id] || 1;
+  const handleToggleVn = useCallback(
+    (vn, currentTime = 0) => {
+      const speed = vnSpeed[vn.id] || 1;
 
-    if (playingVnId === vn.id) {
+      if (playingVnId === vn.id) {
+        pauseTrack();
+        setPlayingVnId(null);
+      } else {
+        playSfx("btn-toggle");
+        setPlayingVnId(vn.id);
+
+        playTrack(
+          vn.id,
+          vn.src,
+          () => handleVnFinished(vn),
+          speed,
+          (currTime, duration) => {
+            activeUpdaterRef.current?.(currTime, duration);
+          },
+          currentTime
+        );
+      }
+    },
+    [playingVnId, vnSpeed, pauseTrack, playSfx, playTrack]
+  );
+
+  // Saat VN selesai diputar -> Muncul animasi typing Tatwa -> Pop balasan Tatwa -> Unlocked next VN
+  const handleVnFinished = useCallback(
+    (vn) => {
       pauseTrack();
       setPlayingVnId(null);
-      if (progressTimer.current) clearInterval(progressTimer.current);
-    } else {
-      playSfx("btn-toggle");
-      setPlayingVnId(vn.id);
-      const startAt = vnProgress[vn.id] || 0;
+      setCompletedVns((prev) => ({ ...prev, [vn.id]: true }));
 
-      playTrack(
-        vn.id,
-        vn.src,
-        () => handleVnFinished(vn),
-        speed,
-        (currTime) => {
-          if (!isScrubbingRef.current) {
-            setVnProgress((prev) => ({ ...prev, [vn.id]: currTime }));
+      if (!revealedReplies[vn.id]) {
+        // 1. Tampilkan animasi typing Tatwa
+        setIsTypingFor(vn.id);
+
+        // 2. Balasan Tatwa muncul setelah 1.1s
+        setTimeout(() => {
+          setIsTypingFor(null);
+          playSfx("bubble-pop");
+          setRevealedReplies((prev) => ({ ...prev, [vn.id]: true }));
+
+          // 3. Jika ada VN berikutnya dari Diba, munculkan dengan jeda alami 450ms
+          const currentIdx = vns.findIndex((item) => item.id === vn.id);
+          const nextVn = vns[currentIdx + 1];
+          if (nextVn) {
+            setTimeout(() => {
+              playSfx("soft-tap");
+              setUnlockedVns((prev) => ({ ...prev, [nextVn.id]: true }));
+            }, 450);
           }
-        },
-        startAt
-      );
-    }
-  };
-
-  // Saat VN selesai diputar -> Muncul animasi typing -> Pop balasan Tatwa
-  const handleVnFinished = (vn) => {
-    pauseTrack();
-    setPlayingVnId(null);
-    setCompletedVns((prev) => ({ ...prev, [vn.id]: true }));
-
-    if (!revealedReplies[vn.id]) {
-      setIsTypingFor(vn.id);
-      setTimeout(() => {
-        setIsTypingFor(null);
-        playSfx("bubble-pop");
-        setRevealedReplies((prev) => ({ ...prev, [vn.id]: true }));
-      }, 1200);
-    }
-  };
+        }, 1100);
+      }
+    },
+    [pauseTrack, revealedReplies, vns, playSfx]
+  );
 
   // Transisi Tarik Kertas Wishlist ke Segmen 7
   const handlePullWishlist = () => {
@@ -133,34 +474,6 @@ export function Segment6VoiceNotes({ onComplete }) {
     }, 500);
   };
 
-  const pauseTrackRef = useRef(pauseTrack);
-  useEffect(() => {
-    pauseTrackRef.current = pauseTrack;
-  });
-
-  useEffect(() => {
-    return () => {
-      if (progressTimer.current) clearInterval(progressTimer.current);
-      pauseTrackRef.current?.();
-    };
-  }, []);
-
-  // Format detik menjadi 0:00
-  const formatTime = (sec) => {
-    const s = Math.floor(sec || 0);
-    const m = Math.floor(s / 60);
-    const remainder = s % 60;
-    return `${m}:${remainder < 10 ? "0" : ""}${remainder}`;
-  };
-
-  // 16 Bar waveform acak realistis untuk VN
-  const generateWaveBars = (id) => {
-    const seed = id.charCodeAt(id.length - 1) || 5;
-    return [30, 65, 45, 90, 55, 95, 75, 45, 85, 60, 95, 55, 40, 75, 50, 65].map(
-      (base, i) => Math.min(100, Math.max(25, base + ((seed * (i + 1)) % 25) - 10))
-    );
-  };
-
   const allVnsRevealed =
     vns.every((vn) => revealedReplies[vn.id]) ||
     (revealedReplies["vn-7"] && Object.keys(revealedReplies).length >= 4);
@@ -169,7 +482,6 @@ export function Segment6VoiceNotes({ onComplete }) {
     <section className="w-full h-full flex-1 flex flex-col items-center justify-center px-3 py-1.5 sm:py-2 select-none relative overflow-hidden my-auto bg-gradient-to-b from-[#101722] via-[#0A1017] to-[#05080E] text-white">
       {/* WRAPPER TENGAH LAYAR TERFOKUS (ROOM CHAT CONTAINER) */}
       <div className="w-full max-w-[365px] sm:max-w-[380px] flex flex-col items-center justify-center gap-1.5 sm:gap-2 my-auto">
-
         {/* INDIKATOR KONEKSI AUDIO DARI SEGMEN 5 */}
         <div className="flex items-center gap-1.5 text-emerald-300 font-mono text-[9px] font-bold uppercase tracking-wider bg-[#101F20]/90 px-2.5 py-0.5 rounded-full border border-emerald-500/30 shadow-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
@@ -177,9 +489,8 @@ export function Segment6VoiceNotes({ onComplete }) {
           <Headphones className="w-3 h-3 text-emerald-400 ml-0.5" />
         </div>
 
-        {/* BINGKAI ROOMCHAT WHATSAPP REALISTIS DENGAN TINGGI RESPONSIF BEBAS OVERFLOW */}
+        {/* BINGKAI ROOMCHAT WHATSAPP REALISTIS */}
         <div className="w-full h-[min(440px,calc(100dvh-125px))] sm:h-[490px] bg-[#0B141A] rounded-2xl border border-[#202C33] shadow-[0_16px_45px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden relative">
-
           {/* 1. HEADER ROOMCHAT WA */}
           <div className="h-13 bg-[#1F2C34] border-b border-[#2A3942] px-3 flex items-center justify-between z-20 shrink-0 shadow-sm">
             <div className="flex items-center gap-2">
@@ -213,200 +524,47 @@ export function Segment6VoiceNotes({ onComplete }) {
             </div>
           </div>
 
-          {/* 2. CHAT STREAM / FEED (SCROLLABLE, BEBAS TRANSLATE, SCRUBBABLE VN & BALASAN) */}
-          <div className="flex-1 p-3 overflow-y-auto space-y-3 relative z-10 scrollbar-thin scrollbar-thumb-white/10">
+          {/* 2. CHAT STREAM / FEED (SCROLLABLE, SMOOTH SCROLL, BUTTERY WAVEFORMS) */}
+          <div
+            ref={chatContainerRef}
+            className="flex-1 p-3 overflow-y-auto space-y-3 relative z-10 scrollbar-thin scrollbar-thumb-white/10 scroll-smooth overscroll-contain"
+          >
             {/* Latar Belakang Subtle Pattern Wallpaper Chat */}
             <div className="absolute inset-0 bg-[radial-gradient(#1F2C34_1px,transparent_1px)] [background-size:16px_16px] opacity-35 pointer-events-none" />
 
-            {/* DAFTAR BUBBLE CHAT TERUNGKAP SATU PER SATU */}
+            {/* DAFTAR BUBBLE CHAT TERUNGKAP SECARA NATURAL SATU PER SATU */}
             {vns.map((vn, idx) => {
-              const isUnlocked = idx === 0 || revealedReplies[vns[idx - 1].id];
+              const isUnlocked = unlockedVns[vn.id];
               if (!isUnlocked) return null;
 
-              const isPlaying = playingVnId === vn.id;
-              const isCompleted = completedVns[vn.id];
-              const isTyping = isTypingFor === vn.id;
-              const isReplied = revealedReplies[vn.id];
-              const currentProgress = vnProgress[vn.id] || 0;
-              const targetDuration = vn.durationSeconds || 7;
-              const currentSpeed = vnSpeed[vn.id] || 1;
-              const waveBars = generateWaveBars(vn.id);
-
               return (
-                <div key={vn.id} className="space-y-2 relative z-10">
-                  {/* BUBBLE VN ADIBA (SISI KIRI - WHATSAPP STYLE, BEBAS TRANSLATE, SCRUBBABLE) */}
-                  <div className="flex justify-start w-full">
-                    <div className="w-[95%] sm:w-[92%] bg-[#202C33] rounded-2xl rounded-tl-xs px-3 py-2.5 border border-[#2A3942] shadow-md flex flex-col gap-1.5 text-left relative">
-
-                      {/* Bar Pemutar VN: Play Button, Waveform Scrubber & Speed Badge */}
-                      <div className="flex items-center gap-2.5 w-full">
-                        {/* Tombol Play / Pause */}
-                        <button
-                          onClick={() => handleToggleVn(vn)}
-                          aria-label={isPlaying ? "Pause voice note" : "Play voice note"}
-                          className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all cursor-pointer shrink-0 ${isPlaying
-                            ? "bg-emerald-400 text-slate-950 scale-105 shadow-emerald-500/20"
-                            : "bg-[#00A884] hover:bg-[#02906f] text-white"
-                            }`}
-                        >
-                          {isPlaying ? (
-                            <Pause className="w-4 h-4 fill-current" />
-                          ) : (
-                            <Play className="w-4 h-4 fill-current ml-0.5" />
-                          )}
-                        </button>
-
-                        {/* WAVEFORM SCRUBBER (DAPAT DI-SLIDE / DIKLIK MAJU-MUNDUR SEPERTI WA ASLI) */}
-                        <div className="relative flex-1 flex items-center h-8 cursor-pointer select-none group touch-none">
-                          {/* Visual Waveform Bars */}
-                          <div className="flex items-center gap-[2px] w-full h-full pointer-events-none px-0.5">
-                            {waveBars.map((h, bIdx) => {
-                              const barProgress =
-                                (bIdx / (waveBars.length - 1)) * targetDuration;
-                              const isPassed = currentProgress >= barProgress;
-                              return (
-                                <div
-                                  key={bIdx}
-                                  className={`flex-1 rounded-full transition-all duration-150 ${
-                                    isPassed
-                                      ? isPlaying
-                                        ? "bg-emerald-400 shadow-[0_0_5px_#34D399]"
-                                        : "bg-[#00A884]"
-                                      : "bg-[#8696A0]/45"
-                                  }`}
-                                  style={{ height: `${Math.max(20, h)}%` }}
-                                />
-                              );
-                            })}
-                          </div>
-
-                          {/* Scrubber Knob / Dot seperti WhatsApp asli */}
-                          <div
-                            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-[#00A884] border-2 border-[#202C33] shadow-md pointer-events-none transition-[left] duration-75 z-10"
-                            style={{
-                              left: `${Math.min(
-                                99,
-                                Math.max(
-                                  1,
-                                  (currentProgress / targetDuration) * 100
-                                )
-                              )}%`,
-                            }}
-                          />
-
-                          {/* Native Range Slider Transparan di Atas Waveform untuk Scrubbing Sentuh Mulus Maju-Mundur */}
-                          <input
-                            type="range"
-                            min={0}
-                            max={targetDuration}
-                            step={0.05}
-                            value={currentProgress}
-                            onPointerDown={() => {
-                              isScrubbingRef.current = true;
-                            }}
-                            onTouchStart={() => {
-                              isScrubbingRef.current = true;
-                            }}
-                            onPointerUp={() => {
-                              isScrubbingRef.current = false;
-                            }}
-                            onTouchEnd={() => {
-                              isScrubbingRef.current = false;
-                            }}
-                            onChange={(e) =>
-                              handleSeek(vn, parseFloat(e.target.value))
-                            }
-                            onInput={(e) =>
-                              handleSeek(vn, parseFloat(e.target.value))
-                            }
-                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20 touch-none"
-                            aria-label="Maju mundurkan voice note"
-                          />
-                        </div>
-
-                        {/* Tombol Speed 1x / 2x di Dalam Bubble VN */}
-                        <button
-                          onClick={(e) => handleToggleSpeed(vn.id, e)}
-                          title="Ubah kecepatan putar"
-                          className={`h-6.5 px-2 rounded-full font-mono text-[10px] font-bold border transition-all cursor-pointer shrink-0 flex items-center justify-center ${currentSpeed === 2
-                            ? "bg-amber-400 text-slate-950 border-amber-300 font-extrabold shadow-xs"
-                            : "bg-[#111B21] text-slate-300 border-white/15 hover:text-white hover:border-white/30"
-                            }`}
-                        >
-                          {currentSpeed}x
-                        </button>
-                      </div>
-
-                      {/* Baris Informasi Bawah: Durasi & Timestamp (Jelas, Berjarak Aman, & Tidak Bertabrakan) */}
-                      <div className="flex items-center justify-between pl-11.5 pr-1 pt-0.5 text-[10px] font-mono text-[#8696A0]">
-                        <span className="font-semibold text-slate-300 tracking-tight">
-                          {isPlaying || currentProgress > 0
-                            ? formatTime(currentProgress)
-                            : vn.duration}
-                        </span>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <span className="text-[#8696A0]">20:4{idx + 1}</span>
-                          <CheckCheck className="w-3.5 h-3.5 text-[#53BDEB]" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* INDIKATOR TYPING TATWA */}
-                  <AnimatePresence>
-                    {isTyping && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 4 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        className="flex justify-end w-full"
-                      >
-                        <div className="bg-[#005C4B]/80 text-emerald-100 rounded-2xl rounded-tr-xs px-3 py-1.5 border border-emerald-500/20 shadow-sm flex items-center gap-1.5">
-                          <span className="font-sans-ui text-[10.5px] font-semibold">
-                            Tatwa sedang mengetik
-                          </span>
-                          <div className="flex items-center gap-0.5 pt-1">
-                            <span className="w-1 h-1 rounded-full bg-white animate-bounce" />
-                            <span className="w-1 h-1 rounded-full bg-white animate-bounce [animation-delay:0.2s]" />
-                            <span className="w-1 h-1 rounded-full bg-white animate-bounce [animation-delay:0.4s]" />
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* BUBBLE BALASAN TATWA (SISI KANAN - WHATSAPP OUTGOING BUBBLE) */}
-                  <AnimatePresence>
-                    {isReplied && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.92, y: 5 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        transition={{ type: "spring", stiffness: 280, damping: 22 }}
-                        className="flex justify-end w-full"
-                      >
-                        <div className="max-w-[86%] sm:max-w-[82%] bg-[#005C4B] rounded-2xl rounded-tr-xs px-3 py-2 border border-[#02735E] shadow-md text-left relative">
-                          <p className="font-sans-ui text-[12.5px] sm:text-[13px] text-[#E9EDEF] font-medium leading-relaxed">
-                            "{vn.tatwaReply}"
-                          </p>
-                          <div className="flex items-center justify-end gap-1 mt-0.5 text-[9px] font-mono text-emerald-200/70">
-                            <span>20:4{idx + 1}</span>
-                            <CheckCheck className="w-3 h-3 text-[#53BDEB]" />
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                <VoiceNoteItem
+                  key={vn.id}
+                  vn={vn}
+                  idx={idx}
+                  isPlaying={playingVnId === vn.id}
+                  isCompleted={completedVns[vn.id]}
+                  isTyping={isTypingFor === vn.id}
+                  isReplied={revealedReplies[vn.id]}
+                  currentSpeed={vnSpeed[vn.id] || 1}
+                  activeUpdaterRef={activeUpdaterRef}
+                  onTogglePlay={handleToggleVn}
+                  onToggleSpeed={handleToggleSpeed}
+                  onSeek={handleSeek}
+                />
               );
             })}
-
-            <div ref={chatBottomRef} className="h-2" />
           </div>
         </div>
 
-        {/* 3. TRANSISI TANGIBLE KE SEGMEN 7: SOBEKAN KERTAS WISHLIST (MUNCUL SETELAH VN TERBUKA) */}
+        {/* 3. TRANSISI TANGIBLE KE SEGMEN 7: SOBEKAN KERTAS WISHLIST */}
         {allVnsRevealed && (
-          <div className="relative w-full h-[75px] mt-1 z-30 flex justify-center">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full h-[75px] mt-1 z-30 flex justify-center"
+          >
             {/* Latar Belakang Redup saat Kertas Ditarik Naik */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -429,10 +587,10 @@ export function Segment6VoiceNotes({ onComplete }) {
               animate={
                 isTransitioning
                   ? {
-                    y: -330,
-                    scale: 1,
-                    transition: { duration: 0.48, ease: [0.22, 1, 0.36, 1] },
-                  }
+                      y: -330,
+                      scale: 1,
+                      transition: { duration: 0.48, ease: [0.22, 1, 0.36, 1] },
+                    }
                   : { y: 0 }
               }
               className="absolute top-0 w-full max-w-[360px] sm:max-w-[375px] cursor-grab active:cursor-grabbing touch-none select-none z-30 flex flex-col items-center"
@@ -444,13 +602,21 @@ export function Segment6VoiceNotes({ onComplete }) {
               <div className="w-full bg-[#FEFCE8] rounded-b-xl border border-[#EADBBD] shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative flex flex-col overflow-hidden text-left paper-shadow pb-3">
                 {/* Efek Sobekan Kertas Kasar di Tepi Atas (Torn Paper Edge SVG) */}
                 <div className="w-full h-4 bg-[#EDE3C8] relative overflow-hidden flex items-end">
-                  <svg viewBox="0 0 400 20" preserveAspectRatio="none" className="w-full h-3 text-[#FEFCE8] fill-current">
+                  <svg
+                    viewBox="0 0 400 20"
+                    preserveAspectRatio="none"
+                    className="w-full h-3 text-[#FEFCE8] fill-current"
+                  >
                     <path d="M0,0 L15,15 L30,3 L45,18 L60,2 L75,16 L90,4 L105,17 L120,3 L135,18 L150,2 L165,16 L180,4 L195,17 L210,3 L225,18 L240,2 L255,16 L270,4 L285,17 L300,3 L315,18 L330,2 L345,16 L360,4 L375,17 L390,3 L400,15 L400,20 L0,20 Z" />
                   </svg>
                 </div>
 
                 {/* Isolasi Kertas Sage Perekat di Bagian Atas */}
-                <WashiTape color="sage" angle={1} className="absolute top-1 right-8 z-30 pointer-events-none" />
+                <WashiTape
+                  color="sage"
+                  angle={1}
+                  className="absolute top-1 right-8 z-30 pointer-events-none"
+                />
 
                 {/* Garis Margin Merah Buku Kiri */}
                 <div className="absolute left-9 top-4 bottom-0 w-px bg-rose-300 pointer-events-none" />
@@ -478,7 +644,10 @@ export function Segment6VoiceNotes({ onComplete }) {
                 {/* PREVIEW KONTEN DAFTAR WISHLIST */}
                 <div className="p-3.5 pt-1 pl-11 space-y-2.5 relative z-10">
                   {scrapbookData.wishlist.map((item, idx) => (
-                    <div key={`preview-wish-${idx}`} className="border-b border-[#F0E6CE] pb-2 last:border-0">
+                    <div
+                      key={`preview-wish-${idx}`}
+                      className="border-b border-[#F0E6CE] pb-2 last:border-0"
+                    >
                       <div className="flex items-start gap-2">
                         <div className="mt-0.5 w-4 h-4 rounded border-2 border-[#8C6D4F] flex items-center justify-center shrink-0 bg-white shadow-2xs">
                           {idx === 0 ? (
@@ -510,7 +679,7 @@ export function Segment6VoiceNotes({ onComplete }) {
                 </div>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
 
         {/* 4. PANDUAN INTERAKSI RINGKAS */}
@@ -527,7 +696,6 @@ export function Segment6VoiceNotes({ onComplete }) {
             </div>
           )}
         </div>
-
       </div>
     </section>
   );

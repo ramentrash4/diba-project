@@ -22,6 +22,35 @@ export function AudioProvider({ children }) {
   const bgmAudioRef = useRef(null);
   const foregroundAudioRef = useRef(null);
   const isBgmActiveRef = useRef(false);
+  const rafIdRef = useRef(null);
+  const timeUpdateCallbackRef = useRef(null);
+  const onEndedCallbackRef = useRef(null);
+
+  const stopSmoothProgress = useCallback(() => {
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+  }, []);
+
+  const startSmoothProgress = useCallback(() => {
+    stopSmoothProgress();
+    const tick = () => {
+      const audio = foregroundAudioRef.current;
+      if (audio && !audio.paused && !audio.ended) {
+        if (timeUpdateCallbackRef.current) {
+          timeUpdateCallbackRef.current(
+            audio.currentTime || 0,
+            audio.duration || 0
+          );
+        }
+        rafIdRef.current = requestAnimationFrame(tick);
+      } else {
+        stopSmoothProgress();
+      }
+    };
+    rafIdRef.current = requestAnimationFrame(tick);
+  }, [stopSmoothProgress]);
 
   useEffect(() => {
     isBgmActiveRef.current = isBgmActive;
@@ -48,6 +77,7 @@ export function AudioProvider({ children }) {
 
       const fg = new Audio();
       fg.onended = () => {
+        stopSmoothProgress();
         setIsForegroundPlaying(false);
         setActiveTrackId(null);
         restoreBgm();
@@ -56,6 +86,7 @@ export function AudioProvider({ children }) {
     }
 
     return () => {
+      stopSmoothProgress();
       if (bgmAudioRef.current) {
         bgmAudioRef.current.pause();
       }
@@ -64,7 +95,7 @@ export function AudioProvider({ children }) {
       }
       lofiEngine.stop();
     };
-  }, [restoreBgm]);
+  }, [restoreBgm, stopSmoothProgress]);
 
   // Mulai memutar BGM lembut
   const startBgm = useCallback(() => {
@@ -106,14 +137,16 @@ export function AudioProvider({ children }) {
   }, []);
 
   const pauseTrack = useCallback(() => {
+    stopSmoothProgress();
     if (foregroundAudioRef.current) {
       foregroundAudioRef.current.pause();
     }
     setIsForegroundPlaying(false);
     restoreBgm();
-  }, [restoreBgm]);
+  }, [restoreBgm, stopSmoothProgress]);
 
   const stopTrack = useCallback(() => {
+    stopSmoothProgress();
     if (foregroundAudioRef.current) {
       foregroundAudioRef.current.pause();
       try {
@@ -123,7 +156,7 @@ export function AudioProvider({ children }) {
     setIsForegroundPlaying(false);
     setActiveTrackId(null);
     restoreBgm();
-  }, [restoreBgm]);
+  }, [restoreBgm, stopSmoothProgress]);
 
   // Memutar audio foreground (Lagu Segmen 2 atau VN Segmen 6)
   const playTrack = useCallback(
@@ -143,6 +176,9 @@ export function AudioProvider({ children }) {
       setActiveTrackId(trackId);
       setIsForegroundPlaying(true);
       duckBgm();
+
+      timeUpdateCallbackRef.current = onTimeUpdateCallback;
+      onEndedCallbackRef.current = onEndedCallback;
 
       if (foregroundAudioRef.current) {
         const audio = foregroundAudioRef.current;
@@ -173,8 +209,8 @@ export function AudioProvider({ children }) {
         }
 
         audio.ontimeupdate = () => {
-          if (onTimeUpdateCallback && foregroundAudioRef.current) {
-            onTimeUpdateCallback(
+          if (timeUpdateCallbackRef.current && foregroundAudioRef.current) {
+            timeUpdateCallbackRef.current(
               foregroundAudioRef.current.currentTime || 0,
               foregroundAudioRef.current.duration || 0
             );
@@ -182,22 +218,36 @@ export function AudioProvider({ children }) {
         };
 
         audio.onended = () => {
+          stopSmoothProgress();
           setIsForegroundPlaying(false);
           setActiveTrackId(null);
           restoreBgm();
-          if (onEndedCallback) onEndedCallback();
+          if (onEndedCallbackRef.current) onEndedCallbackRef.current();
         };
 
         const playPromise = audio.play();
         if (playPromise !== undefined) {
-          playPromise.catch((err) => {
-            if (err && err.name === "AbortError") return;
-            console.warn(`Audio play error for track ${trackId}:`, err);
-          });
+          playPromise
+            .then(() => {
+              startSmoothProgress();
+            })
+            .catch((err) => {
+              stopSmoothProgress();
+              if (err && err.name === "AbortError") return;
+              console.warn(`Audio play error for track ${trackId}:`, err);
+            });
         }
       }
     },
-    [activeTrackId, isForegroundPlaying, duckBgm, restoreBgm, pauseTrack]
+    [
+      activeTrackId,
+      isForegroundPlaying,
+      duckBgm,
+      restoreBgm,
+      pauseTrack,
+      startSmoothProgress,
+      stopSmoothProgress,
+    ]
   );
 
   // Memainkan SFX haptik
