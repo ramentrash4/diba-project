@@ -151,15 +151,23 @@ export function AudioProvider({ children }) {
 
         if (!isSameSrc) {
           audio.src = src;
+          try {
+            audio.load();
+          } catch (e) {}
         }
-        audio.playbackRate = playbackRate;
+        audio.defaultPlaybackRate = playbackRate;
+        try {
+          audio.playbackRate = playbackRate;
+        } catch (e) {}
 
         if (startTime > 0) {
           try {
             audio.currentTime = startTime;
           } catch (e) {
             audio.onloadedmetadata = () => {
-              audio.currentTime = startTime;
+              try {
+                audio.currentTime = startTime;
+              } catch (err) {}
             };
           }
         }
@@ -180,10 +188,13 @@ export function AudioProvider({ children }) {
           if (onEndedCallback) onEndedCallback();
         };
 
-        audio.play().catch((err) => {
-          if (err && err.name === "AbortError") return;
-          console.warn(`Audio play error for track ${trackId}:`, err);
-        });
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            if (err && err.name === "AbortError") return;
+            console.warn(`Audio play error for track ${trackId}:`, err);
+          });
+        }
       }
     },
     [activeTrackId, isForegroundPlaying, duckBgm, restoreBgm, pauseTrack]

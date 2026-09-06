@@ -97,6 +97,24 @@ export const scrapbookData = {
         "Di fotoo ini yang keliatann cuma mataa kamuu, tapi justru ituu mewakili pesona kecantikan kamuu eakkk... lampu merah kala itu 😋",
       rotation: -1,
     },
+    {
+      id: "photo-4",
+      src: "/polaroids/4.webp",
+      title: "a lovely smile",
+      frontCaption: "a lovely smile",
+      backNote:
+        "Salah satu foto yang aku suka juga nih... padahal aku asal paparazi tapi komuk kamu malah maniss bgt ih🫣",
+      rotation: 2.5,
+    },
+    {
+      id: "photo-5",
+      src: "/polaroids/5.webp",
+      title: "I like your red outfit",
+      frontCaption: "I like your red outfit",
+      backNote:
+        "Si merah dengan tingkahnya, padahal cuma cardigan tapi kalo kamu yang make jadi special duper  cardigan🫠",
+      rotation: -2,
+    },
   ],
 
   // 5. Segmen 4: Kamus Bahasa Kita (Inside Jokes)
@@ -169,7 +187,7 @@ export const scrapbookData = {
     {
       id: "vn-1",
       sender: "Adiba",
-      src: "/audio/vn/1.ogg",
+      src: "/audio/vn/1.mp3",
       duration: "0:09",
       durationSeconds: 9,
       transcript:
@@ -180,7 +198,7 @@ export const scrapbookData = {
     {
       id: "vn-2",
       sender: "Adiba",
-      src: "/audio/vn/2.ogg",
+      src: "/audio/vn/2.mp3",
       duration: "0:03",
       durationSeconds: 3,
       transcript:
@@ -191,7 +209,7 @@ export const scrapbookData = {
     {
       id: "vn-3",
       sender: "Adiba",
-      src: "/audio/vn/3.ogg",
+      src: "/audio/vn/3.mp3",
       duration: "0:09",
       durationSeconds: 9,
       transcript:
@@ -202,7 +220,7 @@ export const scrapbookData = {
     {
       id: "vn-4",
       sender: "Adiba",
-      src: "/audio/vn/4.ogg",
+      src: "/audio/vn/4.mp3",
       duration: "0:07",
       durationSeconds: 7,
       transcript:
@@ -213,7 +231,7 @@ export const scrapbookData = {
     {
       id: "vn-5",
       sender: "Adiba",
-      src: "/audio/vn/5.ogg",
+      src: "/audio/vn/5.mp3",
       duration: "0:07",
       durationSeconds: 7,
       transcript:
@@ -224,7 +242,7 @@ export const scrapbookData = {
     {
       id: "vn-6",
       sender: "Adiba",
-      src: "/audio/vn/6.ogg",
+      src: "/audio/vn/6.mp3",
       duration: "0:07",
       durationSeconds: 7,
       transcript:
@@ -235,7 +253,7 @@ export const scrapbookData = {
     {
       id: "vn-7",
       sender: "Adiba",
-      src: "/audio/vn/7.ogg",
+      src: "/audio/vn/7.mp3",
       duration: "0:04",
       durationSeconds: 4,
       transcript:
