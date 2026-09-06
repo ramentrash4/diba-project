@@ -4,9 +4,9 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function AtmosphereBackdrop({ currentSegment }) {
+  // Hanya Segmen 5 (Kaca Berembun) dan Segmen 6 (Voice Notes Chat) yang bernuansa malam (dark mode)
+  // Segmen 7 (Wishlist Kertas) dan Segmen 8 (Tiket Doa & Surat) KEMBALI PENUH KE LIGHT MODE (kertas linen hangat)
   const isNight = currentSegment === 5 || currentSegment === 6;
-  const isDusk = currentSegment === 7;
-  const isMidnight = currentSegment === 8;
 
   return (
     <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden select-none" style={{ contain: "strict" }}>
@@ -14,12 +14,12 @@ export function AtmosphereBackdrop({ currentSegment }) {
       <motion.div
         className="absolute inset-0"
         animate={{
-          background: isMidnight
-            ? "radial-gradient(circle at 50% 30%, #151D2C 0%, #0A0F18 100%)"
-            : isNight
+          background: isNight
             ? "radial-gradient(circle at 50% 35%, #182032 0%, #0E131E 100%)"
-            : isDusk
-            ? "radial-gradient(circle at 50% 40%, #283042 0%, #1A1F2B 100%)"
+            : currentSegment === 7
+            ? "radial-gradient(circle at 85% 20%, #FFFDF8 0%, #FAF3E6 50%, #F1E5D3 100%)"
+            : currentSegment === 8
+            ? "radial-gradient(circle at 50% 20%, #FFFDF8 0%, #FAF1E8 45%, #EFE1D2 100%)"
             : currentSegment === 4
             ? "radial-gradient(circle at 80% 20%, #FFFBF2 0%, #F5ECDD 45%, #ECDDC8 100%)"
             : "radial-gradient(circle at 85% 15%, #FFFDF5 0%, #FAF2E6 45%, #F2E4D2 100%)",
@@ -36,9 +36,9 @@ export function AtmosphereBackdrop({ currentSegment }) {
         }}
       />
 
-      {/* 3. Atmosfer Siang/Sore Hangat (Segmen 1, 2, 3, 4) */}
+      {/* 3. Atmosfer Siang/Sore Hangat (Light Mode: Segmen 1, 2, 3, 4, 7, 8) */}
       <AnimatePresence>
-        {!isNight && !isDusk && !isMidnight && (
+        {!isNight && (
           <motion.div
             key="day-atmosphere"
             initial={{ opacity: 0 }}
@@ -47,7 +47,7 @@ export function AtmosphereBackdrop({ currentSegment }) {
             transition={{ duration: 0.8 }}
             className="absolute inset-0 pointer-events-none"
           >
-            {/* Berkas Cahaya Matahari Sore Menggunakan Radial Gradient Berkinerja Tinggi (Bebas Lag Blur) */}
+            {/* Berkas Cahaya Matahari Sore Hangat (Radial Gradient Hardware Accelerated) */}
             <div
               className="absolute -top-16 -right-16 w-[380px] h-[380px] rounded-full pointer-events-none"
               style={{
@@ -136,7 +136,7 @@ export function AtmosphereBackdrop({ currentSegment }) {
         )}
       </AnimatePresence>
 
-      {/* 4. Efek Hujan & Malam Temaram (Segmen 5 Kaca Berembun & Segmen 6 Voice Notes) */}
+      {/* 4. Efek Hujan & Malam Temaram (Khusus Segmen 5 Kaca Berembun & Segmen 6 Voice Notes) */}
       <AnimatePresence>
         {isNight && (
           <motion.div
@@ -212,108 +212,6 @@ export function AtmosphereBackdrop({ currentSegment }) {
                   duration: 4 + i * 0.8,
                   repeat: Infinity,
                   ease: "easeInOut",
-                }}
-              />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* 5. Efek Senja Blue Hour (Segmen 7 Wishlist) */}
-      <AnimatePresence>
-        {isDusk && (
-          <motion.div
-            key="dusk-ambience"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-            className="absolute inset-0 pointer-events-none"
-          >
-            <div
-              className="absolute top-[20%] right-[-10%] w-80 h-80 rounded-full pointer-events-none"
-              style={{
-                background: "radial-gradient(circle, rgba(251,191,36,0.18) 0%, rgba(251,191,36,0.04) 50%, transparent 75%)",
-              }}
-            />
-            <div
-              className="absolute bottom-[20%] left-[-10%] w-80 h-80 rounded-full pointer-events-none"
-              style={{
-                background: "radial-gradient(circle, rgba(99,102,241,0.18) 0%, rgba(99,102,241,0.04) 50%, transparent 75%)",
-              }}
-            />
-            {[...Array(4)].map((_, i) => (
-              <motion.div
-                key={`dusk-fairy-${i}`}
-                className="absolute rounded-full bg-amber-200"
-                style={{
-                  width: "3.5px",
-                  height: "3.5px",
-                  top: `${18 + i * 18}%`,
-                  left: `${18 + (i * 22) % 64}%`,
-                  opacity: 0.35,
-                  willChange: "transform, opacity",
-                  transform: "translate3d(0,0,0)",
-                }}
-                animate={{
-                  opacity: [0.2, 0.55, 0.2],
-                  scale: [0.85, 1.2, 0.85],
-                }}
-                transition={{
-                  duration: 3.5 + i * 0.7,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* 6. Efek Midnight Starlight Berkah (Segmen 8 Closing) */}
-      <AnimatePresence>
-        {isMidnight && (
-          <motion.div
-            key="midnight-ambience"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2 }}
-            className="absolute inset-0 pointer-events-none"
-          >
-            <div
-              className="absolute top-[18%] left-1/2 -translate-x-1/2 w-96 h-96 rounded-full pointer-events-none"
-              style={{
-                background: "radial-gradient(circle, rgba(252,211,77,0.14) 0%, rgba(252,211,77,0.03) 50%, transparent 75%)",
-              }}
-            />
-            <div
-              className="absolute bottom-[10%] left-1/3 w-80 h-80 rounded-full pointer-events-none"
-              style={{
-                background: "radial-gradient(circle, rgba(251,113,133,0.12) 0%, rgba(251,113,133,0.03) 50%, transparent 75%)",
-              }}
-            />
-            {[...Array(5)].map((_, i) => (
-              <motion.div
-                key={`starlight-${i}`}
-                className="absolute rounded-full bg-[#FFF4DC]"
-                style={{
-                  width: `${2.5 + (i % 2)}px`,
-                  height: `${2.5 + (i % 2)}px`,
-                  top: `${12 + i * 15}%`,
-                  left: `${10 + (i * 19) % 75}%`,
-                  willChange: "transform, opacity",
-                  transform: "translate3d(0,0,0)",
-                }}
-                animate={{
-                  opacity: [0.15, 0.65, 0.15],
-                  scale: [0.85, 1.25, 0.85],
-                }}
-                transition={{
-                  duration: 3 + (i % 3) * 0.8,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: i * 0.25,
                 }}
               />
             ))}
