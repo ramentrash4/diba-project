@@ -155,10 +155,10 @@ export function Segment1Prolog({ onComplete }) {
                     Penerima:
                   </span>
                   <span className="text-2xl sm:text-3xl text-[#120C08] font-black block leading-tight">
-                    Adiba (Askiyaa)
+                    Adiba Askiyaa
                   </span>
                   <span className="text-xs text-[#382C20] font-sans-ui font-bold block mt-0.5">
-                    Ilmu Komputer — Angkatan 2025
+                    KEMAKOM — Angkatan 2025
                   </span>
                   <span className="text-sm text-[#8C2318] font-black block mt-1">
                     Dari: {scrapbookData.recipient.sender}
