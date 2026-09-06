@@ -20,7 +20,7 @@ export function Segment5KacaEmbun({ onComplete }) {
   const [activeTab, setActiveTab] = useState(0);
 
   // Status bersihnya embun untuk tiap jendela
-  const [clearedTabs, setClearedTabs] = useState({ 0: false, 1: false, 2: false });
+  const [clearedTabs, setClearedTabs] = useState({});
 
   // Persentase embun yang terhapus pada jendela saat ini
   const [clearedPercent, setClearedPercent] = useState(0);
@@ -274,8 +274,8 @@ export function Segment5KacaEmbun({ onComplete }) {
             <span>Malam Dingin di Kafe • 14 Oktober</span>
           </div>
 
-          <h2 className="font-handwriting text-2xl sm:text-3xl text-amber-200 font-black tracking-wide drop-shadow-md">
-            Hal-hal Kecil Tentangmu ✨
+          <h2 className="font-handwriting text-xl sm:text-2xl text-amber-200 font-black tracking-wide drop-shadow-md text-center max-w-[310px] leading-tight pt-0.5">
+            Hal-hal Kecil yang Aku Kangenin dari Kamu ✨
           </h2>
 
           {/* Indikator Posisi Kaca Memori (Murni Visual Dots, Bukan Tombol) */}
@@ -323,8 +323,8 @@ export function Segment5KacaEmbun({ onComplete }) {
             </div>
 
             {/* Pesan Manis yang Tersingkap */}
-            <div className="my-auto px-2 py-3 flex flex-col items-center justify-center">
-              <p className="font-handwriting text-xl sm:text-2xl text-amber-100 font-bold leading-relaxed drop-shadow-sm">
+            <div className="my-auto px-1 sm:px-2 py-2 flex flex-col items-center justify-center">
+              <p className="font-handwriting text-lg sm:text-[21px] text-amber-100 font-bold leading-relaxed drop-shadow-sm">
                 "{currentItem.hiddenText}"
               </p>
             </div>

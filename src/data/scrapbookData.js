@@ -102,26 +102,26 @@ export const scrapbookData = {
   // 5. Segmen 4: Kamus Bahasa Kita (Inside Jokes)
   dictionary: [
     {
-      word: "Mukjekkk",
-      phonetic: "/muk·jekkk/",
+      word: "Mukjek",
+      phonetic: "/muk·jek/",
       type: "ungkapan / kode rahasia",
       definition:
         "Bahasa rahasia yang biasa kita ucapin kalau lagi asyik ngegibahin hal random di sekitar kita hehe.",
       example:
-        "Tatwa: 'Liat deh orang di meja seberang...' — Diba: 'Mukjekkk! Jangan keras-keras ih!' *sambil nahan ketawa* 🤫",
+        "Diba: 'eh itu itu wa ada orang' — Tatwa: 'ihh mukjek anying' — Diba: 'tertawa dan menutup mulut'",
       secretFootnote:
-        "Setiap kata ini keluar, auto saling lirik terus langsung ketawa kecil berdua tanpa ada orang lain yang paham kodenya. 😂🤫",
+        "kalo kata mukjek udah keluar berarti kita lagi mode tengil tengilnya. 😂🤫",
     },
     {
       word: "Mam",
-      phonetic: "/ma·aam/",
+      phonetic: "/maaam/",
       type: "verba / sinyal manja",
       definition:
         "Kata sakti yang mendadak keluar kalau Adiba lagi laper parah dan kangen, biasanya diiringi nada manja.",
       example:
-        "Diba: 'Tatwaaa... mam 🥺' — Tatwa: 'Mau mam apa hari ini? Bakso apa seblak favorit kamu?' 🍜",
+        "Diba: 'mau mammm dimana' — Tatwa: 'sate pengkolan ga siii' 🍜",
       secretFootnote:
-        "Kalau kata 'mam' udah keluar dengan nada gemasnya, artinya Tatwa harus sigap nyiapin makanan sebelum cemberutnya makin bertambah. 😋🍽️",
+        "Kalau kata 'mam' udah keluar dengan nada gemasnya, artinya Tatwa harus nyediaiin tempat sebelum cemberutnya makin bertambah. 😋🍽️",
     },
     {
       word: "Achuuu",
@@ -130,28 +130,37 @@ export const scrapbookData = {
       definition:
         "Imbuhan penutup kalimat paling istimewa yang cuma boleh dan cuma pernah dipakai kalau lagi sama kamu.",
       example:
-        "Diba: 'Makasih banyak yaaa Tatwa achuuu...' — Tatwa: 'Sama-sama manusia favorit Tatwa 🫶🏼'",
+        "Diba: 'eh wa tau ga sii, bunda achuuu ngajakin ke singapur' — Tatwa: 'ih kayaaaa' — Diba: 'iyalaaa orang bunda achuuu' —",
       secretFootnote:
-        "Imbuhan yang paling bikin meleleh dan cuma milik kita berdua. Gak akan pernah ada yang bisa gantiin panggilan ini. 🥺❤️",
+        "pokoknya kalau imbuhan itu udah keluar, artinya hal itu udah jadi kepemilikanmu.....",
     },
   ],
 
-  // 6. Segmen 5: Hal-hal Kecil (Kaca Berembun)
+  // 6. Segmen 5: Hal-hal Kecil yang Aku Kangenin dari Kamu (Kaca Berembun)
   foggyGlass: [
     {
       id: "fog-1",
       title: "Hal Kecil #1",
-      hiddenText: "Cara bicaramu yang tiba-tiba jadi cepet banget kalau lagi antusias nyeritain hal yang kamu suka.",
+      hiddenText:
+        "Caraaa kamu manggil nama akuu \" Awaaaa... awaaaa. \" yg dipanggil badan yg nengok hati tauuu",
     },
     {
       id: "fog-2",
       title: "Hal Kecil #2",
-      hiddenText: "Kebiasaanmu mencatat hal-hal kecil di sticky notes warna-warni yang selalu tertempel di buku.",
+      hiddenText:
+        "Caraa kamu nyeritaun sesuatu... dari hening tiba² excited seketika dan langsung ngelirik dgn tatapan sinis namun lucukkk",
     },
     {
       id: "fog-3",
       title: "Hal Kecil #3",
-      hiddenText: "Gayamu kalau lagi ngambek tapi masih peduli dan nanyain 'Udah makan belum?'.",
+      hiddenText:
+        "Cara kamuu ngambekk, tiba tiba geser duduknyaa dan reflek nyubitt akuuu... sakit sih tapi canduu",
+    },
+    {
+      id: "fog-4",
+      title: "Hal Kecil #4",
+      hiddenText:
+        "aku paling suka kalo kamuu menggunakan bahasa bayikkk... contohh \" ih mayah mayah\"",
     },
   ],
 
